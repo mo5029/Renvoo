@@ -7,9 +7,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/cli.ts",
-    "site:dev": "vite --config config/vite.site.config.mjs",
-    "site:build": "vite build --config config/vite.site.config.mjs && node config/site-postbuild.mjs",
-    "site:preview": "vite preview --config config/vite.site.config.mjs",
+    "site:generate": "node config/generate-site-pages.mjs",
+    "site:dev": "npm run site:generate && vite --config config/vite.site.config.mjs",
+    "site:build": "npm run site:generate && vite build --config config/vite.site.config.mjs && node config/site-postbuild.mjs",
+    "site:preview": "npm run site:generate && vite preview --config config/vite.site.config.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "memory:init": "npm run build && node dist/src/cli.js init",

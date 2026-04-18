@@ -61,6 +61,8 @@ memory/
 
 The repo now also includes a clinic-facing marketing site under `src/site/`.
 
+- Regenerate the static page set from the shared bilingual content source:
+  - `npm run site:generate`
 - Start local website dev:
   - `npm run site:dev`
 - Build the static website:
@@ -69,6 +71,7 @@ The repo now also includes a clinic-facing marketing site under `src/site/`.
   - `npm run site:preview`
 
 Website build output goes to `dist/site/`.
+The public funnel is Dutch-first at the root and mirrored in English under `src/site/en/`.
 If you set `SITE_URL=https://your-domain.example` when running `npm run site:build`, the build also generates `sitemap.xml` and a `robots.txt` file that includes the sitemap location.
 
 Deployment notes live in `docs/website/deployment.md`.

@@ -2,17 +2,31 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import fg from "fast-glob";
+
 const configDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(configDir, "..");
 const distDir = resolve(projectRoot, "dist/site");
 
 const rawSiteUrl = process.env.SITE_URL?.trim();
 const siteUrl = rawSiteUrl ? rawSiteUrl.replace(/\/+$/, "") : "";
-const socialImageUrl = siteUrl ? `${siteUrl}/social-preview.png` : "./social-preview.png";
-
 const robotsLines = ["User-agent: *", "Allow: /"];
-const htmlFiles = ["index.html", "privacy.html", "patient-notice.html", "404.html"];
-const sitemapPaths = ["/", "/privacy.html", "/patient-notice.html"];
+
+const htmlFiles = fg.sync(["**/*.html"], {
+  cwd: distDir,
+  onlyFiles: true,
+});
+
+const sitemapPaths = htmlFiles
+  .filter((file) => !file.endsWith("404.html"))
+  .map((file) => {
+    const normalized = file.replace(/\\/g, "/");
+    return normalized === "index.html"
+      ? "/"
+      : normalized.endsWith("/index.html")
+        ? `/${normalized.slice(0, -"index.html".length)}`
+        : `/${normalized}`;
+  });
 
 if (siteUrl) {
   robotsLines.push("", `Sitemap: ${siteUrl}/sitemap.xml`);
@@ -35,16 +49,27 @@ if (siteUrl) {
 for (const htmlFile of htmlFiles) {
   const filePath = resolve(distDir, htmlFile);
   let html = await readFile(filePath, "utf8");
+  const normalized = htmlFile.replace(/\\/g, "/");
+  const pagePath =
+    normalized === "index.html"
+      ? "/"
+      : normalized.endsWith("/index.html")
+        ? `/${normalized.slice(0, -"index.html".length)}`
+        : `/${normalized}`;
+  const depth = normalized.split("/").length - 1;
+  const socialImageRelative = `${depth ? "../".repeat(depth) : "./"}social-preview.png`;
+  const canonicalUrl = siteUrl ? `${siteUrl}${pagePath}` : "";
+  const socialImageUrl = siteUrl ? `${siteUrl}/social-preview.png` : socialImageRelative;
 
   if (siteUrl) {
     html = html
-      .replaceAll("__SITE_URL__", siteUrl)
+      .replaceAll("__CANONICAL_URL__", canonicalUrl)
       .replaceAll("__SOCIAL_IMAGE__", socialImageUrl);
   } else {
     html = html
-      .replace(/^\s*<meta\s+property="og:url"\s+content="__SITE_URL__\/"\s*\/>\n?/m, "")
-      .replace(/^\s*<link\s+rel="canonical"\s+href="__SITE_URL__\/"\s*\/>\n?/m, "")
-      .replaceAll("__SOCIAL_IMAGE__", "./social-preview.png");
+      .replace(/^\s*<meta\s+property="og:url"\s+content="__CANONICAL_URL__"\s*\/>\n?/m, "")
+      .replace(/^\s*<link\s+rel="canonical"\s+href="__CANONICAL_URL__"\s*\/>\n?/m, "")
+      .replaceAll("__SOCIAL_IMAGE__", socialImageRelative);
   }
 
   await writeFile(filePath, html, "utf8");
