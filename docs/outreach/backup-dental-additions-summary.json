@@ -1,0 +1,68 @@
+{
+  "candidate_count": 981,
+  "qualified_additions": 142,
+  "cities": {
+    "Amersfoort": 9,
+    "Amstelveen": 5,
+    "Amsterdam": 41,
+    "Delft": 3,
+    "Den Haag": 33,
+    "Dordrecht": 2,
+    "Gouda": 5,
+    "Haarlem": 7,
+    "Leiden": 5,
+    "Rotterdam": 32
+  },
+  "top10": [
+    {
+      "city": "Den Haag",
+      "clinic_name": "Dental Clinics Den Haag Thomsonlaan",
+      "contact_email": "denhaag@dentalclinics.nl"
+    },
+    {
+      "city": "Amsterdam",
+      "clinic_name": "Tandartspraktijk Jan van Galen",
+      "contact_email": "info@tandartspraktijkjanvangalen.nl"
+    },
+    {
+      "city": "Rotterdam",
+      "clinic_name": "Dental Clinics Rotterdam Zuiderterras",
+      "contact_email": "zuiderterras@dentalclinics.nl"
+    },
+    {
+      "city": "Gouda",
+      "clinic_name": "Dental Clinics Gouda B\u00fcchnerweg",
+      "contact_email": "buchnerweg@dentalclinics.nl"
+    },
+    {
+      "city": "Delft",
+      "clinic_name": "Dental Clinics Delft",
+      "contact_email": "delft@dentalclinics.nl"
+    },
+    {
+      "city": "Amsterdam",
+      "clinic_name": "Tandartspraktijk De Liefde",
+      "contact_email": "info@tandartspraktijkdeliefde.nl"
+    },
+    {
+      "city": "Amsterdam",
+      "clinic_name": "Kesseler Lock Tandheelkunde en Implantologie",
+      "contact_email": "info@implantologie.nl"
+    },
+    {
+      "city": "Amsterdam",
+      "clinic_name": "Dental Clinics Amsterdam Reguliersgracht",
+      "contact_email": "reguliersgracht@dentalclinics.nl"
+    },
+    {
+      "city": "Leiden",
+      "clinic_name": "Van Leeuwen Tandartsen - centrum voor mondzorg en implantologie Leiden",
+      "contact_email": "info@vanleeuwen-tandartsen.nl"
+    },
+    {
+      "city": "Dordrecht",
+      "clinic_name": "Dental Clinics Dordrecht Kuipershaven",
+      "contact_email": "kuipershaven@dentalclinics.nl"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+# Renvoo Memory System
+
+This workspace now contains a from-scratch memory system designed for long-term use with an Obsidian-compatible vault for active reasoning and a Pinecone archive for large semantic recall. It is grounded in Karpathy's `llm-wiki.md` gist, vendored locally under `vendor/karpathy-llm-wiki/`.
+
+## What it fixes
+
+The basic "Obsidian + LLM wiki" pattern in the transcript is useful, but it breaks down when the vault gets large. This build adds:
+
+- Sharded indexes instead of one ever-growing global index.
+- Semantic archive search with Pinecone for bulky or cold content.
+- Drift and contradiction tracking through lint reports and source-linked notes.
+- Monthly logs and compaction hooks so the working set stays small.
+- A static agent profile separate from changing memory so identity does not bloat.
+
+## Layout
+
+```text
+memory/
+  .obsidian/               Obsidian-friendly vault settings
+  assets/                  Downloaded images and attachments
+  archive/                 Pinecone sync metadata and local cache
+  raw/                     Original sources
+  system/                  Stable identity, rules, and domain definitions
+  wiki/
+    contradictions.md
+    log.md
+    indexes/
+    topics/
+    entities/
+    decisions/
+    sources/
+    maintenance/
+    queries/
+```
+
+## Quick start
+
+1. `cp .env.example .env`
+2. Add `OPENAI_API_KEY` if you want LLM-assisted synthesis and answers.
+3. Add `PINECONE_API_KEY` if you want semantic archive search and long-term cold storage.
+4. `npm install`
+5. `npm run memory:init`
+6. Open the `memory/` folder as an Obsidian vault if you want the visual graph layer.
+
+## Daily workflow
+
+- Ingest content:
+  - `npm run memory:ingest -- --file /absolute/path/to/file.md`
+  - `npm run memory:ingest -- --url https://example.com/article`
+  - `npm run memory:ingest -- --text "short note text" --title "Idea capture"`
+- Query memory:
+  - `npm run memory:query -- --question "What matters most about X?"`
+- Check health:
+  - `npm run memory:lint`
+- Rebuild indexes and compact the hot layer:
+  - `npm run memory:compact`
+- Inspect status:
+  - `npm run memory:status`
+
+## Website
+
+The repo now also includes a clinic-facing marketing site under `src/site/`.
+
+- Start local website dev:
+  - `npm run site:dev`
+- Build the static website:
+  - `npm run site:build`
+- Preview the built website:
+  - `npm run site:preview`
+
+Website build output goes to `dist/site/`.
+If you set `SITE_URL=https://your-domain.example` when running `npm run site:build`, the build also generates `sitemap.xml` and a `robots.txt` file that includes the sitemap location.
+
+Deployment notes live in `docs/website/deployment.md`.
+
+## Content model
+
+Keep only distilled, active reasoning in the wiki. Large transcripts, PDFs, exports, and archives belong in Pinecone-backed storage with summarized wiki notes pointing back to them.
+
+That is the main architectural fix for the scaling problem in the original pattern:
+
+- `system/` is identity and stable rules.
+- `wiki/` is active reasoning and evolving judgment.
+- `archive/` is semantic recall for large and stable source material.
+
+## Notes
+
+- If `OPENAI_API_KEY` is missing, ingestion falls back to a deterministic local draft flow.
+- If `PINECONE_API_KEY` is missing, archive sync is skipped and query falls back to local vault search only.

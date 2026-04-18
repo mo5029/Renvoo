@@ -1,0 +1,40 @@
+{
+  "name": "renvoo-memory-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Obsidian-compatible memory system with Pinecone archive and maintenance tooling.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli.ts",
+    "site:dev": "vite --config config/vite.site.config.mjs",
+    "site:build": "vite build --config config/vite.site.config.mjs && node config/site-postbuild.mjs",
+    "site:preview": "vite preview --config config/vite.site.config.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "memory:init": "npm run build && node dist/src/cli.js init",
+    "memory:ingest": "npm run build && node dist/src/cli.js ingest",
+    "memory:query": "npm run build && node dist/src/cli.js query",
+    "memory:lint": "npm run build && node dist/src/cli.js lint",
+    "memory:compact": "npm run build && node dist/src/cli.js compact",
+    "memory:status": "npm run build && node dist/src/cli.js status"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "commander": "^14.0.1",
+    "dotenv": "^17.2.3",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "pdf-parse": "^1.1.1",
+    "slugify": "^1.6.6",
+    "turndown": "^7.2.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.8",
+    "vitest": "^4.0.3"
+  }
+}

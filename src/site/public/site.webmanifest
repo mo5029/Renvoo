@@ -1,0 +1,15 @@
+{
+  "name": "Renvoo",
+  "short_name": "Renvoo",
+  "description": "Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.",
+  "theme_color": "#0d667c",
+  "background_color": "#f4efe8",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "./icons/favicon.png",
+      "sizes": "653x812",
+      "type": "image/png"
+    }
+  ]
+}

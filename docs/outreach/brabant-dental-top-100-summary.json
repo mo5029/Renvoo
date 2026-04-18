@@ -1,0 +1,43 @@
+{
+  "total_city_candidates": 1171,
+  "qualified_with_email_and_unsent": 140,
+  "written_top_records": 100,
+  "core_brainport_records": 14,
+  "brabant_extended_records": 24,
+  "adjacent_south_records": 33,
+  "national_backup_records": 29,
+  "quality_tier_breakdown": {
+    "A": 100,
+    "B": 0,
+    "C": 0,
+    "D": 0
+  },
+  "cities": {
+    "Amersfoort": 5,
+    "Amstelveen": 3,
+    "Arnhem": 4,
+    "Bergen op Zoom": 2,
+    "Best": 1,
+    "Breda": 5,
+    "Delft": 2,
+    "Den Bosch": 5,
+    "Dordrecht": 1,
+    "Eindhoven": 10,
+    "Geleen": 1,
+    "Gouda": 2,
+    "Haarlem": 3,
+    "Helmond": 2,
+    "Leiden": 3,
+    "Maastricht": 3,
+    "Nijmegen": 8,
+    "Oss": 3,
+    "Roosendaal": 1,
+    "Rotterdam": 10,
+    "Tilburg": 6,
+    "Uden": 2,
+    "Utrecht": 13,
+    "Veldhoven": 1,
+    "Venlo": 2,
+    "Weert": 2
+  }
+}
