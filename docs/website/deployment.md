@@ -1,6 +1,7 @@
 # Renvoo Website Deployment
 
 The clinic website is a static Vite build.
+The root site is Dutch-first, with mirrored English routes under `/en/`.
 
 ## Build
 
@@ -10,11 +11,19 @@ SITE_URL=https://your-domain.example npm run site:build
 ```
 
 The static output goes to `dist/site/`.
+`npm run site:build` regenerates the bilingual HTML pages before Vite builds them.
 
 ## What the build includes
 
 - `index.html`
+- `product.html`
+- `pilot.html`
+- `trust.html`
 - `404.html`
+- `en/index.html`
+- `en/product.html`
+- `en/pilot.html`
+- `en/trust.html`
 - `robots.txt`
 - `site.webmanifest`
 - `sitemap.xml` when `SITE_URL` is set
@@ -46,6 +55,7 @@ This repo now includes:
 ## Verification Checklist
 
 - Homepage loads without broken assets
+- Product, pilot, and trust pages load in Dutch and English
 - `downloads/renvoo-clinic-one-pager.pdf` opens
 - `downloads/renvoo-clinic-deck.pptx` downloads
 - `404.html` renders correctly

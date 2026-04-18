@@ -1,63 +1,93 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Renvoo | Page not found</title>
-    <meta
-      name="description"
-      content="The page you requested was not found. Return to the Renvoo clinic website."
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./icons/favicon.png"
-    />
-    <link
-      rel="stylesheet"
-      href="./styles.css"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renvoo | Pagina niet gevonden</title>
+    <meta name="description" content="De gevraagde Renvoo-pagina bestaat niet of is verplaatst." />
+    <meta name="theme-color" content="#f4efe7" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Renvoo | Pagina niet gevonden" />
+    <meta property="og:description" content="De gevraagde Renvoo-pagina bestaat niet of is verplaatst." />
+    <meta property="og:url" content="__CANONICAL_URL__" />
+    <meta property="og:image" content="__SOCIAL_IMAGE__" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Renvoo | Pagina niet gevonden" />
+    <meta name="twitter:description" content="De gevraagde Renvoo-pagina bestaat niet of is verplaatst." />
+    <meta name="twitter:image" content="__SOCIAL_IMAGE__" />
+    <link rel="canonical" href="__CANONICAL_URL__" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="./icons/favicon.png" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
-    <div class="page-glow page-glow-one"></div>
-    <div class="page-glow page-glow-two"></div>
-
-    <main class="section-shell not-found-page">
-      <div class="not-found-card">
-        <img
-          class="not-found-logo"
-          src="./assets/renvoo-logo-horizontal.png"
-          alt="Renvoo"
-        />
-        <p class="eyebrow">Page not found</p>
-        <h1>The page you were looking for is not here.</h1>
-        <p class="lead">
-          The safest next step is to go back to the clinic site and continue from the core Renvoo
-          overview.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="./index.html">Return to the homepage</a>
-          <a class="button button-secondary" href="./downloads/renvoo-clinic-one-pager.pptx" download>
-            Download the one-pager
-          </a>
+  <body class="page-notFound lang-nl" data-lang="nl" data-page="notFound" data-prefix="." data-switch-lang="en">
+    <a class="skip-link" href="#content">Ga naar inhoud</a>
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
+    <header class="site-header" data-header>
+  <div class="site-header-inner">
+    <a class="brand-mark" href="./index.html" aria-label="Renvoo Start">
+      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" width="1200" height="320" />
+      <span>Operationele SaaS voor rustigere agenda's</span>
+    </a>
+    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open navigatie">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="site-nav-shell" data-site-nav-shell>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="" href="./index.html">Start</a><a class="" href="./product.html">Product</a><a class="" href="./pilot.html">Pilot</a><a class="" href="./trust.html">Vertrouwen</a>
+      </nav>
+      <div class="site-header-actions">
+        <a class="language-switch" href="./en/404.html" data-track="language_switched">EN</a>
+        <a class="header-cta" href="./pilot.html#booking" data-track="nav_book_meeting">Plan gesprek</a>
+      </div>
+    </div>
+  </div>
+</header>
+    <main id="content" class="site-main">
+      
+    <section class="chapter hero-page hero-not-found">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">404</p>
+          <h1>Deze pagina bestaat niet meer.</h1>
+          <p class="hero-lead">Ga terug naar de funnel en kies opnieuw of u eerst product, vertrouwen of direct het validatiegesprek wilt bekijken.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="./index.html">Terug naar start</a><a class="button button-secondary" href="./pilot.html">Naar planner</a>
+          </div>
         </div>
       </div>
+    </section>
+  
     </main>
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-summary">
+      <p class="footer-kicker">Renvoo</p>
+      <p>Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen.</p>
+    </div>
+    <div>
+      <p class="footer-title">Funnel</p>
+      <ul class="footer-links"><li><a href="./index.html">Start</a></li><li><a href="./product.html">Product</a></li><li><a href="./pilot.html">Pilot</a></li><li><a href="./trust.html">Vertrouwen</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Juridisch</p>
+      <ul class="footer-links"><li><a href="./privacy.html">Privacyverklaring website</a></li><li><a href="./patient-notice.html">Notitie patiëntbericht</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Taal</p>
+      <ul class="footer-links"><li><a href="./en/404.html">English</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-meta">
+    <p>Gebouwd rond pilot-proof, niet rond opgeblazen claims.</p>
+    <p><span data-year></span> Renvoo</p>
+  </div>
+</footer>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>
