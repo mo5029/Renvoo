@@ -5,7 +5,7 @@ This file is the locked copy source for the clinic deck and the one-pager.
 ## Canonical Strings
 
 - Main headline: `Reduce no-shows. Recover lost appointments.`
-- One-sentence description: `Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.`
+- One-sentence description: `Renvoo is a B2B clinic SaaS for Dutch dental clinics that helps reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.`
 - Founder credibility line: `Renvoo is being built by Mohamed Ibrahim, former Electrical Subteam Lead for Team Polar at TU/e and part of the NVIDIA 6G Developer Program.`
 - Pricing line: `Preliminary pilot pricing starts at EUR 2.49 per appointment, plus a fixed fee depending on the clinic. Final pricing is still being shaped with pilot partners.`
 - CTA line: `We are looking for a short validation meeting with a dental clinic owner or practice manager to review your current no-show and rescheduling workflow.`
@@ -13,8 +13,10 @@ This file is the locked copy source for the clinic deck and the one-pager.
 ## Messaging Guardrails
 
 - Audience: dental clinic owners, practice managers, and operations-minded leads
+- Product shape: B2B clinic SaaS, not a patient platform
 - Positioning: operational AI, not clinical AI
 - Data boundary: non-clinical administrative scheduling and communication data only
+- Patient interaction: secure links and clinic-triggered messages, with no patient accounts in v1
 - Adoption posture: low-friction, CSV-first or read-only onboarding first
 - Tone: practical, credible, operator-facing
 - Proof posture: scenario math and operating logic, not unproven pilot claims
@@ -25,7 +27,7 @@ This file is the locked copy source for the clinic deck and the one-pager.
 
 - Kicker: `For Dutch dental clinics`
 - Headline: `Reduce no-shows. Recover lost appointments.`
-- Description: `Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.`
+- Description: `Renvoo is a B2B clinic SaaS for Dutch dental clinics that helps reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.`
 
 ### Slide 2
 
@@ -60,7 +62,7 @@ This file is the locked copy source for the clinic deck and the one-pager.
 ### Slide 8
 
 - Title: `Low-friction for clinics by design`
-- Subtitle: `The workflow is designed around operational data, clinic control, and lightweight onboarding.`
+- Subtitle: `The workflow is designed around operational data, clinic control, and lightweight onboarding without patient accounts in v1.`
 
 ### Slide 9
 
@@ -86,4 +88,3 @@ This file is the locked copy source for the clinic deck and the one-pager.
 - Any string shared between deck and one-pager must match exactly.
 - No alternate pricing, founder, or CTA phrasing is allowed.
 - All cost language must remain preliminary.
-

@@ -16,6 +16,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(projectRoot, "src/site/index.html"),
+        privacy: resolve(projectRoot, "src/site/privacy.html"),
+        patientNotice: resolve(projectRoot, "src/site/patient-notice.html"),
         notFound: resolve(projectRoot, "src/site/404.html"),
       },
     },

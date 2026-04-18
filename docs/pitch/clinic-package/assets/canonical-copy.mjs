@@ -3,7 +3,7 @@ export const BRAND = {
   audience: "For Dutch dental clinics",
   headline: "Reduce no-shows. Recover lost appointments.",
   oneSentence:
-    "Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.",
+    "Renvoo is a B2B clinic SaaS for Dutch dental clinics that helps reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work.",
   founderLine:
     "Renvoo is being built by Mohamed Ibrahim, former Electrical Subteam Lead for Team Polar at TU/e and part of the NVIDIA 6G Developer Program.",
   pricingLine:
@@ -182,7 +182,8 @@ export const DECK = {
       id: "low-friction",
       section: "solution",
       title: "Low-friction for clinics by design",
-      subtitle: "The workflow is designed around operational data, clinic control, and lightweight onboarding.",
+      subtitle:
+        "The workflow is designed around operational data, clinic control, and lightweight onboarding without patient accounts in v1.",
       cards: [
         {
           title: "Administrative data only",
@@ -193,12 +194,12 @@ export const DECK = {
           body: "CSV-first and read-only onboarding paths reduce integration friction while pilots are being validated.",
         },
         {
-          title: "Clinic control and auditability",
-          body: "The clinic stays in control of patient workflows and operational decisions.",
+          title: "No patient accounts in v1",
+          body: "Patient confirmations and rescheduling can happen through secure links without adding a new patient portal.",
         },
       ],
       notes:
-        "This is where trust is built. Emphasize narrow data boundaries and low-friction operational fit.",
+        "This is where trust is built. Emphasize narrow data boundaries, low-friction operational fit, and the simple clinic-SaaS posture.",
       sourceKeys: ["compliance", "roadmap"],
     },
     {
@@ -245,7 +246,7 @@ export const ONE_PAGER = {
   trustPoints: [
     "Administrative scheduling and communication data only",
     "Lightweight onboarding paths first",
-    "Clinic control and auditability by design",
+    "Secure links instead of patient accounts in v1",
   ],
   pricingLine: BRAND.pricingLine,
   founderLine: BRAND.founderLine,

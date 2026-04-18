@@ -13,7 +13,7 @@ This package contains the clinic-facing Renvoo materials for dental outreach.
 
 - English-first
 - Dental-first
+- B2B clinic SaaS, not a patient platform
 - `70%` problem, `20%` solution, `10%` cost
 - Same theme, same copy spine, same CTA across deck and one-pager
 - Pricing is presented as preliminary pilot pricing only
-

@@ -11,6 +11,8 @@ const siteUrl = rawSiteUrl ? rawSiteUrl.replace(/\/+$/, "") : "";
 const socialImageUrl = siteUrl ? `${siteUrl}/social-preview.png` : "./social-preview.png";
 
 const robotsLines = ["User-agent: *", "Allow: /"];
+const htmlFiles = ["index.html", "privacy.html", "patient-notice.html", "404.html"];
+const sitemapPaths = ["/", "/privacy.html", "/patient-notice.html"];
 
 if (siteUrl) {
   robotsLines.push("", `Sitemap: ${siteUrl}/sitemap.xml`);
@@ -22,9 +24,7 @@ if (siteUrl) {
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    "  <url>",
-    `    <loc>${siteUrl}/</loc>`,
-    "  </url>",
+    ...sitemapPaths.flatMap((pathname) => ["  <url>", `    <loc>${siteUrl}${pathname}</loc>`, "  </url>"]),
     "</urlset>",
     "",
   ].join("\n");
@@ -32,7 +32,7 @@ if (siteUrl) {
   await writeFile(resolve(distDir, "sitemap.xml"), sitemap, "utf8");
 }
 
-for (const htmlFile of ["index.html", "404.html"]) {
+for (const htmlFile of htmlFiles) {
   const filePath = resolve(distDir, htmlFile);
   let html = await readFile(filePath, "utf8");
 

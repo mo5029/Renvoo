@@ -73,6 +73,17 @@ If you set `SITE_URL=https://your-domain.example` when running `npm run site:bui
 
 Deployment notes live in `docs/website/deployment.md`.
 
+## Legal Pack
+
+The repo now also includes a simple clinic-SaaS legal and compliance pack under `docs/legal/`.
+
+- `docs/legal/contracts/`: pilot MSA, DPA, security annex, and pilot SOW templates
+- `docs/legal/privacy/`: data inventory, retention matrix, processor register, breach SOP, DPIA-lite, and notice drafts
+- `docs/legal/corporate/`: BV setup checklist and IP assignment templates
+- `docs/legal/regulatory/`: non-clinical software classification memo
+
+These are starter templates for Renvoo's Dutch dental-clinic pilot motion and should still be reviewed by Dutch counsel before signature or launch.
+
 ## Content model
 
 Keep only distilled, active reasoning in the wiki. Large transcripts, PDFs, exports, and archives belong in Pinecone-backed storage with summarized wiki notes pointing back to them.
