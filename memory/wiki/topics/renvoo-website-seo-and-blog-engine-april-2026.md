@@ -154,6 +154,17 @@ That keeps the system easy to inspect, safer for early-stage claims, and easier 
 - The daily blog pipeline is safe-by-default, but durable auto-publishing still depends on the right environment variables and GitHub/Vercel setup.
 - `SITE_URL` is required for production canonicals, `hreflang`, and sitemap generation. Local builds intentionally omit those tags when the variable is missing.
 
+## Launch Status
+
+As of the latest April 24, 2026 launch-prep step:
+
+- the launch branch was pushed
+- `main` was updated to the launch-ready code
+- Vercel build config was pointed at `https://renvoo.nl`
+- the public contact path was set to `mohamed.ibrahim5029@gmail.com`
+
+The main unresolved step is platform-side, not repo-side: the GitHub repo still needs to be imported into a Vercel project and have the custom domain attached there.
+
 ## Sources
 
 - [[wiki/sources/renvoo-seo-and-ai-search-growth-engine-april-2026]]

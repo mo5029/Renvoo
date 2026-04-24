@@ -103,6 +103,20 @@ On April 24, 2026, a Codex desktop heartbeat automation was created for ongoing 
 
 This matters because it removes the requirement for a user-managed `OPENAI_API_KEY` in order to keep the content pipeline moving inside the Codex app workflow.
 
+## Launch Prep Status
+
+Later on April 24, 2026, the production launch path was prepared further:
+
+- the current launch work was committed and pushed to `origin/codex/seo-ai-growth-engine`
+- the same work was fast-forwarded onto `main` and pushed to `origin/main`
+- `vercel.json` was updated so Vercel builds use:
+  - `SITE_URL=https://renvoo.nl`
+  - `SITE_CONTACT_EMAIL=mohamed.ibrahim5029@gmail.com`
+
+That means the repository itself is now aligned to the intended production domain and public contact route.
+
+The remaining blocker is no longer code. The remaining blocker is the one-time Vercel project import plus adding `renvoo.nl` and `www.renvoo.nl` to that project in Vercel.
+
 ## Key Files
 
 - `src/site/lib/site-content.js`
@@ -155,6 +169,7 @@ Important env vars:
 - The build now emits AI-search-friendly and SEO-friendly artifacts including schema markup, breadcrumbs, `robots.txt`, `sitemap.xml`, and `llms.txt`. (high) — `src/site/lib/site-render.js`, `config/site-postbuild.mjs`
 - The repo now contains a daily blog pipeline that can research, draft, validate, and optionally persist posts, but still defaults to conservative draft-oriented behavior when signals are weak or configuration is incomplete. (high) — `src/lib/blog-generator.js`, `scripts/generate-daily-blog.js`, `api/cron/daily-blog.js`
 - Renvoo now also has an app-level recurring automation that can generate and document blog drafts without relying on a user-managed OpenAI API key inside the repo itself. (high) — Codex automation `daily-renvoo-blog-draft`
+- The current production-ready code has been pushed to `main`, and Vercel build config now targets `https://renvoo.nl` with `mohamed.ibrahim5029@gmail.com` as the public contact route. (high) — `git push origin main`, `vercel.json`
 
 ## Human Notes
 
