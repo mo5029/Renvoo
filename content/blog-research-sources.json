@@ -1,0 +1,26 @@
+[
+  {
+    "title": "KNMT - Minder afzeggingen met deze 2 woorden",
+    "url": "https://knmt.nl/nieuws/minder-afzeggingen-met-deze-2-woorden",
+    "locale": "nl",
+    "tags": ["dental", "no-show", "reminders"]
+  },
+  {
+    "title": "Nederlandse Zorgautoriteit - Mag je een no-show declareren?",
+    "url": "https://www.nza.nl/documenten/vragen-en-antwoorden/mag-je-een-no-show-declareren",
+    "locale": "nl",
+    "tags": ["no-show", "cancellations", "operations"]
+  },
+  {
+    "title": "Nederlandse Zorgautoriteit - No-show in paramedische zorg",
+    "url": "https://www.nza.nl/vraag-en-antwoord/paramedische-zorg/mag-er-een-no-show-in-rekening-gebracht-worden-als-de-patient-niet-is-geweest",
+    "locale": "nl",
+    "tags": ["no-show", "private-clinics", "operations"]
+  },
+  {
+    "title": "KNMT - Information for non-Dutch dentists",
+    "url": "https://knmt.nl/information-for-non-dutch-dentists",
+    "locale": "all",
+    "tags": ["dental", "operations"]
+  }
+]

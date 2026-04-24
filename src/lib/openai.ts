@@ -110,6 +110,7 @@ async function callOpenAi(config: AppConfig, instructions: string, input: string
       ],
       max_output_tokens: 3500,
     }),
+    signal: AbortSignal.timeout(45_000),
   });
 
   if (!response.ok) {
@@ -133,7 +134,12 @@ function fallbackSynthesis(source: LoadedSource): SourceSynthesis {
 
   return {
     summary,
-    storageStrategy: tokenEstimate > 5000 ? "archive-first" : "wiki-and-archive",
+    storageStrategy:
+      source.externalExportMode === "blocked"
+        ? "wiki-only"
+        : tokenEstimate > 5000
+          ? "archive-first"
+          : "wiki-and-archive",
     topics: [
       {
         title: source.title,
@@ -161,7 +167,7 @@ export async function synthesizeSource(
   localHits: SearchHit[],
   archiveHits: ArchiveHit[],
 ): Promise<SourceSynthesis> {
-  if (!config.openAi.apiKey) {
+  if (!config.openAi.apiKey || source.externalExportMode === "blocked") {
     return fallbackSynthesis(source);
   }
 
@@ -179,6 +185,7 @@ export async function synthesizeSource(
     `Source title: ${source.title}`,
     `Source kind: ${source.kind}`,
     `Source tags: ${source.tags.join(", ") || "none"}`,
+    `External export mode: ${source.externalExportMode}`,
     "",
     "Relevant wiki context:",
     localHits.length
@@ -200,8 +207,10 @@ export async function synthesizeSource(
           .join("\n")
       : "No archive context.",
     "",
-    "Raw source text:",
-    truncateText(source.text, 24000),
+    source.externalExportMode === "raw"
+      ? "Raw source text:"
+      : "Redacted source text prepared for external export:",
+    truncateText(source.externalExportText, 24000),
     "",
     "Return this JSON shape:",
     JSON.stringify(

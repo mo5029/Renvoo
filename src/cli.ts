@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command, Option } from "commander";
 
 import { runCompact } from "./commands/compact.js";
 import { runIngest } from "./commands/ingest.js";
@@ -7,7 +7,11 @@ import { runLint } from "./commands/lint.js";
 import { runQuery } from "./commands/query.js";
 import { runStatus } from "./commands/status.js";
 import { loadConfig } from "./lib/config.js";
-import type { RawSourceInput } from "./lib/types.js";
+import {
+  INGEST_EXTERNAL_EXPORT_MODE_ENV,
+  resolveExternalExportMode,
+  type RawSourceInput,
+} from "./lib/types.js";
 
 const program = new Command();
 program.name("renvoo-memory").description("Karpathy-style memory system for Renvoo.");
@@ -28,11 +32,21 @@ program
   .option("--title <title>", "Optional source title")
   .option("--domain <domain>", "Domain label", "renvoo-startup")
   .option("--tags <tags>", "Comma separated tags", "")
+  .addOption(
+    new Option(
+      "--external-export-mode <mode>",
+      "Off-box export mode for ingest: blocked, redacted, or raw",
+    )
+      .choices(["blocked", "redacted", "raw"])
+      .default("blocked"),
+  )
   .action(async (options) => {
     const inputKinds = [options.file, options.url, options.text].filter(Boolean);
     if (inputKinds.length !== 1) {
       throw new Error("Provide exactly one of --file, --url, or --text.");
     }
+
+    const externalExportMode = resolveExternalExportMode(options.externalExportMode, "blocked");
 
     const input: RawSourceInput = {
       kind: options.file ? "file" : options.url ? "url" : "text",
@@ -41,13 +55,20 @@ program
       text: options.text,
       title: options.title,
       domain: options.domain,
+      externalExportMode,
       tags: String(options.tags)
         .split(",")
         .map((tag: string) => tag.trim())
         .filter(Boolean),
     };
 
-    await runIngest(loadConfig(), input);
+    process.env[INGEST_EXTERNAL_EXPORT_MODE_ENV] = externalExportMode;
+
+    try {
+      await runIngest(loadConfig(), input);
+    } finally {
+      delete process.env[INGEST_EXTERNAL_EXPORT_MODE_ENV];
+    }
   });
 
 program

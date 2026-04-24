@@ -2,6 +2,35 @@ export type SourceKind = "file" | "url" | "text";
 export type NoteType = "topic" | "entity" | "decision" | "source";
 export type Confidence = "low" | "medium" | "high";
 export type StorageStrategy = "wiki-only" | "wiki-and-archive" | "archive-first";
+export type ExternalExportMode = "blocked" | "redacted" | "raw";
+export const INGEST_EXTERNAL_EXPORT_MODE_ENV = "RENVOO_INGEST_EXTERNAL_EXPORT_MODE";
+
+export function parseExternalExportMode(value?: string | null): ExternalExportMode | null {
+  const normalized = value?.trim().toLowerCase();
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (normalized === "blocked" || normalized === "redacted" || normalized === "raw") {
+    return normalized;
+  }
+
+  throw new Error(
+    `Unsupported external export mode: ${value}. Use one of blocked, redacted, or raw.`,
+  );
+}
+
+export function resolveExternalExportMode(
+  value?: string | null,
+  fallback: ExternalExportMode = "blocked",
+): ExternalExportMode {
+  return parseExternalExportMode(value) ?? fallback;
+}
+
+export function externalExportEnabled(mode?: ExternalExportMode | null): boolean {
+  return mode === "redacted" || mode === "raw";
+}
 
 export interface AppConfig {
   rootDir: string;
@@ -44,6 +73,7 @@ export interface RawSourceInput {
   url?: string;
   text?: string;
   domain?: string;
+  externalExportMode?: ExternalExportMode;
   tags: string[];
 }
 
@@ -60,6 +90,9 @@ export interface LoadedSource {
   assetPaths: string[];
   tags: string[];
   createdAt: string;
+  externalExportMode: ExternalExportMode;
+  externalExportText: string;
+  externalExportRedacted: boolean;
 }
 
 export interface Claim {
@@ -115,7 +148,7 @@ export interface ArchiveRecord {
   document_id: string;
   document_title: string;
   source_kind: SourceKind;
-  source_path: string;
+  source_path?: string;
   domain: string;
   source_url?: string;
   tags?: string;

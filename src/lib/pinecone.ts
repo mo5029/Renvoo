@@ -2,7 +2,14 @@ import path from "node:path";
 
 import { chunkText } from "./chunking.js";
 import { fileExists, readText, writeText } from "./fs-utils.js";
-import type { AppConfig, ArchiveHit, ArchiveRecord, LoadedSource } from "./types.js";
+import {
+  INGEST_EXTERNAL_EXPORT_MODE_ENV,
+  parseExternalExportMode,
+  type AppConfig,
+  type ArchiveHit,
+  type ArchiveRecord,
+  type LoadedSource,
+} from "./types.js";
 
 const API_VERSION = "2026-04";
 
@@ -16,6 +23,34 @@ interface IndexDescription {
 
 function hasPinecone(config: AppConfig): boolean {
   return Boolean(config.pinecone.apiKey && config.pinecone.indexName);
+}
+
+function getScopedIngestExportMode() {
+  return parseExternalExportMode(process.env[INGEST_EXTERNAL_EXPORT_MODE_ENV]);
+}
+
+export function validatePineconeHost(host: string): string {
+  const trimmed = host.trim();
+  const parsed = new URL(trimmed.includes("://") ? trimmed : `https://${trimmed}`);
+
+  if (parsed.protocol !== "https:") {
+    throw new Error(`Invalid Pinecone host protocol: ${host}`);
+  }
+
+  if (parsed.username || parsed.password || parsed.port || parsed.search || parsed.hash) {
+    throw new Error(`Invalid Pinecone host format: ${host}`);
+  }
+
+  const normalizedHost = parsed.hostname.toLowerCase();
+  if (!normalizedHost.endsWith(".pinecone.io")) {
+    throw new Error(`Refusing to use a non-Pinecone host: ${host}`);
+  }
+
+  if (parsed.pathname && parsed.pathname !== "/") {
+    throw new Error(`Invalid Pinecone host path: ${host}`);
+  }
+
+  return normalizedHost;
 }
 
 async function controlRequest(
@@ -90,7 +125,11 @@ async function getIndexHost(config: AppConfig): Promise<string | null> {
   if (await fileExists(cachePath)) {
     const cached = JSON.parse(await readText(cachePath)) as IndexDescription;
     if (cached.host) {
-      return cached.host;
+      try {
+        return validatePineconeHost(cached.host);
+      } catch {
+        // Ignore poisoned or stale cache entries and fetch a fresh control-plane host.
+      }
     }
   }
 
@@ -110,8 +149,9 @@ async function getIndexHost(config: AppConfig): Promise<string | null> {
     throw new Error("Pinecone index host is unavailable.");
   }
 
-  await writeText(cachePath, JSON.stringify(description, null, 2));
-  return description.host;
+  const validatedHost = validatePineconeHost(description.host);
+  await writeText(cachePath, JSON.stringify({ ...description, host: validatedHost }, null, 2));
+  return validatedHost;
 }
 
 async function dataRequest(
@@ -138,19 +178,25 @@ export async function upsertSourceToArchive(
   config: AppConfig,
   source: LoadedSource,
 ): Promise<{ synced: boolean; chunks: number }> {
-  if (!hasPinecone(config)) {
+  if (!hasPinecone(config) || source.externalExportMode === "blocked") {
     return { synced: false, chunks: 0 };
   }
 
-  const chunks = chunkText(source.text, { maxChars: 2800, overlapChars: 250 });
+  const exportText = source.externalExportText.trim();
+  if (!exportText) {
+    return { synced: false, chunks: 0 };
+  }
+
+  const chunks = chunkText(exportText, { maxChars: 2800, overlapChars: 250 });
+  const redactedMetadata = source.externalExportMode !== "raw";
   const records: ArchiveRecord[] = chunks.map((chunk, index) => ({
     _id: `${source.id}-${index + 1}`,
     chunk_text: chunk,
     document_id: source.id,
-    document_title: source.title,
+    document_title: redactedMetadata ? `${source.kind}-${source.id}` : source.title,
     source_kind: source.kind,
-    source_path: path.relative(config.vaultDir, source.rawNotePath),
-    source_url: source.url,
+    source_path: redactedMetadata ? undefined : path.relative(config.vaultDir, source.rawNotePath),
+    source_url: redactedMetadata ? undefined : source.url,
     domain: source.domain,
     tags: source.tags.join(", "),
   }));
@@ -180,6 +226,10 @@ export async function searchArchive(
   question: string,
   limit = 6,
 ): Promise<ArchiveHit[]> {
+  if (getScopedIngestExportMode() === "blocked") {
+    return [];
+  }
+
   if (!hasPinecone(config)) {
     return [];
   }

@@ -3,8 +3,8 @@ title: "Renvoo Founder Dental Outreach Campaign"
 type: topic
 domain: renvoo-startup
 summary: "Renvoo now has a founder-led dental outreach campaign built around a verified 100-clinic email list, a TU/e and NVIDIA-backed founder introduction, and a ranked send queue that starts with Brainport and Brabant clinics before broader backup cities."
-updated_at: 2026-04-17T22:10:00Z
-review_after: 2026-04-24T00:00:00Z
+updated_at: 2026-04-24T08:35:00Z
+review_after: 2026-05-08T08:35:00Z
 source_ids:
   - manual-renvoo-founder-dental-outreach-2026-04-17
 source_note_links:
@@ -67,7 +67,7 @@ Renvoo's outreach has moved beyond event planning into a founder-led clinic camp
 
 ## Maintenance
 
-- Review after: 2026-04-24T00:00:00Z
+- Review after: 2026-05-08T08:35:00Z
 
 ## Human Notes
 

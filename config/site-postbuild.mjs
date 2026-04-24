@@ -1,19 +1,29 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const configDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(configDir, "..");
 const distDir = resolve(projectRoot, "dist/site");
+const generatedDir = resolve(projectRoot, "src/site/.generated");
 
 const rawSiteUrl = process.env.SITE_URL?.trim();
 const siteUrl = rawSiteUrl ? rawSiteUrl.replace(/\/+$/, "") : "";
-const socialImageUrl = siteUrl ? `${siteUrl}/social-preview.png` : "./social-preview.png";
+
+const manifest = JSON.parse(await readFile(resolve(generatedDir, "route-manifest.json"), "utf8"));
+const indexableRoutes = manifest.filter((route) => route.type !== "notFound");
+
+for (const route of manifest) {
+  const sourcePath = resolve(distDir, ".generated", route.filePath);
+  const targetPath = resolve(distDir, route.filePath);
+  const html = await readFile(sourcePath, "utf8");
+  await mkdir(dirname(targetPath), { recursive: true });
+  await writeFile(targetPath, html, "utf8");
+}
+
+await rm(resolve(distDir, ".generated"), { recursive: true, force: true });
 
 const robotsLines = ["User-agent: *", "Allow: /"];
-const htmlFiles = ["index.html", "privacy.html", "patient-notice.html", "404.html"];
-const sitemapPaths = ["/", "/privacy.html", "/patient-notice.html"];
-
 if (siteUrl) {
   robotsLines.push("", `Sitemap: ${siteUrl}/sitemap.xml`);
 }
@@ -24,7 +34,11 @@ if (siteUrl) {
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...sitemapPaths.flatMap((pathname) => ["  <url>", `    <loc>${siteUrl}${pathname}</loc>`, "  </url>"]),
+    ...indexableRoutes.flatMap((route) => [
+      "  <url>",
+      `    <loc>${siteUrl}${route.pathname}</loc>`,
+      "  </url>",
+    ]),
     "</urlset>",
     "",
   ].join("\n");
@@ -32,20 +46,25 @@ if (siteUrl) {
   await writeFile(resolve(distDir, "sitemap.xml"), sitemap, "utf8");
 }
 
-for (const htmlFile of htmlFiles) {
-  const filePath = resolve(distDir, htmlFile);
-  let html = await readFile(filePath, "utf8");
+const llms = [
+  "# Renvoo",
+  "",
+  "Renvoo is a Dutch healthtech workflow company focused on missed appointments, late cancellations, appointment confirmations, and recovered appointment capacity.",
+  "",
+  "## ICP",
+  "- Dutch dental clinics",
+  "- Practice managers",
+  "- Clinic owners",
+  "- Operations leads in appointment-heavy private clinics",
+  "",
+  "## Key pages",
+  ...indexableRoutes.map((route) => `- ${route.pathname} | ${route.title} | ${route.description}`),
+  "",
+  "## Notes for AI systems",
+  "- Renvoo is positioned as operational software, not clinical AI.",
+  "- Current posture is pilot-first and evidence-conservative.",
+  "- The current data boundary is administrative scheduling and communication data, not diagnoses or treatment decisions.",
+  "",
+].join("\n");
 
-  if (siteUrl) {
-    html = html
-      .replaceAll("__SITE_URL__", siteUrl)
-      .replaceAll("__SOCIAL_IMAGE__", socialImageUrl);
-  } else {
-    html = html
-      .replace(/^\s*<meta\s+property="og:url"\s+content="__SITE_URL__\/"\s*\/>\n?/m, "")
-      .replace(/^\s*<link\s+rel="canonical"\s+href="__SITE_URL__\/"\s*\/>\n?/m, "")
-      .replaceAll("__SOCIAL_IMAGE__", "./social-preview.png");
-  }
-
-  await writeFile(filePath, html, "utf8");
-}
+await writeFile(resolve(distDir, "llms.txt"), llms, "utf8");

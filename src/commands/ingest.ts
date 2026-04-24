@@ -1,7 +1,7 @@
 import { searchArchive, upsertSourceToArchive } from "../lib/pinecone.js";
 import { searchWikiNotes } from "../lib/search.js";
 import { loadSource } from "../lib/source-loader.js";
-import type { AppConfig, RawSourceInput } from "../lib/types.js";
+import { externalExportEnabled, type AppConfig, type RawSourceInput } from "../lib/types.js";
 import { synthesizeSource } from "../lib/openai.js";
 import {
   appendContradictions,
@@ -15,8 +15,11 @@ import {
 export async function runIngest(config: AppConfig, input: RawSourceInput): Promise<void> {
   await ensureVaultStructure(config);
   const source = await loadSource(config, input);
+  const exportEnabled = externalExportEnabled(source.externalExportMode);
   const localHits = await searchWikiNotes(config, source.title, 6);
-  const archiveHits = await searchArchive(config, `${source.title} ${source.domain}`, 6);
+  const archiveHits = exportEnabled
+    ? await searchArchive(config, `${source.title} ${source.domain}`, 6)
+    : [];
   const synthesis = await synthesizeSource(config, source, localHits, archiveHits);
   const archiveSync = await upsertSourceToArchive(config, source);
   const sourceNotePath = await upsertSourceNote(config, source, synthesis, archiveSync);
@@ -90,6 +93,8 @@ export async function runIngest(config: AppConfig, input: RawSourceInput): Promi
   await rebuildIndexes(config);
   await appendLogEntry(config, "ingest", source.title, [
     `Source kind: ${source.kind}`,
+    `External export mode: ${source.externalExportMode}`,
+    `External export redacted: ${source.externalExportRedacted ? "yes" : "no"}`,
     `Storage strategy: ${synthesis.storageStrategy}`,
     `Topic notes touched: ${topicPaths.length}`,
     `Entity notes touched: ${entityPaths.length}`,

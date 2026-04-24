@@ -5,6 +5,8 @@ dist/
 !.env.example
 .DS_Store
 tmp/
+src/site/.generated/
+memory/private/finance/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

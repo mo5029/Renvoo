@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Renvoo Private Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dashboard navigation">
+        <div class="brand-block">
+          <span class="brand-mark">R</span>
+          <div>
+            <strong>Renvoo</strong>
+            <span>Private ops</span>
+          </div>
+        </div>
+        <nav class="nav-list">
+          <button class="nav-item is-active" type="button" data-view="overview">Overview</button>
+          <button class="nav-item" type="button" data-view="transactions">Transactions</button>
+          <button class="nav-item" type="button" data-view="expense">Add Expense</button>
+          <button class="nav-item" type="button" data-view="recurring">Recurring</button>
+          <button class="nav-item" type="button" data-view="budgets">Budgets</button>
+          <button class="nav-item" type="button" data-view="reports">Reports</button>
+          <button class="nav-item" type="button" data-view="data">Data Explorer</button>
+        </nav>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Private localhost dashboard</p>
+            <h1>Finance & ops control room</h1>
+          </div>
+          <div class="toolbar">
+            <label>
+              <span>Month</span>
+              <input type="month" data-month />
+            </label>
+            <button class="icon-button" type="button" data-refresh title="Refresh data">Refresh</button>
+          </div>
+        </header>
+
+        <section class="summary-grid" aria-label="Finance summary">
+          <article class="metric-card">
+            <span>Month spend</span>
+            <strong data-metric="monthSpend">0.00 EUR</strong>
+          </article>
+          <article class="metric-card">
+            <span>All-time spend</span>
+            <strong data-metric="allTimeSpend">0.00 EUR</strong>
+          </article>
+          <article class="metric-card">
+            <span>Upcoming</span>
+            <strong data-metric="upcoming">0.00 EUR</strong>
+          </article>
+          <article class="metric-card">
+            <span>VAT tracked</span>
+            <strong data-metric="vat">0.00 EUR</strong>
+          </article>
+        </section>
+
+        <section class="view is-active" id="overview" data-panel="overview">
+          <div class="panel-grid">
+            <article class="panel panel-wide">
+              <div class="panel-head">
+                <h2>Category spending</h2>
+                <span data-count="categories">0 categories</span>
+              </div>
+              <div class="bar-list" data-categories></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Upcoming charges</h2>
+                <span data-count="upcoming">0 charges</span>
+              </div>
+              <div class="stack-list" data-upcoming></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Budget state</h2>
+                <span data-count="budgets">0 budgets</span>
+              </div>
+              <div class="stack-list" data-budget-state></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="transactions" data-panel="transactions">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Transactions</h2>
+              <input class="search-input" type="search" placeholder="Search transactions" data-transaction-search />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Vendor</th>
+                    <th>Account</th>
+                    <th>Status</th>
+                    <th class="number">Amount</th>
+                  </tr>
+                </thead>
+                <tbody data-transactions></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="expense" data-panel="expense">
+          <div class="form-grid">
+            <form class="panel form-panel" data-expense-form>
+              <div class="panel-head">
+                <h2>Add expense</h2>
+                <span>Balanced journal entry</span>
+              </div>
+              <label>Date <input name="date" type="date" /></label>
+              <label>Amount <input name="amount" inputmode="decimal" required placeholder="71.67" /></label>
+              <label>Currency <input name="currency" value="EUR" required /></label>
+              <label>Vendor <input name="vendor" required placeholder="Codex" /></label>
+              <label>Expense account <select name="expenseAccountCode" data-expense-accounts></select></label>
+              <label>Payment account <select name="paymentAccountCode" data-payment-accounts></select></label>
+              <label>VAT bps <input name="vatRateBps" type="number" min="0" value="0" /></label>
+              <label>Receipt path <input name="receiptPath" placeholder="/absolute/path.pdf" /></label>
+              <label class="full">Notes <textarea name="notes" rows="3"></textarea></label>
+              <button class="primary-button" type="submit">Add expense</button>
+              <p class="form-status" data-expense-status></p>
+            </form>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Accounts</h2>
+                <span data-count="accounts">0 accounts</span>
+              </div>
+              <div class="account-list" data-accounts></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="recurring" data-panel="recurring">
+          <div class="form-grid">
+            <form class="panel form-panel" data-subscription-form>
+              <div class="panel-head">
+                <h2>Add recurring</h2>
+                <span>Subscription schedule</span>
+              </div>
+              <label>Name <input name="name" required placeholder="Codex" /></label>
+              <label>Vendor <input name="vendor" required placeholder="OpenAI" /></label>
+              <label>Start date <input name="startDate" type="date" required /></label>
+              <label>Cadence <select name="cadence"><option>monthly</option><option>yearly</option></select></label>
+              <label>Amount <input name="amount" inputmode="decimal" required /></label>
+              <label>Regular amount <input name="regularAmount" inputmode="decimal" /></label>
+              <label>Discount type <select name="discountType"><option value="">None</option><option>fixed</option><option>percent</option></select></label>
+              <label>Discount value <input name="discountValue" /></label>
+              <label>Discount periods <input name="discountPeriods" type="number" min="1" /></label>
+              <label>Cancel by <input name="cancellationDeadline" type="date" /></label>
+              <button class="primary-button" type="submit">Add recurring</button>
+              <p class="form-status" data-subscription-status></p>
+            </form>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Recurring timeline</h2>
+                <span data-count="subscriptions">0 subscriptions</span>
+              </div>
+              <div class="stack-list" data-subscriptions></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="budgets" data-panel="budgets">
+          <div class="form-grid">
+            <form class="panel form-panel" data-budget-form>
+              <div class="panel-head">
+                <h2>Add budget</h2>
+                <span>Monthly envelope</span>
+              </div>
+              <label>Month <input name="month" type="month" required /></label>
+              <label>Category <input name="category" required placeholder="software" /></label>
+              <label>Amount <input name="amount" inputmode="decimal" required /></label>
+              <label>Currency <input name="currency" value="EUR" /></label>
+              <label class="full">Notes <textarea name="notes" rows="3"></textarea></label>
+              <button class="primary-button" type="submit">Add budget</button>
+              <p class="form-status" data-budget-status></p>
+            </form>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Budget envelopes</h2>
+                <span data-count="budgetRows">0 rows</span>
+              </div>
+              <div class="bar-list" data-budgets></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="reports" data-panel="reports">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Monthly report</h2>
+              <button class="secondary-button" type="button" data-report-button>Generate</button>
+            </div>
+            <div class="report-grid">
+              <pre data-private-report></pre>
+              <pre data-public-preview></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="data" data-panel="data">
+          <div class="panel-grid">
+            <article class="panel panel-wide">
+              <div class="panel-head">
+                <h2>Outreach databases</h2>
+                <span data-count="outreach">0 files</span>
+              </div>
+              <div class="data-list" data-outreach></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Legal registers</h2>
+                <span data-count="legal">0 docs</span>
+              </div>
+              <div class="data-list" data-legal></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>Memory health</h2>
+                <span>Wiki</span>
+              </div>
+              <div class="data-list" data-memory></div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

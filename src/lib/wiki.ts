@@ -28,6 +28,10 @@ function uniq(values: string[]): string[] {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
+function omitUndefined<T extends Record<string, unknown>>(value: T): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined));
+}
+
 function noteDirFor(config: AppConfig, noteType: NoteType): string {
   return path.join(config.wikiDir, CATEGORY_DIRS[noteType]);
 }
@@ -320,17 +324,19 @@ export async function upsertKnowledgeNote(
   const existingRaw = (await fileExists(filePath)) ? await readText(filePath) : "";
   const humanNotes = readHumanNotes(existingRaw) || defaultHumanNotes();
   const reviewAfter = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString();
-  const frontmatter = buildKnowledgeFrontmatter(existingData, {
-    title: payload.title,
-    type: payload.noteType,
-    summary: payload.summary,
-    reviewAfter,
-    sourceIds: [payload.source.id],
-    sourceLinks: [wikiLink(config, payload.sourceNotePath)],
-    relatedLinks: payload.relatedPaths.map((item) => wikiLink(config, item)),
-    claims: payload.claims,
-    domain: payload.source.domain,
-  });
+  const frontmatter = omitUndefined(
+    buildKnowledgeFrontmatter(existingData, {
+      title: payload.title,
+      type: payload.noteType,
+      summary: payload.summary,
+      reviewAfter,
+      sourceIds: [payload.source.id],
+      sourceLinks: [wikiLink(config, payload.sourceNotePath)],
+      relatedLinks: payload.relatedPaths.map((item) => wikiLink(config, item)),
+      claims: payload.claims,
+      domain: payload.source.domain,
+    }),
+  );
 
   const body = [
     `# ${payload.title}`,
@@ -388,7 +394,7 @@ export async function upsertSourceNote(
   const humanNotes = readHumanNotes(existingRaw) || defaultHumanNotes();
   const existingData = await parseExistingFrontmatter(filePath);
 
-  const frontmatter = {
+  const frontmatter = omitUndefined({
     ...existingData,
     title: source.title,
     type: "source",
@@ -407,7 +413,7 @@ export async function upsertSourceNote(
     archive_synced_at: archiveSync.synced ? new Date().toISOString() : undefined,
     archive_chunk_count: archiveSync.chunks,
     tags: source.tags,
-  };
+  });
 
   const topicLinks = synthesis.topics.map((topic) =>
     wikiLink(config, notePathFor(config, "topic", topic.slug)),
