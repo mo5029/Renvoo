@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "npm run site:build",
+  "buildCommand": "SITE_URL=https://renvoo.nl SITE_CONTACT_EMAIL=mohamed.ibrahim5029@gmail.com npm run site:build",
   "outputDirectory": "dist/site",
   "cleanUrls": true,
   "crons": [
