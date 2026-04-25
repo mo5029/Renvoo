@@ -4,6 +4,11 @@
   "buildCommand": "npm run site:build",
   "outputDirectory": "dist/site",
   "cleanUrls": true,
+  "functions": {
+    "api/book-meeting.js": {
+      "maxDuration": 30
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

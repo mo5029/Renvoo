@@ -76,6 +76,26 @@ If you set `SITE_URL=https://your-domain.example` when running `npm run site:bui
 
 Deployment notes live in `docs/website/deployment.md`.
 
+### Booking Flow
+
+The pilot planner now supports two booking modes:
+
+- fallback draft mode
+  - creates a Google Calendar draft in the visitor's browser
+  - includes Mohamed as an attendee in that draft
+- live host-calendar mode
+  - posts to `api/book-meeting`
+  - creates the event directly in Mohamed's Google Calendar when the Google Calendar booking env vars are configured
+
+Required env vars for live host-calendar booking:
+
+- `GOOGLE_CALENDAR_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_CALENDAR_PRIVATE_KEY`
+- `GOOGLE_CALENDAR_ID`
+- optional: `GOOGLE_CALENDAR_DELEGATED_USER`
+
+If those vars are missing, the site falls back cleanly to the Google Calendar draft flow.
+
 ## Blog System
 
 The website now also has a repo-native blog system for SEO and AI-search discovery.

@@ -51,6 +51,25 @@ This repo now includes:
 - `SITE_URL`
   - Use the final public origin without a trailing slash.
   - Example: `https://renvoo.example`
+- `GOOGLE_CALENDAR_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_CALENDAR_PRIVATE_KEY`
+- `GOOGLE_CALENDAR_ID`
+- `GOOGLE_CALENDAR_DELEGATED_USER` (optional)
+
+If the Google Calendar booking variables are not configured, the pilot planner falls back to the browser-side Google Calendar draft flow.
+
+## Google Calendar Host Booking
+
+The booking API creates events directly in the configured Google Calendar only when the target calendar is accessible to the configured service account.
+
+Typical setup:
+
+1. Create a Google Cloud service account.
+2. Enable the Google Calendar API.
+3. Share the target Google Calendar with the service-account email.
+4. Add the env vars above in Vercel.
+
+If you are using Google Workspace with domain-wide delegation, `GOOGLE_CALENDAR_DELEGATED_USER` can be used as well.
 
 ## Verification Checklist
 

@@ -10,26 +10,35 @@ import {
   persistBookingRequest,
   validateBookingStep,
 } from "./lib/booking.js";
+import {
+  getStoredLocale,
+  localizeInternalHref,
+  setStoredLocale,
+  translatePathname,
+} from "./lib/locale.js";
 import { siteContent } from "./lib/site-content.js";
 
 const body = document.body;
 const currentLang = body.dataset.lang === "en" ? "en" : "nl";
 const copy = siteContent[currentLang];
 const yearSlot = document.querySelector("[data-year]");
+const isRedirectingForLocale = setupLocalePreference();
 
 if (yearSlot) {
   yearSlot.textContent = String(new Date().getFullYear());
 }
 
-body.classList.add("js-ready");
-requestAnimationFrame(() => {
-  body.classList.add("is-loaded");
-});
+if (!isRedirectingForLocale) {
+  body.classList.add("js-ready");
+  requestAnimationFrame(() => {
+    body.classList.add("is-loaded");
+  });
 
-setupHeader();
-setupRevealMotion();
-setupTracking();
-setupBookingFlow();
+  setupHeader();
+  setupRevealMotion();
+  setupTracking();
+  setupBookingFlow();
+}
 
 function setupHeader() {
   const header = document.querySelector("[data-header]");
@@ -136,6 +145,55 @@ function emitFunnelEvent(eventName, detail = {}) {
   }
 }
 
+function setupLocalePreference() {
+  const preferredLocale = getStoredLocale();
+  const alternatePath =
+    preferredLocale && preferredLocale !== currentLang
+      ? translatePathname(window.location.pathname, preferredLocale)
+      : null;
+
+  if (alternatePath) {
+    const nextUrl = `${alternatePath}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+      window.location.replace(nextUrl);
+      return true;
+    }
+  }
+
+  if (!preferredLocale) {
+    setStoredLocale(currentLang);
+  }
+
+  document.querySelectorAll("a[href]").forEach((link) => {
+    if (!(link instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    link.addEventListener("click", () => {
+      const isLanguageSwitch =
+        link.classList.contains("language-switch") ||
+        link.getAttribute("data-track") === "language_switched" ||
+        link.dataset.localeLink === "true";
+
+      if (isLanguageSwitch) {
+        const targetLang = link.dataset.targetLang === "en" ? "en" : link.dataset.targetLang === "nl" ? "nl" : currentLang === "en" ? "nl" : "en";
+        setStoredLocale(targetLang);
+        return;
+      }
+
+      const preferred = getStoredLocale() ?? currentLang;
+      setStoredLocale(preferred);
+
+      const localizedHref = localizeInternalHref(link.getAttribute("href") ?? "", preferred, window.location.href);
+      if (localizedHref) {
+        link.href = localizedHref;
+      }
+    });
+  });
+
+  return false;
+}
+
 function setupBookingFlow() {
   const form = document.querySelector("[data-booking-form]");
   if (!(form instanceof HTMLFormElement)) {
@@ -149,6 +207,8 @@ function setupBookingFlow() {
   const nextButton = form.querySelector("[data-booking-next]");
   const submitButton = form.querySelector("[data-booking-submit]");
   const successPanel = document.querySelector("[data-booking-success]");
+  const successHeading = successPanel?.querySelector("[data-success-heading]");
+  const successBody = successPanel?.querySelector("[data-success-body]");
   const successSummary = successPanel?.querySelector("[data-success-summary]");
   const successStatus = successPanel?.querySelector("[data-success-status]");
   const calendarButton = successPanel?.querySelector("[data-booking-calendar]");
@@ -237,21 +297,32 @@ function setupBookingFlow() {
       page: body.dataset.page ?? "pilot",
       mode: "preview",
     });
-
-    await new Promise((resolve) => window.setTimeout(resolve, 520));
-
-    persistBookingRequest(payload);
+    const bookingResult = await submitBookingRequest(payload, labels);
+    persistBookingRequest({
+      ...payload,
+      deliveryMode: bookingResult.mode,
+      eventId: bookingResult.eventId ?? "",
+      warning: bookingResult.warning ?? "",
+    });
     latestSummary = createPlainTextSummary(payload, labelMaps);
 
     if (successSummary instanceof HTMLElement) {
       successSummary.textContent = latestSummary;
     }
 
+    if (successHeading instanceof HTMLElement) {
+      successHeading.textContent = bookingResult.heading;
+    }
+
+    if (successBody instanceof HTMLElement) {
+      successBody.textContent = bookingResult.body;
+    }
+
     if (calendarButton instanceof HTMLAnchorElement) {
-      const calendarUrl = createGoogleCalendarUrl(payload);
-      calendarButton.hidden = !calendarUrl;
-      if (calendarUrl) {
-        calendarButton.href = calendarUrl;
+      calendarButton.hidden = !bookingResult.actionUrl;
+      calendarButton.textContent = bookingResult.actionLabel;
+      if (bookingResult.actionUrl) {
+        calendarButton.href = bookingResult.actionUrl;
       }
     }
 
@@ -261,13 +332,14 @@ function setupBookingFlow() {
     }
 
     if (status instanceof HTMLElement) {
-      status.textContent = labels.statusSuccess;
+      status.textContent = bookingResult.statusMessage;
     }
 
     emitFunnelEvent("booking_submitted", {
-      mode: "preview",
+      mode: bookingResult.mode,
       hasBackupSlot: Boolean(payload.backupSlot),
       meetingFormat: payload.meetingFormat,
+      hostCalendarBooking: bookingResult.mode === "calendar-event",
     });
 
     setSubmitting(false);
@@ -382,6 +454,68 @@ function setupBookingFlow() {
     if (successStatus instanceof HTMLElement) {
       successStatus.textContent = message;
     }
+  }
+}
+
+async function submitBookingRequest(payload, labels) {
+  const fallback = {
+    mode: "draft-fallback",
+    heading: labels.statusSuccess,
+    body: labels.successBody,
+    statusMessage: labels.statusSuccess,
+    actionUrl: createGoogleCalendarUrl(payload),
+    actionLabel: labels.buttons.calendar,
+    eventId: "",
+    warning: "",
+  };
+
+  try {
+    const response = await fetch("/api/book-meeting", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await response.json().catch(() => null);
+    if (!response.ok || !json?.success) {
+      return {
+        ...fallback,
+        heading: labels.statusFallback,
+        body: labels.successBodyFallback,
+        statusMessage: labels.statusFallback,
+      };
+    }
+
+    if (json.mode === "calendar-event") {
+      return {
+        mode: "calendar-event",
+        heading: labels.statusBooked,
+        body: labels.successBodyBooked,
+        statusMessage: labels.statusBooked,
+        actionUrl: json.meetLink || json.htmlLink || "",
+        actionLabel: json.meetLink ? labels.buttons.meet : labels.buttons.calendarBooked,
+        eventId: json.eventId ?? "",
+        warning: "",
+      };
+    }
+
+    return {
+      ...fallback,
+      actionUrl: json.calendarUrl || fallback.actionUrl,
+      warning: json.warning ?? "",
+      heading: json.warning ? labels.statusFallback : fallback.heading,
+      body: json.warning ? labels.successBodyFallback : fallback.body,
+      statusMessage: json.warning ? labels.statusFallback : fallback.statusMessage,
+    };
+  } catch {
+    return {
+      ...fallback,
+      heading: labels.statusFallback,
+      body: labels.successBodyFallback,
+      statusMessage: labels.statusFallback,
+    };
   }
 }
 

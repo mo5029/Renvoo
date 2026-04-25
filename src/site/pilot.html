@@ -145,7 +145,7 @@
         <div class="section-heading" data-reveal>
     <p class="eyebrow">Lokale planner</p>
     <h2>Kies een voorkeursmoment en een backupmoment</h2>
-    <p class="section-intro">Deze planner werkt nu als request-flow. U kiest een eerste moment en eventueel een backupmoment, daarna staat een Google Calendar-draft klaar terwijl live routing nog ontbreekt.</p>
+    <p class="section-intro">Deze planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet is gekoppeld, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.</p>
   </div>
         <ul class="bullet-list" data-reveal>
           <li>Naam en zakelijke contactgegevens</li><li>Korte context over praktijk en huidige workflow</li><li>Gesprekstype plus een eerste en tweede tijdsoptie</li>
@@ -163,7 +163,7 @@
       <div class="section-heading" data-reveal>
     <p class="eyebrow">Plan gesprek</p>
     <h2>Vraag een validatiegesprek aan</h2>
-    <p class="section-intro">Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.</p>
+    <p class="section-intro">De planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet beschikbaar is, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.</p>
   </div>
       <div class="booking-layout booking-layout-single">
         <div class="booking-stack" data-reveal>
@@ -279,14 +279,14 @@
         </div>
       </section>
 
-      <p class="booking-preview-note">Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.</p>
+      <p class="booking-preview-note">De planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet beschikbaar is, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.</p>
     </form>
 
     <section class="booking-success" data-booking-success hidden aria-live="polite">
       <div class="success-card">
         <p class="eyebrow">Aanvraag klaar voor opvolging</p>
-        <h3>Uw aanvraag is lokaal opgeslagen voor de live handoff.</h3>
-        <p>De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.</p>
+        <h3 data-success-heading>Uw aanvraag is lokaal opgeslagen voor de live handoff.</h3>
+        <p data-success-body>De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.</p>
         <pre data-success-summary></pre>
         <div class="form-actions">
           <a class="button button-primary" href="#" target="_blank" rel="noreferrer" data-booking-calendar hidden>Open Google Calendar</a>
@@ -328,7 +328,7 @@
     </div>
     <div>
       <p class="footer-title">Taal</p>
-      <ul class="footer-links"><li><a href="/en/">English</a></li></ul>
+      <ul class="footer-links"><li><a href="/en/" data-locale-link="true" data-target-lang="en">English</a></li></ul>
     </div>
   </div>
   <div class="footer-meta">

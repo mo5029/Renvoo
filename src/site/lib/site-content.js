@@ -330,7 +330,7 @@ export const siteContent = {
           eyebrow: "Lokale planner",
           title: "Kies een voorkeursmoment en een backupmoment",
           body:
-            "Deze planner werkt nu als request-flow. U kiest een eerste moment en eventueel een backupmoment, daarna staat een Google Calendar-draft klaar terwijl live routing nog ontbreekt.",
+            "Deze planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet is gekoppeld, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
           support: [
             "Naam en zakelijke contactgegevens",
             "Korte context over praktijk en huidige workflow",
@@ -347,8 +347,8 @@ export const siteContent = {
         plannerAside: {
           title: "Wat u na versturen ziet",
           items: [
-            "Een Google Calendar-draft op basis van uw eerste voorkeur",
-            "Een kopieerbare handoff voor de live routing",
+            "Bij live koppeling: een afspraak op Mohameds agenda met uitnodiging naar uw e-mailadres",
+            "Anders: een Google Calendar-draft op basis van uw eerste voorkeur",
             "Een schone samenvatting voor interne opvolging",
           ],
           responseExpectation:
@@ -620,6 +620,8 @@ export const siteContent = {
         statusStep2: "Kies uw voorkeursmomenten voor het gesprek.",
         statusReview: "Controleer uw aanvraag en verstuur wanneer alles klopt.",
         statusSuccess: "Uw aanvraag is lokaal opgeslagen voor de live handoff.",
+        statusBooked: "Het gesprek staat in Mohameds agenda en de uitnodiging is verstuurd.",
+        statusFallback: "Live boeken lukte niet direct. Gebruik de draft of de samenvatting voor follow-up.",
         summaryTitle: "Renvoo booking request",
         submittedAt: "Ingediend op",
         mode: "Modus",
@@ -639,6 +641,8 @@ export const siteContent = {
           back: "Terug",
           submit: "Verstuur aanvraag",
           calendar: "Open Google Calendar",
+          calendarBooked: "Open de geboekte afspraak",
+          meet: "Open Google Meet",
           restart: "Nieuwe aanvraag",
           copy: "Kopieer samenvatting",
           download: "Download samenvatting",
@@ -657,12 +661,16 @@ export const siteContent = {
           differentDateTime: "Kies een ander backupmoment dan uw eerste voorkeur.",
         },
         previewMode:
-          "Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.",
+          "De planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet beschikbaar is, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
         responseExpectation:
           "Doel: na deze aanvraag volgt bevestiging op de eerste optie of een korte afstemming via het backupmoment.",
         successTitle: "Aanvraag klaar voor opvolging",
         successBody:
           "De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.",
+        successBodyBooked:
+          "Renvoo heeft het gesprek op Mohameds agenda gezet en de uitnodiging naar dit zakelijke e-mailadres gestuurd. Bewaar de samenvatting hieronder voor uw eigen referentie.",
+        successBodyFallback:
+          "De aanvraag is vastgelegd, maar live host-booking was niet beschikbaar. Gebruik de Google Calendar-draft of de samenvatting hieronder voor de follow-up.",
         copySuccess: "Samenvatting gekopieerd.",
         copyFallback: "Kopiëren lukte niet automatisch. Gebruik de downloadknop als fallback.",
         downloadReady: "Samenvatting gedownload.",
@@ -1009,7 +1017,7 @@ export const siteContent = {
           eyebrow: "Local booking flow",
           title: "Choose a preferred slot and one backup option",
           body:
-            "This planner currently works as a request flow. Choose a first option and an optional backup, then open a Google Calendar draft while live routing is still being connected.",
+            "This planner tries to book on Mohamed's calendar first. If live host-side booking is not configured yet, it falls back to a Google Calendar draft built from the first preferred slot.",
           support: [
             "Name and business contact details",
             "Short context about clinic and current workflow",
@@ -1026,8 +1034,8 @@ export const siteContent = {
         plannerAside: {
           title: "What happens after submit",
           items: [
-            "A Google Calendar draft based on the first preferred slot",
-            "A copyable handoff while live routing is not yet active",
+            "If live booking works: the meeting lands on Mohamed's calendar and your email gets invited",
+            "Otherwise: a Google Calendar draft based on the first preferred slot",
             "A tidy summary for internal follow-up or launch prep",
           ],
           responseExpectation:
@@ -1299,6 +1307,8 @@ export const siteContent = {
         statusStep2: "Choose preferred meeting timing next.",
         statusReview: "Review the request and submit when everything looks right.",
         statusSuccess: "Your request has been saved locally for the live handoff.",
+        statusBooked: "The meeting is on Mohamed's calendar and the invite has been sent.",
+        statusFallback: "Live booking was not available right away. Use the draft or summary for follow-up.",
         summaryTitle: "Renvoo booking request",
         submittedAt: "Submitted at",
         mode: "Mode",
@@ -1318,6 +1328,8 @@ export const siteContent = {
           back: "Back",
           submit: "Submit Request",
           calendar: "Open Google Calendar",
+          calendarBooked: "Open the booked meeting",
+          meet: "Open Google Meet",
           restart: "Start Again",
           copy: "Copy Summary",
           download: "Download Summary",
@@ -1336,12 +1348,16 @@ export const siteContent = {
           differentDateTime: "Choose a different backup slot from the first option.",
         },
         previewMode:
-          "Live routing is not connected yet. The planner therefore creates a clean local handoff plus a Google Calendar draft from the first preferred slot.",
+          "The planner tries to book on Mohamed's calendar first. If live host-side booking is not available, it falls back to a Google Calendar draft from the first preferred slot.",
         responseExpectation:
           "Target response: confirmation on the first option or a short follow-up using the backup slot.",
         successTitle: "Request ready for follow-up",
         successBody:
           "The planner has saved the request locally. Open the Google Calendar draft for the first preferred slot, or copy/download the handoff while live routing is still inactive.",
+        successBodyBooked:
+          "Renvoo added the meeting to Mohamed's calendar and sent the invite to this business email. Keep the summary below if you want your own copy.",
+        successBodyFallback:
+          "The request was captured, but live host-side booking was not available. Use the Google Calendar draft or the summary below for follow-up.",
         copySuccess: "Summary copied.",
         copyFallback: "Automatic copy did not work. Use the download button as fallback.",
         downloadReady: "Summary downloaded.",

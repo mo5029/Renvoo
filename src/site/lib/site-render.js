@@ -346,7 +346,7 @@ function renderFooter(content, lang, page) {
   const languageLinks = content.footer.languageLinks
     .map((link) => {
       const targetPage = page === "notFound" ? "home" : link.page;
-      return `<li><a href="${hrefFor(link.lang, targetPage)}">${link.label}</a></li>`;
+      return `<li><a href="${hrefFor(link.lang, targetPage)}" data-locale-link="true" data-target-lang="${link.lang}">${link.label}</a></li>`;
     })
     .join("");
 
@@ -784,8 +784,8 @@ function renderBookingForm(content) {
     <section class="booking-success" data-booking-success hidden aria-live="polite">
       <div class="success-card">
         <p class="eyebrow">${labels.successTitle}</p>
-        <h3>${labels.statusSuccess}</h3>
-        <p>${labels.successBody}</p>
+        <h3 data-success-heading>${labels.statusSuccess}</h3>
+        <p data-success-body>${labels.successBody}</p>
         <pre data-success-summary></pre>
         <div class="form-actions">
           <a class="button button-primary" href="#" target="_blank" rel="noreferrer" data-booking-calendar hidden>${labels.buttons.calendar}</a>
