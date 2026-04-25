@@ -1,10 +1,13 @@
+import { getSuggestedInternalLinks } from "../../lib/blog-content.js";
 import { pageFileNames, pageOrder, siteContent } from "./site-content.js";
 
+const localeOrder = ["nl", "en"];
 const pageSequence = [
   { lang: "nl", page: "home" },
   { lang: "nl", page: "product" },
   { lang: "nl", page: "pilot" },
   { lang: "nl", page: "trust" },
+  { lang: "nl", page: "blogIndex" },
   { lang: "nl", page: "privacy" },
   { lang: "nl", page: "patientNotice" },
   { lang: "nl", page: "notFound" },
@@ -12,52 +15,244 @@ const pageSequence = [
   { lang: "en", page: "product" },
   { lang: "en", page: "pilot" },
   { lang: "en", page: "trust" },
+  { lang: "en", page: "blogIndex" },
   { lang: "en", page: "privacy" },
   { lang: "en", page: "patientNotice" },
-  { lang: "en", page: "notFound" },
 ];
 
-function prefixForLang(lang) {
-  return lang === "en" ? ".." : ".";
+function alternateLocale(lang) {
+  return lang === "en" ? "nl" : "en";
+}
+
+function prefixForPath(filePath) {
+  const depth = filePath.split("/").length - 1;
+  return depth === 0 ? "." : Array.from({ length: depth }, () => "..").join("/");
 }
 
 function outputPathFor(lang, page) {
   const fileName = pageFileNames[page];
-  return lang === "en" ? `en/${fileName}` : fileName;
+  return lang === "en" && page !== "notFound" ? `en/${fileName}` : fileName;
 }
 
-function routeFor(currentLang, targetLang, page, hash = "") {
-  const fileName = pageFileNames[page];
-  const filePath =
-    currentLang === targetLang
-      ? `./${fileName}`
-      : currentLang === "en"
-        ? `../${fileName}`
-        : `./en/${fileName}`;
+function hrefFor(lang, page, hash = "") {
+  const filePath = outputPathFor(lang, page).replace(/\\/g, "/");
+  let href = `/${filePath}`;
 
-  return `${filePath}${hash}`;
+  if (href === "/index.html") {
+    href = "/";
+  } else if (href.endsWith("/index.html")) {
+    href = href.slice(0, -"index.html".length);
+  }
+
+  return `${href}${hash}`;
+}
+
+function canonicalUrl(siteUrl, pathname) {
+  return siteUrl ? `${siteUrl.replace(/\/+$/, "")}${pathname}` : pathname;
 }
 
 function assetPath(prefix, relativePath) {
   return `${prefix}/${relativePath}`;
 }
 
-function renderDocument({ lang, page, content }) {
-  const prefix = prefixForLang(lang);
-  const routes = {
-    home: routeFor(lang, lang, "home"),
-    product: routeFor(lang, lang, "product"),
-    pilot: routeFor(lang, lang, "pilot"),
-    trust: routeFor(lang, lang, "trust"),
-    booking: routeFor(lang, lang, "pilot", "#booking"),
-    privacy: routeFor(lang, lang, "privacy"),
-    patientNotice: routeFor(lang, lang, "patientNotice"),
-    switch: routeFor(lang, lang === "nl" ? "en" : "nl", page),
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function renderJsonLd(schemaObjects) {
+  return schemaObjects
+    .filter(Boolean)
+    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>`)
+    .join("\n");
+}
+
+function buildOrganizationSchema(lang, siteUrl) {
+  const content = siteContent[lang];
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Renvoo",
+    url: canonicalUrl(siteUrl, hrefFor(lang, "home")),
+    logo: canonicalUrl(siteUrl, "/social-preview.png"),
+    description: content.footer.summary,
+    areaServed: "NL",
   };
-  const pageCopy = content.pages[page];
-  const switchLabel = content.switchLabel;
-  const switchLang = lang === "nl" ? "en" : "nl";
+}
+
+function buildWebsiteSchema(lang, siteUrl) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Renvoo",
+    url: canonicalUrl(siteUrl, hrefFor(lang, "home")),
+    inLanguage: siteContent[lang].locale,
+    description: siteContent[lang].footer.summary,
+  };
+}
+
+function buildSoftwareSchema(lang, pathname, description) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Renvoo",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    inLanguage: siteContent[lang].locale,
+    description,
+    url: pathname,
+    featureList: [
+      "No-show reduction workflow",
+      "Appointment confirmation support",
+      "Late cancellation handling",
+      "Recovered capacity and backfill support",
+    ],
+  };
+}
+
+function buildFaqSchema(items = []) {
+  if (!items.length) {
+    return null;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}
+
+function buildBreadcrumbSchema(siteUrl, breadcrumbs) {
+  if (!breadcrumbs.length) {
+    return null;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.label,
+      item: canonicalUrl(siteUrl, item.href),
+    })),
+  };
+}
+
+function buildArticleSchema(siteUrl, lang, post, breadcrumbs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.metaDescription || post.excerpt,
+    datePublished: post.date,
+    dateModified: post.updated,
+    inLanguage: siteContent[lang].locale,
+    mainEntityOfPage: canonicalUrl(
+      siteUrl,
+      lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`,
+    ),
+    author: {
+      "@type": "Organization",
+      name: "Renvoo",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Renvoo",
+      logo: {
+        "@type": "ImageObject",
+        url: canonicalUrl(siteUrl, "/social-preview.png"),
+      },
+    },
+    image: canonicalUrl(siteUrl, "/social-preview.png"),
+    articleSection: post.category,
+    keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(", "),
+    breadcrumb: buildBreadcrumbSchema(siteUrl, breadcrumbs),
+  };
+}
+
+function breadcrumbsForPage(lang, page) {
+  if (page === "home" || page === "notFound") {
+    return [];
+  }
+
+  return [
+    { href: hrefFor(lang, "home"), label: siteContent[lang].pageNames.home },
+    { href: hrefFor(lang, page), label: siteContent[lang].pageNames[page] },
+  ];
+}
+
+function renderBreadcrumbNav(breadcrumbs) {
+  if (!breadcrumbs.length) {
+    return "";
+  }
+
+  return `<nav class="breadcrumbs chapter" aria-label="Breadcrumb">
+    <ol>
+      ${breadcrumbs
+        .map((item, index) => {
+          const isLast = index === breadcrumbs.length - 1;
+          return `<li>${isLast ? `<span>${item.label}</span>` : `<a href="${item.href}">${item.label}</a>`}</li>`;
+        })
+        .join("")}
+    </ol>
+  </nav>`;
+}
+
+function renderDocument({
+  lang,
+  page,
+  content,
+  filePath,
+  pathname,
+  mainContent,
+  siteUrl = "",
+  breadcrumbs = [],
+  schema = [],
+  extraHead = "",
+  pageType = "website",
+  switchTarget = null,
+  seoOverride = null,
+}) {
+  const prefix = prefixForPath(filePath);
+  const pageCopy = {
+    ...(content.pages[page] ?? content.pages.home),
+    seo: seoOverride ?? (content.pages[page] ?? content.pages.home).seo,
+  };
+  const canonical = canonicalUrl(siteUrl, pathname);
+  const switchLang = alternateLocale(lang);
   const bodyClass = `page-${page} lang-${lang}`;
+  const routes = {
+    home: hrefFor(lang, "home"),
+    product: hrefFor(lang, "product"),
+    pilot: hrefFor(lang, "pilot"),
+    trust: hrefFor(lang, "trust"),
+    blogIndex: hrefFor(lang, "blogIndex"),
+    booking: hrefFor(lang, "pilot", "#booking"),
+    privacy: hrefFor(lang, "privacy"),
+    patientNotice: hrefFor(lang, "patientNotice"),
+    switch:
+      switchTarget ?? (page === "notFound" ? hrefFor(switchLang, "home") : hrefFor(switchLang, page)),
+  };
+
+  const alternateHead = siteUrl
+    ? page !== "notFound" && pageType !== "article"
+      ? `<link rel="canonical" href="${canonical}" />
+    <link rel="alternate" hreflang="${content.locale}" href="${canonical}" />
+    <link rel="alternate" hreflang="${siteContent[switchLang].locale}" href="${canonicalUrl(siteUrl, hrefFor(switchLang, page))}" />
+    <link rel="alternate" hreflang="x-default" href="${canonicalUrl(siteUrl, hrefFor("nl", page === "notFound" ? "home" : page))}" />`
+      : `<link rel="canonical" href="${canonical}" />`
+    : "";
 
   return `<!doctype html>
 <html lang="${content.htmlLang}">
@@ -67,29 +262,36 @@ function renderDocument({ lang, page, content }) {
     <title>${pageCopy.seo.title}</title>
     <meta name="description" content="${pageCopy.seo.description}" />
     <meta name="theme-color" content="#f4efe7" />
-    <meta property="og:type" content="website" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:type" content="${pageType}" />
     <meta property="og:title" content="${pageCopy.seo.title}" />
     <meta property="og:description" content="${pageCopy.seo.description}" />
-    <meta property="og:url" content="__CANONICAL_URL__" />
-    <meta property="og:image" content="__SOCIAL_IMAGE__" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
+    <meta property="og:image:alt" content="Renvoo website preview" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${pageCopy.seo.title}" />
     <meta name="twitter:description" content="${pageCopy.seo.description}" />
-    <meta name="twitter:image" content="__SOCIAL_IMAGE__" />
-    <link rel="canonical" href="__CANONICAL_URL__" />
+    <meta name="twitter:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
+    ${alternateHead}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="${assetPath(prefix, "icons/favicon.png")}" />
+    <link rel="apple-touch-icon" href="${assetPath(prefix, "icons/favicon.png")}" />
+    <link rel="manifest" href="${assetPath(prefix, "site.webmanifest")}" />
     <link rel="stylesheet" href="${assetPath(prefix, "styles.css")}" />
+    ${extraHead}
+    ${renderJsonLd(schema)}
   </head>
   <body class="${bodyClass}" data-lang="${lang}" data-page="${page}" data-prefix="${prefix}" data-switch-lang="${switchLang}">
     <a class="skip-link" href="#content">${lang === "nl" ? "Ga naar inhoud" : "Skip to content"}</a>
     <div class="page-aura page-aura-left" aria-hidden="true"></div>
     <div class="page-aura page-aura-right" aria-hidden="true"></div>
-    ${renderHeader(content, page, routes)}
+    ${renderHeader(content, page, routes).replace("./assets/renvoo-logo-horizontal.png", assetPath(prefix, "assets/renvoo-logo-horizontal.png"))}
+    ${renderBreadcrumbNav(breadcrumbs)}
     <main id="content" class="site-main">
-      ${renderPageBody({ lang, page, content, routes, prefix })}
+      ${mainContent}
     </main>
     ${renderFooter(content, lang, page)}
     <script type="module" src="${assetPath(prefix, "main.js")}"></script>
@@ -99,7 +301,7 @@ function renderDocument({ lang, page, content }) {
 }
 
 function renderHeader(content, page, routes) {
-  const navItems = ["home", "product", "pilot", "trust"]
+  const navItems = ["home", "product", "pilot", "trust", "blogIndex"]
     .map((navPage) => {
       const isActive = page === navPage ? "is-active" : "";
       return `<a class="${isActive}" href="${routes[navPage]}">${content.nav[navPage]}</a>`;
@@ -111,7 +313,7 @@ function renderHeader(content, page, routes) {
   return `<header class="site-header" data-header>
   <div class="site-header-inner">
     <a class="brand-mark" href="${routes.home}" aria-label="Renvoo ${content.pageNames.home}">
-      <img src="${assetPath(prefixForLang(content.htmlLang === "nl" ? "nl" : "en"), "assets/renvoo-logo-horizontal.png")}" alt="Renvoo" width="1212" height="274" />
+      <img src="${assetPath(".", "assets/renvoo-logo-horizontal.png")}" alt="Renvoo" width="1212" height="274" />
       <span>${content.brandLine}</span>
     </a>
     <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="${menuLabel}">
@@ -133,24 +335,18 @@ function renderHeader(content, page, routes) {
 }
 
 function renderFooter(content, lang, page) {
-  const quickLinks = ["home", "product", "pilot", "trust"]
-    .map(
-      (footerPage) =>
-        `<li><a href="${routeFor(lang, lang, footerPage)}">${content.pageNames[footerPage]}</a></li>`,
-    )
+  const quickLinks = ["home", "product", "pilot", "trust", "blogIndex"]
+    .map((footerPage) => `<li><a href="${hrefFor(lang, footerPage)}">${content.pageNames[footerPage]}</a></li>`)
     .join("");
 
   const legalLinks = content.footer.legalLinks
-    .map(
-      (link) =>
-        `<li><a href="${routeFor(lang, lang, link.page)}">${link.label}</a></li>`,
-    )
+    .map((link) => `<li><a href="${hrefFor(lang, link.page)}">${link.label}</a></li>`)
     .join("");
 
   const languageLinks = content.footer.languageLinks
     .map((link) => {
-      const targetPage = page === "notFound" ? "notFound" : link.page;
-      return `<li><a href="${routeFor(lang, link.lang, targetPage)}">${link.label}</a></li>`;
+      const targetPage = page === "notFound" ? "home" : link.page;
+      return `<li><a href="${hrefFor(link.lang, targetPage)}">${link.label}</a></li>`;
     })
     .join("");
 
@@ -190,6 +386,8 @@ function renderPageBody({ lang, page, content, routes, prefix }) {
       return renderPilotPage(content, routes);
     case "trust":
       return renderTrustPage(content, routes, prefix);
+    case "blogIndex":
+      return renderBlogIndexPage(content, lang);
     case "privacy":
       return renderLegalPage(content.pages.privacy);
     case "patientNotice":
@@ -782,6 +980,157 @@ function renderLegalPage(copy) {
   `;
 }
 
+function renderBlogIndexPage(content, lang, posts = []) {
+  const page = content.pages.blogIndex;
+  const blog = content.blog;
+  const publishedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
+  const locale = lang === "en" ? "en-US" : "nl-NL";
+
+  return `
+    <section class="chapter hero-page hero-blog">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${page.hero.eyebrow}</p>
+          <h1>${page.hero.title}</h1>
+          <p class="hero-lead">${page.hero.body}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="${hrefFor(lang, "pilot", "#booking")}">${page.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${hrefFor(lang, "product")}">${page.hero.secondaryCta}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter blog-index-section">
+      ${renderSectionHeading(blog.eyebrow, blog.title, blog.intro)}
+      ${
+        publishedPosts.length
+          ? `<div class="blog-grid">
+          ${publishedPosts
+            .map(
+              (post, index) => `<article class="blog-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+              <p class="blog-meta">${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(post.primaryKeyword)}</p>
+              <h3>${escapeHtml(post.title)}</h3>
+              <p>${escapeHtml(post.excerpt)}</p>
+              <div class="blog-card-footer">
+                <span class="step-chip">${escapeHtml(post.category)}</span>
+                <a class="inline-link" href="${lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`}">${blog.readMore}</a>
+              </div>
+            </article>`,
+            )
+            .join("")}
+        </div>`
+          : `<div class="empty-state" data-reveal><p>${blog.emptyLabel}</p></div>`
+      }
+    </section>
+
+    ${renderClosingBand(
+      {
+        eyebrow: blog.eyebrow,
+        title: blog.ctaTitle,
+        body: blog.ctaBody,
+        primaryCta: blog.ctaPrimary,
+        secondaryCta: lang === "en" ? "See the trust page" : "Bekijk de trust-pagina",
+      },
+      hrefFor(lang, "pilot", "#booking"),
+      hrefFor(lang, "trust"),
+    )}
+  `;
+}
+
+function renderBlogArticle(lang, post) {
+  const blog = siteContent[lang].blog;
+  const relatedLinks = getSuggestedInternalLinks(post);
+  const locale = lang === "en" ? "en-US" : "nl-NL";
+
+  return `<article class="chapter article-shell">
+    <div class="article-head" data-reveal>
+      <p class="eyebrow">${blog.eyebrow}</p>
+      <h1>${escapeHtml(post.title)}</h1>
+      <p class="hero-lead">${escapeHtml(post.excerpt)}</p>
+      <div class="article-meta">
+        <span>${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}</span>
+        <span>${escapeHtml(post.primaryKeyword)}</span>
+      </div>
+    </div>
+    <section class="answer-card article-answer" data-reveal>
+      <p class="eyebrow subdued">${lang === "en" ? "Short answer" : "Kort antwoord"}</p>
+      <p class="answer-copy">${escapeHtml(post.answer || post.excerpt)}</p>
+    </section>
+    <div class="article-body prose" data-reveal>${post.contentHtml}</div>
+  </article>
+  ${renderSourcesSection(lang, post.sources)}
+  ${renderFaqSection(lang, post.faq)}
+  ${renderArticleRelated(lang, relatedLinks)}
+  ${renderClosingBand(
+    {
+      eyebrow: blog.eyebrow,
+      title: blog.ctaTitle,
+      body: blog.ctaBody,
+      primaryCta: blog.ctaPrimary,
+      secondaryCta: blog.backToBlog,
+    },
+    hrefFor(lang, "pilot", "#booking"),
+    hrefFor(lang, "blogIndex"),
+  )}`;
+}
+
+function renderSourcesSection(lang, sources) {
+  if (!sources?.length) {
+    return "";
+  }
+
+  return `<section class="chapter">
+    ${renderSectionHeading(lang === "en" ? "Sources" : "Bronnen", siteContent[lang].blog.sourcesTitle)}
+    <div class="glass-card" data-reveal>
+      <ul class="source-list">
+        ${sources.map((source) => `<li><a href="${source.url}" rel="noreferrer">${escapeHtml(source.title)}</a></li>`).join("")}
+      </ul>
+    </div>
+  </section>`;
+}
+
+function renderFaqSection(lang, items) {
+  if (!items?.length) {
+    return "";
+  }
+
+  return `<section class="chapter">
+    ${renderSectionHeading("FAQ", lang === "en" ? "Frequent questions" : "Veelgestelde vragen")}
+    <div class="faq-list">
+      ${items
+        .map(
+          (item, index) => `<article class="faq-card" data-reveal style="--reveal-delay: ${index * 80}ms;">
+          <h3>${escapeHtml(item.question)}</h3>
+          <p>${escapeHtml(item.answer)}</p>
+        </article>`,
+        )
+        .join("")}
+    </div>
+  </section>`;
+}
+
+function renderArticleRelated(lang, links) {
+  if (!links?.length) {
+    return "";
+  }
+
+  return `<section class="chapter">
+    ${renderSectionHeading(lang === "en" ? "Internal links" : "Interne links", siteContent[lang].blog.relatedTitle)}
+    <div class="path-cards">
+      ${links
+        .map(
+          (link, index) => `<article class="path-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+          <h3>${escapeHtml(link.label)}</h3>
+          <p>${escapeHtml(link.href)}</p>
+          <a class="inline-link" href="${link.href}">${escapeHtml(link.label)}</a>
+        </article>`,
+        )
+        .join("")}
+    </div>
+  </section>`;
+}
+
 function renderNotFoundPage(content, routes) {
   const copy = content.pages.notFound;
   return `
@@ -820,19 +1169,145 @@ function renderClosingBand(copy, primaryHref, secondaryHref) {
   </section>`;
 }
 
-export function renderAllPages() {
-  return pageSequence.map(({ lang, page }) => ({
-    path: outputPathFor(lang, page),
-    html: renderDocument({
-      lang,
-      page,
-      content: siteContent[lang],
-    }),
-  }));
+function faqItemsForPage(lang, page) {
+  if (page === "trust") {
+    return siteContent[lang].pages.trust.faq.items;
+  }
+
+  return [];
+}
+
+function schemaForStandardPage(lang, page, pathname, breadcrumbs, siteUrl) {
+  const content = siteContent[lang];
+  const pageCopy = content.pages[page];
+  const description =
+    pageCopy.hero?.body ??
+    pageCopy.hero?.lead ??
+    pageCopy.bookingIntro?.body ??
+    pageCopy.seo.description;
+
+  return [
+    buildOrganizationSchema(lang, siteUrl),
+    page === "home" || page === "blogIndex" ? buildWebsiteSchema(lang, siteUrl) : null,
+    page !== "privacy" && page !== "patientNotice" && page !== "blogIndex"
+      ? buildSoftwareSchema(lang, canonicalUrl(siteUrl, pathname), description)
+      : null,
+    buildFaqSchema(faqItemsForPage(lang, page)),
+    buildBreadcrumbSchema(siteUrl, breadcrumbs),
+  ];
+}
+
+export function renderAllPages({ siteUrl = "", contactEmail = "", posts = [] } = {}) {
+  const pages = [];
+  const routeManifest = [];
+
+  for (const { lang, page } of pageSequence) {
+    const content = siteContent[lang];
+    const filePath = outputPathFor(lang, page);
+    const pathname = hrefFor(lang, page);
+    const breadcrumbs = breadcrumbsForPage(lang, page);
+    const pageCopy = content.pages[page];
+    const mainContent =
+      page === "blogIndex"
+        ? renderBlogIndexPage(content, lang, posts)
+        : renderPageBody({ lang, page, content, routes: {
+            home: hrefFor(lang, "home"),
+            product: hrefFor(lang, "product"),
+            pilot: hrefFor(lang, "pilot"),
+            trust: hrefFor(lang, "trust"),
+            blogIndex: hrefFor(lang, "blogIndex"),
+            booking: hrefFor(lang, "pilot", "#booking"),
+            privacy: hrefFor(lang, "privacy"),
+            patientNotice: hrefFor(lang, "patientNotice"),
+            switch: hrefFor(alternateLocale(lang), page === "notFound" ? "home" : page),
+          }, prefix: prefixForPath(filePath), posts });
+
+    pages.push({
+      path: filePath,
+      html: renderDocument({
+        lang,
+        page,
+        content,
+        filePath,
+        pathname,
+        mainContent,
+        siteUrl,
+        breadcrumbs,
+        schema: schemaForStandardPage(lang, page, pathname, breadcrumbs, siteUrl),
+        pageType: page === "blogIndex" ? "website" : "website",
+        switchTarget: hrefFor(alternateLocale(lang), page === "notFound" ? "home" : page),
+      }),
+    });
+
+    routeManifest.push({
+      locale: lang,
+      type: page === "notFound" ? "notFound" : page === "blogIndex" ? "blogIndex" : "page",
+      filePath,
+      pathname: page === "home" ? (lang === "en" ? "/en/" : "/") : page === "blogIndex" ? (lang === "en" ? "/en/blog/" : "/blog/") : pathname.replace(/\.html$/, ""),
+      title: pageCopy.seo.title,
+      description: pageCopy.seo.description,
+    });
+  }
+
+  for (const lang of localeOrder) {
+    const localizedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
+    for (const post of localizedPosts) {
+      const pathname = lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`;
+      const filePath = lang === "en" ? `en/blog/${post.slug}/index.html` : `blog/${post.slug}/index.html`;
+      const breadcrumbs = [
+        { href: hrefFor(lang, "home"), label: siteContent[lang].pageNames.home },
+        { href: hrefFor(lang, "blogIndex"), label: siteContent[lang].pageNames.blogIndex },
+        { href: pathname, label: post.title },
+      ];
+      const articlePage = {
+        seo: {
+          title: post.metaTitle || post.title,
+          description: post.metaDescription || post.excerpt,
+        },
+      };
+
+      pages.push({
+        path: filePath,
+        html: renderDocument({
+          lang,
+          page: "blogIndex",
+          content: siteContent[lang],
+          filePath,
+          pathname,
+          mainContent: renderBlogArticle(lang, post),
+          siteUrl,
+          breadcrumbs,
+          schema: [
+            buildOrganizationSchema(lang, siteUrl),
+            buildArticleSchema(siteUrl, lang, post, breadcrumbs),
+            buildFaqSchema(post.faq),
+            buildBreadcrumbSchema(siteUrl, breadcrumbs),
+          ],
+          pageType: "article",
+          switchTarget: hrefFor(alternateLocale(lang), "blogIndex"),
+          seoOverride: articlePage.seo,
+          extraHead: `<meta property="article:published_time" content="${post.date}" />
+    <meta property="article:modified_time" content="${post.updated}" />
+    <meta property="article:section" content="${post.category}" />`,
+        }),
+      });
+
+      routeManifest.push({
+        locale: lang,
+        type: "article",
+        filePath,
+        pathname,
+        title: articlePage.seo.title,
+        description: articlePage.seo.description,
+      });
+    }
+  }
+
+  return { pages, routeManifest };
 }
 
 export function getPagePaths() {
   return pageSequence.map(({ lang, page }) => outputPathFor(lang, page));
 }
 
-export { outputPathFor, pageOrder, routeFor };
+export { hrefFor as routeFor, outputPathFor, pageOrder };

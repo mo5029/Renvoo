@@ -25,6 +25,7 @@ export const siteContent = {
       product: "Product",
       pilot: "Pilot",
       trust: "Vertrouwen",
+      blogIndex: "Blog",
       cta: "Plan gesprek",
     },
     footer: {
@@ -45,9 +46,25 @@ export const siteContent = {
       product: "Product",
       pilot: "Pilot",
       trust: "Vertrouwen",
+      blogIndex: "Blog",
       privacy: "Privacy",
       patientNotice: "Patiëntbericht",
       notFound: "Niet gevonden",
+    },
+    blog: {
+      eyebrow: "Blog",
+      title: "Praktische inzichten voor rustigere agenda's",
+      intro:
+        "Korte, eerlijke artikelen voor praktijkhouders en praktijkmanagers over no-shows, late afzeggingen, herinneringen en herstel van lege stoeluren.",
+      emptyLabel: "Er staan nog geen gepubliceerde artikelen klaar.",
+      readMore: "Lees artikel",
+      backToBlog: "Terug naar blog",
+      sourcesTitle: "Bronnen",
+      relatedTitle: "Verder lezen",
+      ctaTitle: "Wilt u dit vertalen naar uw eigen praktijk?",
+      ctaBody:
+        "De beste volgende stap is nog steeds een kort validatiegesprek over uw huidige no-show-, bevestigings- en herstelworkflow.",
+      ctaPrimary: "Plan het gesprek",
     },
     pages: {
       home: {
@@ -457,6 +474,21 @@ export const siteContent = {
           secondaryCta: "Bekijk de pilotflow",
         },
       },
+      blogIndex: {
+        seo: {
+          title: "Renvoo | Blog over no-shows, reminders en herstelwerk",
+          description:
+            "Lees praktische Renvoo-artikelen over no-shows, late afzeggingen, reminder-workflows en het terugwinnen van lege stoeluren in tandartspraktijken.",
+        },
+        hero: {
+          eyebrow: "Blog",
+          title: "Praktische inzichten voor minder no-shows en rustiger herstelwerk",
+          body:
+            "Geen startup-theater, maar concrete uitleg over waar no-shows ontstaan, waarom reminder-only tooling vaak tekortschiet en hoe praktijken eerder kunnen herstellen.",
+          primaryCta: "Plan het gesprek",
+          secondaryCta: "Bekijk het product",
+        },
+      },
       privacy: {
         seo: {
           title: "Renvoo | Privacyverklaring website",
@@ -672,6 +704,7 @@ export const siteContent = {
       product: "Product",
       pilot: "Pilot",
       trust: "Trust",
+      blogIndex: "Blog",
       cta: "Book Meeting",
     },
     footer: {
@@ -692,9 +725,25 @@ export const siteContent = {
       product: "Product",
       pilot: "Pilot",
       trust: "Trust",
+      blogIndex: "Blog",
       privacy: "Privacy",
       patientNotice: "Patient note",
       notFound: "Not found",
+    },
+    blog: {
+      eyebrow: "Blog",
+      title: "Practical reading for calmer schedule recovery",
+      intro:
+        "Short, specific articles for clinic operators on no-shows, late cancellations, reminder workflows, and recovering empty chair time without extra noise.",
+      emptyLabel: "No published articles are live yet.",
+      readMore: "Read article",
+      backToBlog: "Back to blog",
+      sourcesTitle: "Sources",
+      relatedTitle: "Related reading",
+      ctaTitle: "Want to translate this into your own workflow?",
+      ctaBody:
+        "The best next step is still a short validation meeting around your current no-show, confirmation, and recovery process.",
+      ctaPrimary: "Book the meeting",
     },
     pages: {
       home: {
@@ -1104,6 +1153,21 @@ export const siteContent = {
           secondaryCta: "See the Pilot Flow",
         },
       },
+      blogIndex: {
+        seo: {
+          title: "Renvoo | Blog on no-shows, reminders, and schedule recovery",
+          description:
+            "Read practical Renvoo articles on no-shows, late cancellations, reminder workflows, and recovering empty chair time in dental clinics.",
+        },
+        hero: {
+          eyebrow: "Blog",
+          title: "Practical insights for calmer clinic operations",
+          body:
+            "No inflated thought leadership. Just specific explanations of where no-shows start, why reminder-only tooling often falls short, and how clinics can recover fragile schedule time earlier.",
+          primaryCta: "Book the meeting",
+          secondaryCta: "See the product",
+        },
+      },
       privacy: {
         seo: {
           title: "Renvoo | Website privacy note",
@@ -1310,13 +1374,14 @@ export const siteContent = {
   },
 };
 
-export const pageOrder = ["home", "product", "pilot", "trust", "privacy", "patientNotice", "notFound"];
+export const pageOrder = ["home", "product", "pilot", "trust", "blogIndex", "privacy", "patientNotice", "notFound"];
 
 export const pageFileNames = {
   home: "index.html",
   product: "product.html",
   pilot: "pilot.html",
   trust: "trust.html",
+  blogIndex: "blog/index.html",
   privacy: "privacy.html",
   patientNotice: "patient-notice.html",
   notFound: "404.html",

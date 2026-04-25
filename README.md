@@ -76,6 +76,34 @@ If you set `SITE_URL=https://your-domain.example` when running `npm run site:bui
 
 Deployment notes live in `docs/website/deployment.md`.
 
+## Blog System
+
+The website now also has a repo-native blog system for SEO and AI-search discovery.
+
+- Blog source lives in `content/blog/`
+- Shared parsing, validation, and generation logic lives in `src/lib/`
+- The static site generator renders blog routes during `npm run site:generate`
+
+Useful commands:
+
+- Validate all blog content:
+  - `npm run blog:validate`
+- Generate a draft locally:
+  - `npm run blog:generate -- --dry-run`
+- Run the daily pipeline:
+  - `npm run generate:daily-blog`
+
+The blog system is constrained by explicit policy files:
+
+- `docs/compliance/blog-content-compliance.md`
+- `docs/compliance/blog-media-compliance.md`
+
+## Website Versions
+
+Major website states are preserved as Git tags and branches so earlier versions remain easy to inspect or restore.
+
+- Version history: `docs/website/versions.md`
+
 ## Legal Pack
 
 The repo now also includes a simple clinic-SaaS legal and compliance pack under `docs/legal/`.
