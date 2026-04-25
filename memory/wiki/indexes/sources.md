@@ -1,5 +1,5 @@
 # Source Index
 
-Total notes: 8
+Total notes: 6
 
-- [[wiki/indexes/sources/m-r]] (8)
+- [[wiki/indexes/sources/m-r]] (6)

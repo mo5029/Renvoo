@@ -1,19 +1,50 @@
+import {
+  BOOKING_STORAGE_KEY,
+  collectBookingValues,
+  createBookingPayload,
+  createDownloadFile,
+  createGoogleCalendarUrl,
+  createPlainTextSummary,
+  formatBookingDateTime,
+  getFirstInvalidField,
+  persistBookingRequest,
+  validateBookingStep,
+} from "./lib/booking.js";
+import {
+  getStoredLocale,
+  localizeInternalHref,
+  setStoredLocale,
+  translatePathname,
+} from "./lib/locale.js";
+import { siteContent } from "./lib/site-content.js";
+
 const body = document.body;
-const header = document.querySelector("[data-header]");
-const navToggle = document.querySelector("[data-nav-toggle]");
-const navShell = document.querySelector("[data-nav-shell]");
+const currentLang = body.dataset.lang === "en" ? "en" : "nl";
+const copy = siteContent[currentLang];
 const yearSlot = document.querySelector("[data-year]");
+const isRedirectingForLocale = setupLocalePreference();
 
 if (yearSlot) {
   yearSlot.textContent = String(new Date().getFullYear());
 }
 
-setupHeader();
-setupReveal();
-setupTracking();
-setupContactForm();
+if (!isRedirectingForLocale) {
+  body.classList.add("js-ready");
+  requestAnimationFrame(() => {
+    body.classList.add("is-loaded");
+  });
+
+  setupHeader();
+  setupRevealMotion();
+  setupTracking();
+  setupBookingFlow();
+}
 
 function setupHeader() {
+  const header = document.querySelector("[data-header]");
+  const navToggle = document.querySelector("[data-nav-toggle]");
+  const navShell = document.querySelector("[data-site-nav-shell]");
+
   const syncHeaderState = () => {
     if (!header) {
       return;
@@ -36,8 +67,8 @@ function setupHeader() {
   };
 
   navToggle.addEventListener("click", () => {
-    const isOpen = navToggle.getAttribute("aria-expanded") === "true";
-    setNavState(!isOpen);
+    const nextState = navToggle.getAttribute("aria-expanded") !== "true";
+    setNavState(nextState);
   });
 
   navShell.querySelectorAll("a").forEach((link) => {
@@ -45,7 +76,7 @@ function setupHeader() {
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 1080) {
+    if (window.innerWidth > 980) {
       setNavState(false);
     }
   });
@@ -57,7 +88,7 @@ function setupHeader() {
   });
 }
 
-function setupReveal() {
+function setupRevealMotion() {
   const revealElements = document.querySelectorAll("[data-reveal]");
 
   if (!("IntersectionObserver" in window)) {
@@ -75,8 +106,8 @@ function setupReveal() {
       });
     },
     {
-      threshold: 0.12,
-      rootMargin: "0px 0px -8% 0px",
+      threshold: 0.16,
+      rootMargin: "0px 0px -10% 0px",
     },
   );
 
@@ -86,24 +117,24 @@ function setupReveal() {
 function setupTracking() {
   document.querySelectorAll("[data-track]").forEach((element) => {
     element.addEventListener("click", () => {
-      emitEvent(element.getAttribute("data-track") ?? "interaction", {
+      emitFunnelEvent(element.getAttribute("data-track") ?? "interaction", {
         label: element.textContent?.trim() ?? "",
-        href: element.getAttribute("href") ?? "",
+        href: element instanceof HTMLAnchorElement ? element.getAttribute("href") ?? "" : "",
       });
     });
   });
 }
 
-function emitEvent(name, detail = {}) {
+function emitFunnelEvent(eventName, detail = {}) {
   const payload = {
-    event: name,
-    locale: body.dataset.locale ?? "nl",
+    event: eventName,
+    lang: currentLang,
     page: body.dataset.page ?? "",
     timestamp: new Date().toISOString(),
     ...detail,
   };
 
-  window.dispatchEvent(new CustomEvent("renvoo:track", { detail: payload }));
+  window.dispatchEvent(new CustomEvent("renvoo:funnel", { detail: payload }));
 
   if (Array.isArray(window.dataLayer)) {
     window.dataLayer.push(payload);
@@ -114,81 +145,208 @@ function emitEvent(name, detail = {}) {
   }
 }
 
-function setupContactForm() {
-  const form = document.querySelector("[data-contact-form]");
+function setupLocalePreference() {
+  const preferredLocale = getStoredLocale();
+  const alternatePath =
+    preferredLocale && preferredLocale !== currentLang
+      ? translatePathname(window.location.pathname, preferredLocale)
+      : null;
+
+  if (alternatePath) {
+    const nextUrl = `${alternatePath}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+      window.location.replace(nextUrl);
+      return true;
+    }
+  }
+
+  if (!preferredLocale) {
+    setStoredLocale(currentLang);
+  }
+
+  document.querySelectorAll("a[href]").forEach((link) => {
+    if (!(link instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    link.addEventListener("click", () => {
+      const isLanguageSwitch =
+        link.classList.contains("language-switch") ||
+        link.getAttribute("data-track") === "language_switched" ||
+        link.dataset.localeLink === "true";
+
+      if (isLanguageSwitch) {
+        const targetLang = link.dataset.targetLang === "en" ? "en" : link.dataset.targetLang === "nl" ? "nl" : currentLang === "en" ? "nl" : "en";
+        setStoredLocale(targetLang);
+        return;
+      }
+
+      const preferred = getStoredLocale() ?? currentLang;
+      setStoredLocale(preferred);
+
+      const localizedHref = localizeInternalHref(link.getAttribute("href") ?? "", preferred, window.location.href);
+      if (localizedHref) {
+        link.href = localizedHref;
+      }
+    });
+  });
+
+  return false;
+}
+
+function setupBookingFlow() {
+  const form = document.querySelector("[data-booking-form]");
   if (!(form instanceof HTMLFormElement)) {
     return;
   }
 
-  const status = form.querySelector("[data-contact-status]");
-  const summary = form.querySelector("[data-contact-summary]");
-  const copyButton = form.querySelector("[data-contact-copy]");
-  const mailButton = form.querySelector("[data-contact-mail]");
-  const contactEmail = form.dataset.contactEmail ?? "";
-  const locale = body.dataset.locale === "en" ? "en" : "nl";
-  const translations = {
-    nl: {
-      required: "Vul dit veld in.",
-      email: "Gebruik een geldig e-mailadres.",
-      success:
-        "De samenvatting is klaar. Open de e-mail of kopieer de tekst voor uw follow-up.",
-      copied: "De samenvatting is gekopieerd.",
-      missingEmail:
-        "Er is nog geen publiek contactadres ingesteld. Kopieer de samenvatting en verstuur die via uw gewenste kanaal.",
-      subject: "Workflow review voor Renvoo",
-    },
-    en: {
-      required: "Please fill in this field.",
-      email: "Use a valid email address.",
-      success: "The summary is ready. Open the email or copy the text for follow-up.",
-      copied: "The summary has been copied.",
-      missingEmail:
-        "No public contact email is configured yet. Copy the summary and send it through your preferred channel.",
-      subject: "Renvoo workflow review request",
-    },
-  }[locale];
+  const booking = copy.booking;
+  const labels = booking.labels;
+  const status = form.querySelector("[data-form-status]");
+  const backButton = form.querySelector("[data-booking-back]");
+  const nextButton = form.querySelector("[data-booking-next]");
+  const submitButton = form.querySelector("[data-booking-submit]");
+  const successPanel = document.querySelector("[data-booking-success]");
+  const successHeading = successPanel?.querySelector("[data-success-heading]");
+  const successBody = successPanel?.querySelector("[data-success-body]");
+  const successSummary = successPanel?.querySelector("[data-success-summary]");
+  const successStatus = successPanel?.querySelector("[data-success-status]");
+  const calendarButton = successPanel?.querySelector("[data-booking-calendar]");
+  const copyButton = successPanel?.querySelector("[data-booking-copy]");
+  const downloadButton = successPanel?.querySelector("[data-booking-download]");
+  const restartButton = successPanel?.querySelector("[data-booking-restart]");
+  const panels = Array.from(form.querySelectorAll("[data-step-panel]"));
+  const markers = Array.from(form.querySelectorAll("[data-step-marker]"));
+  const reviewList = form.querySelector("[data-review-list]");
+  const labelMaps = createLabelMaps(booking, labels);
 
+  let currentStep = 1;
+  let started = false;
   let latestSummary = "";
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    clearErrors(form);
+  primeDateTimeFields(form);
+  setStep(1);
 
-    const values = Object.fromEntries(new FormData(form).entries());
-    const errors = validateContactValues(values, translations);
-
-    if (Object.keys(errors).length > 0) {
-      applyErrors(form, errors);
-      const firstField = form.querySelector(`[name="${Object.keys(errors)[0]}"]`);
-      if (firstField instanceof HTMLElement) {
-        firstField.focus();
-      }
+  form.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) {
       return;
     }
 
-    latestSummary = buildSummary(values, locale);
-    if (summary instanceof HTMLElement) {
-      summary.hidden = false;
-      summary.textContent = latestSummary;
+    clearFieldError(form, target.name);
+
+    if (currentStep === 3 && reviewList instanceof HTMLElement) {
+      renderReviewList(reviewList, collectBookingValues(form), labelMaps);
+    }
+  });
+
+  form.addEventListener("change", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) {
+      return;
     }
 
-    if (copyButton instanceof HTMLButtonElement) {
-      copyButton.hidden = false;
+    clearFieldError(form, target.name);
+  });
+
+  nextButton?.addEventListener("click", () => {
+    const values = collectBookingValues(form);
+    const errors = validateBookingStep(currentStep, values);
+
+    if (Object.keys(errors).length) {
+      applyErrors(form, errors, labels.errors);
+      focusFirstField(form, getFirstInvalidField(errors));
+      return;
     }
 
-    if (mailButton instanceof HTMLButtonElement) {
-      mailButton.hidden = false;
+    if (currentStep === 1 && !started) {
+      started = true;
+      emitFunnelEvent("booking_started", {
+        mode: "preview",
+        storageKey: BOOKING_STORAGE_KEY,
+      });
+    }
+
+    setStep(currentStep + 1);
+  });
+
+  backButton?.addEventListener("click", () => {
+    setStep(currentStep - 1);
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const values = collectBookingValues(form);
+    const step1Errors = validateBookingStep(1, values);
+    const step2Errors = validateBookingStep(2, values);
+    const combinedErrors = { ...step1Errors, ...step2Errors };
+
+    if (Object.keys(combinedErrors).length) {
+      const firstField = getFirstInvalidField(combinedErrors);
+      setStep(["meetingFormat", "preferredSlot", "backupSlot"].includes(firstField ?? "") ? 2 : 1);
+      applyErrors(form, combinedErrors, labels.errors);
+      focusFirstField(form, firstField);
+      return;
+    }
+
+    setSubmitting(true);
+
+    const payload = createBookingPayload(values, {
+      locale: copy.locale,
+      page: body.dataset.page ?? "pilot",
+      mode: "preview",
+    });
+    const bookingResult = await submitBookingRequest(payload, labels);
+    persistBookingRequest({
+      ...payload,
+      deliveryMode: bookingResult.mode,
+      eventId: bookingResult.eventId ?? "",
+      warning: bookingResult.warning ?? "",
+    });
+    latestSummary = createPlainTextSummary(payload, labelMaps);
+
+    if (successSummary instanceof HTMLElement) {
+      successSummary.textContent = latestSummary;
+    }
+
+    if (successHeading instanceof HTMLElement) {
+      successHeading.textContent = bookingResult.heading;
+    }
+
+    if (successBody instanceof HTMLElement) {
+      successBody.textContent = bookingResult.body;
+    }
+
+    if (calendarButton instanceof HTMLAnchorElement) {
+      calendarButton.hidden = !bookingResult.actionUrl;
+      calendarButton.textContent = bookingResult.actionLabel;
+      if (bookingResult.actionUrl) {
+        calendarButton.href = bookingResult.actionUrl;
+      }
+    }
+
+    form.hidden = true;
+    if (successPanel instanceof HTMLElement) {
+      successPanel.hidden = false;
     }
 
     if (status instanceof HTMLElement) {
-      status.textContent = contactEmail ? translations.success : translations.missingEmail;
+      status.textContent = bookingResult.statusMessage;
     }
 
-    emitEvent("contact_request_created", {
-      hasConfiguredEmail: Boolean(contactEmail),
-      role: String(values.role ?? ""),
-      clinic: String(values.clinic ?? ""),
+    emitFunnelEvent("booking_submitted", {
+      mode: bookingResult.mode,
+      hasBackupSlot: Boolean(payload.backupSlot),
+      meetingFormat: payload.meetingFormat,
+      hostCalendarBooking: bookingResult.mode === "calendar-event",
     });
+
+    setSubmitting(false);
+  });
+
+  calendarButton?.addEventListener("click", () => {
+    setSuccessStatus(labels.calendarReady);
   });
 
   copyButton?.addEventListener("click", async () => {
@@ -196,115 +354,297 @@ function setupContactForm() {
       return;
     }
 
-    await navigator.clipboard.writeText(latestSummary);
-    if (status instanceof HTMLElement) {
-      status.textContent = translations.copied;
+    try {
+      await navigator.clipboard.writeText(latestSummary);
+      setSuccessStatus(labels.copySuccess);
+    } catch {
+      setSuccessStatus(labels.copyFallback);
     }
   });
 
-  mailButton?.addEventListener("click", () => {
+  downloadButton?.addEventListener("click", () => {
     if (!latestSummary) {
       return;
     }
 
-    if (!contactEmail) {
-      if (status instanceof HTMLElement) {
-        status.textContent = translations.missingEmail;
-      }
+    const fileName =
+      currentLang === "nl" ? "renvoo-gespreksaanvraag.txt" : "renvoo-meeting-request.txt";
+    const download = createDownloadFile(latestSummary, fileName);
+    const link = document.createElement("a");
+    link.href = download.href;
+    link.download = download.fileName;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(download.href), 500);
+    setSuccessStatus(labels.downloadReady);
+  });
+
+  restartButton?.addEventListener("click", () => {
+    form.reset();
+    clearAllErrors(form);
+    primeDateTimeFields(form);
+    form.hidden = false;
+    if (successPanel instanceof HTMLElement) {
+      successPanel.hidden = true;
+    }
+    if (calendarButton instanceof HTMLAnchorElement) {
+      calendarButton.hidden = true;
+      calendarButton.href = "#";
+    }
+    latestSummary = "";
+    setSuccessStatus("");
+    setStep(1);
+    const firstInput = form.querySelector("input, select, textarea");
+    if (firstInput instanceof HTMLElement) {
+      firstInput.focus();
+    }
+  });
+
+  function setStep(step) {
+    currentStep = Math.max(1, Math.min(3, step));
+
+    panels.forEach((panel) => {
+      const panelStep = Number(panel.getAttribute("data-step-panel"));
+      panel.hidden = panelStep !== currentStep;
+    });
+
+    markers.forEach((marker) => {
+      const markerStep = Number(marker.getAttribute("data-step-marker"));
+      marker.classList.toggle("is-active", markerStep === currentStep);
+      marker.classList.toggle("is-complete", markerStep < currentStep);
+    });
+
+    if (backButton instanceof HTMLElement) {
+      backButton.hidden = currentStep !== 3;
+    }
+
+    if (nextButton instanceof HTMLElement) {
+      nextButton.hidden = currentStep === 3;
+    }
+
+    if (submitButton instanceof HTMLElement) {
+      submitButton.hidden = currentStep !== 3;
+    }
+
+    if (status instanceof HTMLElement) {
+      status.textContent =
+        currentStep === 1 ? labels.statusReady : currentStep === 2 ? labels.statusStep2 : labels.statusReview;
+    }
+
+    if (currentStep === 3 && reviewList instanceof HTMLElement) {
+      renderReviewList(reviewList, collectBookingValues(form), labelMaps);
+    }
+  }
+
+  function setSubmitting(isSubmitting) {
+    if (!(submitButton instanceof HTMLButtonElement)) {
       return;
     }
 
-    const href = `mailto:${encodeURIComponent(contactEmail)}?subject=${encodeURIComponent(translations.subject)}&body=${encodeURIComponent(latestSummary)}`;
-    window.location.href = href;
-  });
-}
-
-function validateContactValues(values, translations) {
-  const errors = {};
-  const requiredFields = ["name", "clinic", "role", "email", "preferredTime", "challenge"];
-
-  for (const field of requiredFields) {
-    if (!String(values[field] ?? "").trim()) {
-      errors[field] = translations.required;
-    }
+    submitButton.disabled = isSubmitting;
+    submitButton.textContent = isSubmitting
+      ? currentLang === "nl"
+        ? "Aanvraag versturen…"
+        : "Submitting request…"
+      : labels.buttons.submit;
   }
 
-  const email = String(values.email ?? "").trim();
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = translations.email;
+  function setSuccessStatus(message) {
+    if (successStatus instanceof HTMLElement) {
+      successStatus.textContent = message;
+    }
   }
-
-  return errors;
 }
 
-function buildSummary(values, locale) {
-  const intro =
-    locale === "en"
-      ? "Renvoo workflow review request"
-      : "Verzoek voor een Renvoo workflow review";
+async function submitBookingRequest(payload, labels) {
+  const fallback = {
+    mode: "draft-fallback",
+    heading: labels.statusSuccess,
+    body: labels.successBody,
+    statusMessage: labels.statusSuccess,
+    actionUrl: createGoogleCalendarUrl(payload),
+    actionLabel: labels.buttons.calendar,
+    eventId: "",
+    warning: "",
+  };
 
-  const labels =
-    locale === "en"
-      ? {
-          name: "Name",
-          clinic: "Clinic",
-          role: "Role",
-          email: "Email",
-          phone: "Phone",
-          preferredTime: "Preferred time",
-          challenge: "Main challenge",
-          notes: "Extra context",
-        }
-      : {
-          name: "Naam",
-          clinic: "Praktijk",
-          role: "Rol",
-          email: "E-mail",
-          phone: "Telefoon",
-          preferredTime: "Voorkeurstijd",
-          challenge: "Grootste pijnpunt",
-          notes: "Extra context",
-        };
+  try {
+    const response = await fetch("/api/book-meeting", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  return [
-    intro,
-    "",
-    `${labels.name}: ${String(values.name ?? "").trim()}`,
-    `${labels.clinic}: ${String(values.clinic ?? "").trim()}`,
-    `${labels.role}: ${String(values.role ?? "").trim()}`,
-    `${labels.email}: ${String(values.email ?? "").trim()}`,
-    `${labels.phone}: ${String(values.phone ?? "").trim() || "-"}`,
-    `${labels.preferredTime}: ${String(values.preferredTime ?? "").trim()}`,
-    "",
-    `${labels.challenge}:`,
-    String(values.challenge ?? "").trim(),
-    "",
-    `${labels.notes}:`,
-    String(values.notes ?? "").trim() || "-",
-  ].join("\n");
-}
-
-function applyErrors(form, errors) {
-  for (const [name, message] of Object.entries(errors)) {
-    const field = form.querySelector(`[name="${name}"]`);
-    const errorSlot = form.querySelector(`[data-field-error="${name}"]`);
-
-    if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
-      field.setAttribute("aria-invalid", "true");
+    const json = await response.json().catch(() => null);
+    if (!response.ok || !json?.success) {
+      return {
+        ...fallback,
+        heading: labels.statusFallback,
+        body: labels.successBodyFallback,
+        statusMessage: labels.statusFallback,
+      };
     }
 
+    if (json.mode === "calendar-event") {
+      return {
+        mode: "calendar-event",
+        heading: labels.statusBooked,
+        body: labels.successBodyBooked,
+        statusMessage: labels.statusBooked,
+        actionUrl: json.meetLink || json.htmlLink || "",
+        actionLabel: json.meetLink ? labels.buttons.meet : labels.buttons.calendarBooked,
+        eventId: json.eventId ?? "",
+        warning: "",
+      };
+    }
+
+    return {
+      ...fallback,
+      actionUrl: json.calendarUrl || fallback.actionUrl,
+      warning: json.warning ?? "",
+      heading: json.warning ? labels.statusFallback : fallback.heading,
+      body: json.warning ? labels.successBodyFallback : fallback.body,
+      statusMessage: json.warning ? labels.statusFallback : fallback.statusMessage,
+    };
+  } catch {
+    return {
+      ...fallback,
+      heading: labels.statusFallback,
+      body: labels.successBodyFallback,
+      statusMessage: labels.statusFallback,
+    };
+  }
+}
+
+function createLabelMaps(booking, labels) {
+  return {
+    summaryTitle: labels.summaryTitle,
+    submittedAt: labels.submittedAt,
+    mode: labels.mode,
+    contactName: labels.contactName,
+    contactEmail: labels.contactEmail,
+    role: labels.role,
+    clinicName: labels.clinicName,
+    city: labels.city,
+    clinicSize: labels.clinicSize,
+    primaryPain: labels.primaryPain,
+    workflowNotes: labels.workflowNotes,
+    meetingFormat: labels.meetingFormat,
+    preferredSlot: labels.preferredSlot,
+    backupSlot: labels.backupSlot,
+    roles: Object.fromEntries(booking.roles.map((item) => [item.value, item.label])),
+    clinicSizes: Object.fromEntries(booking.clinicSizes.map((item) => [item.value, item.label])),
+    primaryPains: Object.fromEntries(booking.primaryPains.map((item) => [item.value, item.label])),
+    meetingFormats: Object.fromEntries(booking.meetingFormats.map((item) => [item.value, item.label])),
+  };
+}
+
+function renderReviewList(reviewList, values, labelMaps) {
+  const rows = [
+    [labelMaps.contactName, values.contactName],
+    [labelMaps.contactEmail, values.contactEmail],
+    [labelMaps.role, labelMaps.roles[values.role] ?? values.role],
+    [labelMaps.clinicName, values.clinicName],
+    [labelMaps.city, values.city],
+    [labelMaps.clinicSize, labelMaps.clinicSizes[values.clinicSize] ?? values.clinicSize],
+    [labelMaps.primaryPain, labelMaps.primaryPains[values.primaryPain] ?? values.primaryPain],
+    [labelMaps.workflowNotes, values.workflowNotes],
+    [labelMaps.meetingFormat, labelMaps.meetingFormats[values.meetingFormat] ?? values.meetingFormat],
+    [labelMaps.preferredSlot, formatBookingDateTime(values.preferredSlot, copy.locale)],
+    [labelMaps.backupSlot, values.backupSlot ? formatBookingDateTime(values.backupSlot, copy.locale) : "—"],
+  ];
+
+  reviewList.innerHTML = rows
+    .map(
+      ([label, value]) => `<div><dt>${label}</dt><dd>${value || "—"}</dd></div>`,
+    )
+    .join("");
+}
+
+function applyErrors(form, errors, errorCopy) {
+  clearAllErrors(form);
+
+  Object.entries(errors).forEach(([fieldName, errorKey]) => {
+    const message = errorCopy[errorKey] ?? errorCopy.required;
+    const errorSlot = form.querySelector(`[data-field-error="${fieldName}"]`);
     if (errorSlot instanceof HTMLElement) {
       errorSlot.textContent = message;
     }
+
+    const field = form.querySelector(`[name="${fieldName}"]`);
+    if (field instanceof HTMLElement) {
+      field.setAttribute("aria-invalid", "true");
+    }
+  });
+}
+
+function clearAllErrors(form) {
+  form.querySelectorAll("[data-field-error]").forEach((slot) => {
+    if (slot instanceof HTMLElement) {
+      slot.textContent = "";
+    }
+  });
+
+  form.querySelectorAll("[aria-invalid='true']").forEach((field) => {
+    field.setAttribute("aria-invalid", "false");
+  });
+}
+
+function clearFieldError(form, fieldName) {
+  const errorSlot = form.querySelector(`[data-field-error="${fieldName}"]`);
+  if (errorSlot instanceof HTMLElement) {
+    errorSlot.textContent = "";
+  }
+
+  form.querySelectorAll(`[name="${fieldName}"]`).forEach((field) => {
+    if (field instanceof HTMLElement) {
+      field.setAttribute("aria-invalid", "false");
+    }
+  });
+}
+
+function focusFirstField(form, fieldName) {
+  if (!fieldName) {
+    return;
+  }
+
+  const field = form.querySelector(`[name="${fieldName}"]`);
+  if (field instanceof HTMLElement) {
+    field.focus();
   }
 }
 
-function clearErrors(form) {
-  form.querySelectorAll("[aria-invalid='true']").forEach((field) => {
-    field.removeAttribute("aria-invalid");
-  });
+function primeDateTimeFields(form) {
+  const dateInputs = form.querySelectorAll('input[type="datetime-local"]');
+  if (!dateInputs.length) {
+    return;
+  }
 
-  form.querySelectorAll("[data-field-error]").forEach((slot) => {
-    slot.textContent = "";
+  const minValue = getNextQuarterHourValue();
+  dateInputs.forEach((input) => {
+    if (input instanceof HTMLInputElement) {
+      input.min = minValue;
+    }
   });
+}
+
+function getNextQuarterHourValue() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 45);
+  now.setSeconds(0, 0);
+  const roundedMinutes = Math.ceil(now.getMinutes() / 15) * 15;
+  if (roundedMinutes === 60) {
+    now.setHours(now.getHours() + 1, 0, 0, 0);
+  } else {
+    now.setMinutes(roundedMinutes, 0, 0);
+  }
+
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+function pad(value) {
+  return String(value).padStart(2, "0");
 }

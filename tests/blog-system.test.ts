@@ -38,8 +38,8 @@ function createSyntheticPost(overrides: Record<string, unknown> = {}) {
       "## Praktisch voorbeeld",
       "Het team gebruikt een operationele workflow in plaats van losse herinneringen.",
       "",
-      "[Bekijk no-show reduction](/no-show-reduction/)",
-      "[Plan een kort gesprek](/contact/)",
+      "[Bekijk het product](/product.html)",
+      "[Plan een kort gesprek](/pilot.html#booking)",
     ].join("\n"),
     plainText: [
       "Renvoo helpt praktijken no-shows eerder signaleren en rustiger opvangen.",

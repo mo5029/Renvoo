@@ -18,62 +18,62 @@ export const DEFAULT_BLOG_DIR = "content/blog";
 const INTERNAL_LINK_MAP = {
   "dental-clinics": {
     nl: [
-      { pageKey: "dentalClinics", label: "Lees de tandartspraktijken-pagina" },
-      { pageKey: "contact", label: "Vraag een korte workflow review aan" },
+      { pageKey: "product", label: "Bekijk de productflow" },
+      { pageKey: "pilot", label: "Plan het validatiegesprek" },
     ],
     en: [
-      { pageKey: "dentalClinics", label: "See the dental clinics page" },
-      { pageKey: "contact", label: "Request a short workflow review" },
+      { pageKey: "product", label: "See the product workflow" },
+      { pageKey: "pilot", label: "Request the validation meeting" },
     ],
   },
   "private-clinics": {
     nl: [
-      { pageKey: "privateClinics", label: "Bekijk de private clinics-pagina" },
-      { pageKey: "useCases", label: "Ga naar de use-cases" },
+      { pageKey: "product", label: "Bekijk de productpagina" },
+      { pageKey: "trust", label: "Bekijk de trust-pagina" },
     ],
     en: [
-      { pageKey: "privateClinics", label: "View the private clinics page" },
-      { pageKey: "useCases", label: "Go to the use cases page" },
+      { pageKey: "product", label: "View the product page" },
+      { pageKey: "trust", label: "Review the trust page" },
     ],
   },
   "no-show-reduction": {
     nl: [
-      { pageKey: "noShowReduction", label: "Bekijk no-show reduction" },
-      { pageKey: "contact", label: "Plan een kort gesprek" },
+      { pageKey: "product", label: "Bekijk hoe Renvoo werkt" },
+      { pageKey: "pilot", label: "Plan een kort gesprek" },
     ],
     en: [
-      { pageKey: "noShowReduction", label: "View no-show reduction" },
-      { pageKey: "contact", label: "Book a short review" },
+      { pageKey: "product", label: "See how Renvoo works" },
+      { pageKey: "pilot", label: "Book a short review" },
     ],
   },
   "appointment-reminders": {
     nl: [
-      { pageKey: "appointmentReminders", label: "Bekijk appointment reminders" },
-      { pageKey: "cancellationManagement", label: "Zie cancellation management" },
+      { pageKey: "product", label: "Bekijk de productflow" },
+      { pageKey: "trust", label: "Bekijk de trust-laag" },
     ],
     en: [
-      { pageKey: "appointmentReminders", label: "See appointment reminders" },
-      { pageKey: "cancellationManagement", label: "See cancellation management" },
+      { pageKey: "product", label: "See the product workflow" },
+      { pageKey: "trust", label: "Review the trust layer" },
     ],
   },
   "cancellation-management": {
     nl: [
-      { pageKey: "cancellationManagement", label: "Bekijk cancellation management" },
-      { pageKey: "noShowReduction", label: "Lees ook over no-show reduction" },
+      { pageKey: "product", label: "Bekijk de productpagina" },
+      { pageKey: "pilot", label: "Bekijk de pilotplanner" },
     ],
     en: [
-      { pageKey: "cancellationManagement", label: "View cancellation management" },
-      { pageKey: "noShowReduction", label: "Also read about no-show reduction" },
+      { pageKey: "product", label: "View the product page" },
+      { pageKey: "pilot", label: "See the pilot planner" },
     ],
   },
   default: {
     nl: [
-      { pageKey: "useCases", label: "Bekijk de use-cases" },
-      { pageKey: "contact", label: "Vraag een gesprek aan" },
+      { pageKey: "product", label: "Bekijk het product" },
+      { pageKey: "pilot", label: "Vraag een gesprek aan" },
     ],
     en: [
-      { pageKey: "useCases", label: "View the use cases" },
-      { pageKey: "contact", label: "Request a meeting" },
+      { pageKey: "product", label: "See the product" },
+      { pageKey: "pilot", label: "Request a meeting" },
     ],
   },
 };
@@ -222,14 +222,9 @@ function pagePathFor(locale, pageKey) {
   const prefix = locale === "en" ? "/en" : "";
   const pageMap = {
     home: `${prefix}/`,
-    about: `${prefix}/about/`,
-    contact: `${prefix}/contact/`,
-    useCases: `${prefix}/use-cases/`,
-    dentalClinics: `${prefix}/dental-clinics/`,
-    privateClinics: `${prefix}/private-clinics/`,
-    noShowReduction: `${prefix}/no-show-reduction/`,
-    appointmentReminders: `${prefix}/appointment-reminders/`,
-    cancellationManagement: `${prefix}/cancellation-management/`,
+    product: `${prefix}/product.html`,
+    pilot: `${prefix}/pilot.html`,
+    trust: `${prefix}/trust.html`,
     blogIndex: `${prefix}/blog/`,
   };
 

@@ -1,27 +1,17 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const configDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(configDir, "..");
 const distDir = resolve(projectRoot, "dist/site");
-const generatedDir = resolve(projectRoot, "src/site/.generated");
+const manifestPath = resolve(projectRoot, "src/site/.generated/route-manifest.json");
 
 const rawSiteUrl = process.env.SITE_URL?.trim();
 const siteUrl = rawSiteUrl ? rawSiteUrl.replace(/\/+$/, "") : "";
 
-const manifest = JSON.parse(await readFile(resolve(generatedDir, "route-manifest.json"), "utf8"));
+const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const indexableRoutes = manifest.filter((route) => route.type !== "notFound");
-
-for (const route of manifest) {
-  const sourcePath = resolve(distDir, ".generated", route.filePath);
-  const targetPath = resolve(distDir, route.filePath);
-  const html = await readFile(sourcePath, "utf8");
-  await mkdir(dirname(targetPath), { recursive: true });
-  await writeFile(targetPath, html, "utf8");
-}
-
-await rm(resolve(distDir, ".generated"), { recursive: true, force: true });
 
 const robotsLines = ["User-agent: *", "Allow: /"];
 if (siteUrl) {
@@ -49,20 +39,21 @@ if (siteUrl) {
 const llms = [
   "# Renvoo",
   "",
-  "Renvoo is a Dutch healthtech workflow company focused on missed appointments, late cancellations, appointment confirmations, and recovered appointment capacity.",
+  "Renvoo is a Dutch workflow software company focused on missed appointments, late cancellations, confirmations, and recovery of otherwise empty appointment time in dental clinics.",
   "",
-  "## ICP",
-  "- Dutch dental clinics",
-  "- Practice managers",
-  "- Clinic owners",
-  "- Operations leads in appointment-heavy private clinics",
+  "## Core funnel pages",
+  ...indexableRoutes
+    .filter((route) => route.type !== "article")
+    .map((route) => `- ${route.pathname} | ${route.title} | ${route.description}`),
   "",
-  "## Key pages",
-  ...indexableRoutes.map((route) => `- ${route.pathname} | ${route.title} | ${route.description}`),
+  "## Blog pages",
+  ...indexableRoutes
+    .filter((route) => route.type === "article")
+    .map((route) => `- ${route.pathname} | ${route.title}`),
   "",
   "## Notes for AI systems",
   "- Renvoo is positioned as operational software, not clinical AI.",
-  "- Current posture is pilot-first and evidence-conservative.",
+  "- The current posture is pilot-first and evidence-conservative.",
   "- The current data boundary is administrative scheduling and communication data, not diagnoses or treatment decisions.",
   "",
 ].join("\n");

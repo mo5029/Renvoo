@@ -66,7 +66,7 @@ Een team wil niet alleen herinneren, maar ook weten wanneer extra opvolging zinv
 
 Wanneer een afspraak laat wegvalt, wil een praktijk sneller denken in wachtlijsten, eerdere slots of andere herstelopties. Dat hoort eigenlijk ook bij het gesprek over reminders, omdat juist die reminderflow het eerste signaal van onzekerheid zichtbaar maakt.
 
-Meer over dat bredere proces leest u op de [pagina over cancellation management](/cancellation-management/) en de [pagina over no-show reduction](/no-show-reduction/).
+Meer over dat bredere proces leest u op de [trust-pagina](/trust.html) en de [productpagina](/product.html).
 
 ## Waarom reminder-only tooling in de praktijk te smal kan zijn
 
@@ -103,4 +103,4 @@ Die vragen maken snel zichtbaar of u eigenlijk op zoek bent naar betere reminder
 
 **Appointment reminder automatisering** blijft waardevol. Maar voor veel praktijken is het niet het volledige antwoord. Zodra no-response, late afzeggingen en handmatig herstelwerk de grootste pijnpunten worden, verschuift de behoefte richting een bredere operationele workflow.
 
-Wie dat wil toetsen in de eigen praktijk, kan verder lezen op de [appointment reminders-pagina](/appointment-reminders/) of direct een korte workflow review plannen via [contact](/contact/).
+Wie dat wil toetsen in de eigen praktijk, kan verder lezen op de [productpagina](/product.html) of direct een kort gesprek plannen via de [pilotplanner](/pilot.html#booking).

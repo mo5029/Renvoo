@@ -11,3 +11,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+src/site/.generated/
+src/site/blog/
+src/site/en/blog/

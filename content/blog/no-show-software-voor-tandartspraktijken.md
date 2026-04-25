@@ -65,7 +65,7 @@ Wanneer een afspraak risico loopt, moet het team snel kunnen zien wat de beste v
 
 Een praktijk verdient de waarde van de agenda pas terug wanneer vrijgekomen tijd weer inzetbaar wordt. Daarom hoort herstel van vrijgevallen capaciteit bij het gesprek over **no-show software voor tandartspraktijken**. Dat kan via wachtlijsten, eerdere slots of slim herstel binnen de dag. Wie alleen naar reminders kijkt, laat juist dat stuk liggen.
 
-Meer hierover staat ook op de [pagina over cancellation management](/cancellation-management/) en de [pagina over no-show reduction](/no-show-reduction/).
+Meer hierover staat ook op de [trust-pagina](/trust.html) en de [productpagina](/product.html).
 
 ## Waarom tandartspraktijken de scherpste eerste wedge zijn
 
@@ -99,4 +99,4 @@ De belangrijkste volgende stap is daarom meestal geen grote demo, maar een korte
 
 Wie zoekt naar **no-show software voor tandartspraktijken** zoekt in de praktijk zelden alleen een extra reminder. De echte behoefte zit meestal in eerder risico zien, gerichter kunnen handelen en sneller verloren tijd herstellen. Juist daar wordt het verschil voelbaar in rust, benutting en dagelijkse operatie.
 
-Als u wilt toetsen of die logica ook in uw praktijk herkenbaar is, begin dan met de [tandartspraktijken-pagina](/dental-clinics/) of plan een korte workflow review via [contact](/contact/).
+Als u wilt toetsen of die logica ook in uw praktijk herkenbaar is, begin dan met de [productpagina](/product.html) of plan direct een kort gesprek via de [pilotplanner](/pilot.html#booking).

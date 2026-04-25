@@ -1,107 +1,153 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Renvoo | Pre-launch patient message note</title>
-    <meta
-      name="description"
-      content="Pre-launch patient message note for Renvoo's clinic-triggered reminders, confirmations, and secure rescheduling links."
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./icons/favicon.png"
-    />
-    <link
-      rel="stylesheet"
-      href="./styles.css"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renvoo | Notitie patiëntbericht</title>
+    <meta name="description" content="Pre-launch patient message note voor praktijkgestuurde herinneringen, bevestigingen en veilige verplaatslinks in de eerste Renvoo-pilotfase." />
+    <meta name="theme-color" content="#f4efe7" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Renvoo | Notitie patiëntbericht" />
+    <meta property="og:description" content="Pre-launch patient message note voor praktijkgestuurde herinneringen, bevestigingen en veilige verplaatslinks in de eerste Renvoo-pilotfase." />
+    <meta property="og:url" content="/patient-notice.html" />
+    <meta property="og:image" content="/social-preview.png" />
+    <meta property="og:image:alt" content="Renvoo website preview" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Renvoo | Notitie patiëntbericht" />
+    <meta name="twitter:description" content="Pre-launch patient message note voor praktijkgestuurde herinneringen, bevestigingen en veilige verplaatslinks in de eerste Renvoo-pilotfase." />
+    <meta name="twitter:image" content="/social-preview.png" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="./icons/favicon.png" />
+    <link rel="apple-touch-icon" href="./icons/favicon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+    
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Renvoo",
+  "url": "/",
+  "logo": "/social-preview.png",
+  "description": "Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen.",
+  "areaServed": "NL"
+}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Patiëntbericht",
+      "item": "/patient-notice.html"
+    }
+  ]
+}</script>
   </head>
-  <body>
-    <a class="skip-link" href="#content">Skip to content</a>
-    <div class="page-glow page-glow-one"></div>
-    <div class="page-glow page-glow-two"></div>
+  <body class="page-patientNotice lang-nl" data-lang="nl" data-page="patientNotice" data-prefix="." data-switch-lang="en">
+    <a class="skip-link" href="#content">Ga naar inhoud</a>
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
+    <header class="site-header" data-header>
+  <div class="site-header-inner">
+    <a class="brand-mark" href="/" aria-label="Renvoo Start">
+      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" width="1212" height="274" />
+      <span>Operationele SaaS voor rustigere agenda's</span>
+    </a>
+    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open navigatie">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="site-nav-shell" data-site-nav-shell>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="" href="/">Start</a><a class="" href="/product.html">Product</a><a class="" href="/pilot.html">Pilot</a><a class="" href="/trust.html">Vertrouwen</a><a class="" href="/blog/">Blog</a>
+      </nav>
+      <div class="site-header-actions">
+        <a class="language-switch" href="/en/patient-notice.html" data-track="language_switched">EN</a>
+        <a class="header-cta" href="/pilot.html#booking" data-track="nav_book_meeting">Plan gesprek</a>
+      </div>
+    </div>
+  </div>
+</header>
+    <nav class="breadcrumbs chapter" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Start</a></li><li><span>Patiëntbericht</span></li>
+    </ol>
+  </nav>
+    <main id="content" class="site-main">
+      
+    <section class="chapter legal-hero">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">Pre-launch note</p>
+          <h1>Notitie patiëntbericht</h1>
+          <p class="hero-lead">Deze pagina laat de korte patiëntnotitie zien die Renvoo wil gebruiken voor praktijkgestuurde reminders, bevestigingen en veilige verplaatslinks in de eerste pilotfase.</p>
+        </div>
+      </div>
+    </section>
 
-    <header class="site-header">
-      <a class="brand" href="./index.html" aria-label="Renvoo home">
-        <img
-          src="./assets/renvoo-logo-horizontal.png"
-          alt="Renvoo"
-        />
-      </a>
-      <a class="nav-cta" href="./index.html">Back to home</a>
-    </header>
-
-    <main id="content" class="legal-page">
-      <section class="section-shell legal-hero">
-        <p class="eyebrow">Pre-launch note</p>
-        <h1>Patient message note</h1>
-        <p class="lead">
-          This page shows the short-form patient notice Renvoo plans to use for clinic-triggered
-          reminders, confirmations, and secure rescheduling links during the first pilot phase.
-        </p>
-      </section>
-
-      <section class="section-shell legal-stack">
-        <article class="legal-card">
-          <h2>Short version</h2>
-          <p>
-            Your clinic may use Renvoo to help manage appointment confirmations, rescheduling, and
-            recovery of otherwise unused appointment time. Renvoo acts on behalf of the clinic for
-            those operational messages.
-          </p>
-        </article>
-
-        <article class="legal-card">
-          <h2>Role split</h2>
-          <ul class="legal-list">
-            <li>your clinic stays responsible for your care relationship and patient data</li>
-            <li>Renvoo provides the operational workflow as a service provider to the clinic</li>
-            <li>questions about your appointment or privacy rights should first go to your clinic</li>
-          </ul>
-        </article>
-
-        <article class="legal-card">
-          <h2>What data is meant to be used</h2>
-          <ul class="legal-list">
-            <li>your name and contact details</li>
-            <li>your appointment time and appointment status</li>
-            <li>message and response status needed for scheduling operations</li>
-          </ul>
-        </article>
-
-        <article class="legal-card">
-          <h2>What this is not</h2>
-          <ul class="legal-list">
-            <li>not a patient account or patient portal</li>
-            <li>not a diagnosis tool</li>
-            <li>not a treatment recommendation or medical advice service</li>
-          </ul>
-        </article>
-
-        <article class="legal-card">
-          <h2>Current implementation note</h2>
-          <p>
-            Before live pilot use, the clinic-specific wording, contact details, and approved data
-            categories should be finalized in the formal notice from the legal pack.
-          </p>
-        </article>
-      </section>
+    <section class="chapter legal-grid">
+      <div class="legal-stack">
+        <article class="legal-card" data-reveal style="--reveal-delay: 0ms;">
+            <h2>Korte versie</h2>
+            <p>Uw praktijk kan Renvoo gebruiken om afspraakbevestigingen, verplaatsingen en herstel van anders ongebruikte tijd te ondersteunen. Renvoo werkt daarbij namens de praktijk voor deze operationele berichten.</p>
+            
+          </article><article class="legal-card" data-reveal style="--reveal-delay: 70ms;">
+            <h2>Rolverdeling</h2>
+            
+            <ul class="bullet-list compact"><li>uw praktijk blijft verantwoordelijk voor de zorgrelatie en uw patiëntdata</li><li>Renvoo levert de operationele workflow als serviceprovider voor de praktijk</li><li>vragen over uw afspraak of privacyrechten horen in eerste instantie bij uw praktijk</li></ul>
+          </article><article class="legal-card" data-reveal style="--reveal-delay: 140ms;">
+            <h2>Welke data hier bedoeld is</h2>
+            
+            <ul class="bullet-list compact"><li>uw naam en contactgegevens</li><li>uw afspraakmoment en afspraakstatus</li><li>bericht- en responsstatus die nodig is voor planningsoperatie</li></ul>
+          </article><article class="legal-card" data-reveal style="--reveal-delay: 210ms;">
+            <h2>Wat dit niet is</h2>
+            
+            <ul class="bullet-list compact"><li>geen patiëntaccount of patiëntportaal</li><li>geen diagnosetool</li><li>geen behandeladvies of medische dienst</li></ul>
+          </article><article class="legal-card" data-reveal style="--reveal-delay: 280ms;">
+            <h2>Implementatienotitie</h2>
+            <p>Vóór live pilotgebruik moeten praktijkspecifieke formuleringen, contactgegevens en goedgekeurde datacategorieën definitief worden gemaakt in de formele legal notice.</p>
+            
+          </article>
+      </div>
+    </section>
+  
     </main>
-
-    <footer class="site-footer section-shell">
-      <p>Renvoo is being kept intentionally simple in v1.</p>
-      <p class="footer-links">
-        <a href="./index.html">Home</a>
-        <a href="./privacy.html">Website privacy note</a>
-      </p>
-      <p><span data-year></span> Renvoo.</p>
-    </footer>
-
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-summary">
+      <p class="footer-kicker">Renvoo</p>
+      <p>Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen.</p>
+    </div>
+    <div>
+      <p class="footer-title">Funnel</p>
+      <ul class="footer-links"><li><a href="/">Start</a></li><li><a href="/product.html">Product</a></li><li><a href="/pilot.html">Pilot</a></li><li><a href="/trust.html">Vertrouwen</a></li><li><a href="/blog/">Blog</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Juridisch</p>
+      <ul class="footer-links"><li><a href="/privacy.html">Privacyverklaring website</a></li><li><a href="/patient-notice.html">Notitie patiëntbericht</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Taal</p>
+      <ul class="footer-links"><li><a href="/en/" data-locale-link="true" data-target-lang="en">English</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-meta">
+    <p>Gebouwd rond pilot-proof, niet rond opgeblazen claims.</p>
+    <p><span data-year></span> Renvoo</p>
+  </div>
+</footer>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

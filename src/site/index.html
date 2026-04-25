@@ -1,591 +1,239 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Renvoo | Reduce no-shows. Recover lost appointments.</title>
-    <meta
-      name="description"
-      content="Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work."
-    />
-    <meta
-      name="theme-color"
-      content="#0d667c"
-    />
-    <meta
-      property="og:title"
-      content="Renvoo | Reduce no-shows. Recover lost appointments."
-    />
-    <meta
-      property="og:description"
-      content="Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work."
-    />
-    <meta
-      property="og:type"
-      content="website"
-    />
-    <meta
-      property="og:url"
-      content="__SITE_URL__/"
-    />
-    <meta
-      property="og:image"
-      content="__SOCIAL_IMAGE__"
-    />
-    <meta
-      property="og:image:alt"
-      content="Preview of the Renvoo clinic one-pager"
-    />
-    <meta
-      name="twitter:card"
-      content="summary_large_image"
-    />
-    <meta
-      name="twitter:title"
-      content="Renvoo | Reduce no-shows. Recover lost appointments."
-    />
-    <meta
-      name="twitter:description"
-      content="Renvoo helps dental clinics reduce no-shows, handle late cancellations earlier, and recover lost appointment capacity without adding front-desk work."
-    />
-    <meta
-      name="twitter:image"
-      content="__SOCIAL_IMAGE__"
-    />
-    <link
-      rel="canonical"
-      href="__SITE_URL__/"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="./icons/favicon.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      href="./icons/favicon.png"
-    />
-    <link
-      rel="manifest"
-      href="./site.webmanifest"
-    />
-    <link
-      rel="stylesheet"
-      href="./styles.css"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renvoo | Minder no-shows. Meer grip op de agenda.</title>
+    <meta name="description" content="Renvoo helpt Nederlandse tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken beter herstellen zonder extra front-desk werk." />
+    <meta name="theme-color" content="#f4efe7" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Renvoo | Minder no-shows. Meer grip op de agenda." />
+    <meta property="og:description" content="Renvoo helpt Nederlandse tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken beter herstellen zonder extra front-desk werk." />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/social-preview.png" />
+    <meta property="og:image:alt" content="Renvoo website preview" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Renvoo | Minder no-shows. Meer grip op de agenda." />
+    <meta name="twitter:description" content="Renvoo helpt Nederlandse tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken beter herstellen zonder extra front-desk werk." />
+    <meta name="twitter:image" content="/social-preview.png" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="./icons/favicon.png" />
+    <link rel="apple-touch-icon" href="./icons/favicon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+    
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Renvoo",
+  "url": "/",
+  "logo": "/social-preview.png",
+  "description": "Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen.",
+  "areaServed": "NL"
+}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Renvoo",
+  "url": "/",
+  "inLanguage": "nl-NL",
+  "description": "Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen."
+}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Renvoo",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "nl-NL",
+  "description": "Renvoo helpt tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken sneller herstellen zonder extra front-desk werk.",
+  "url": "/",
+  "featureList": [
+    "No-show reduction workflow",
+    "Appointment confirmation support",
+    "Late cancellation handling",
+    "Recovered capacity and backfill support"
+  ]
+}</script>
   </head>
-  <body>
-    <a class="skip-link" href="#content">Skip to content</a>
-    <div class="page-glow page-glow-one"></div>
-    <div class="page-glow page-glow-two"></div>
-
+  <body class="page-home lang-nl" data-lang="nl" data-page="home" data-prefix="." data-switch-lang="en">
+    <a class="skip-link" href="#content">Ga naar inhoud</a>
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
     <header class="site-header" data-header>
-      <a class="brand" href="#content" aria-label="Renvoo home">
-        <img
-          src="./assets/renvoo-logo-horizontal.png"
-          alt="Renvoo"
-        />
-      </a>
-      <button
-        class="nav-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="site-nav"
-        data-nav-toggle
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-        <span class="sr-only">Toggle navigation</span>
-      </button>
-      <nav class="site-nav" id="site-nav" aria-label="Primary" data-site-nav>
-        <a href="#problem">Problem</a>
-        <a href="#workflow">Workflow</a>
-        <a href="#proof">Proof posture</a>
-        <a href="#compliance">Compliance</a>
-        <a href="#path">Pilot path</a>
-        <a href="#materials">Materials</a>
-        <a href="#faq">FAQ</a>
-        <a href="#pilot">Pilot</a>
-        <a class="site-nav-cta" href="#contact">Validation meeting</a>
+  <div class="site-header-inner">
+    <a class="brand-mark" href="/" aria-label="Renvoo Start">
+      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" width="1212" height="274" />
+      <span>Operationele SaaS voor rustigere agenda's</span>
+    </a>
+    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open navigatie">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="site-nav-shell" data-site-nav-shell>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="is-active" href="/">Start</a><a class="" href="/product.html">Product</a><a class="" href="/pilot.html">Pilot</a><a class="" href="/trust.html">Vertrouwen</a><a class="" href="/blog/">Blog</a>
       </nav>
-      <a class="nav-cta" href="#contact" data-nav-cta>Validation meeting</a>
-    </header>
-
-    <main id="content">
-      <section class="hero section-shell">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">B2B clinic SaaS for Dutch dental clinics</p>
-          <h1>Reduce no-shows. Recover lost appointments.</h1>
-          <p class="lead">
-            Renvoo is a B2B clinic SaaS for Dutch dental clinics that helps reduce no-shows,
-            handle late cancellations earlier, and recover lost appointment capacity without
-            adding front-desk work.
-          </p>
+      <div class="site-header-actions">
+        <a class="language-switch" href="/en/" data-track="language_switched">EN</a>
+        <a class="header-cta" href="/pilot.html#booking" data-track="nav_book_meeting">Plan gesprek</a>
+      </div>
+    </div>
+  </div>
+</header>
+    
+    <main id="content" class="site-main">
+      
+    <section class="chapter hero-home">
+      <div class="hero-grid">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">Voor Nederlandse tandartspraktijken</p>
+          <h1>Minder no-shows. Meer grip op de agenda.</h1>
+          <p class="hero-lead">Renvoo helpt tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken sneller herstellen zonder extra front-desk werk.</p>
           <div class="hero-actions">
-            <a
-              class="button button-primary"
-              href="./downloads/renvoo-clinic-one-pager.pptx"
-              download
-            >
-              Download the one-pager
-            </a>
-            <a class="button button-secondary" href="#pilot">See the pilot brief</a>
+            <a class="button button-primary" href="/pilot.html#booking" data-track="hero_cta">Vraag een validatiegesprek aan</a>
+            <a class="button button-secondary" href="/product.html">Bekijk hoe het werkt</a>
           </div>
-          <ul class="hero-badges" aria-label="Key positioning">
-            <li>Operational workflow SaaS</li>
-            <li>No patient accounts in v1</li>
-            <li>Admin-data-only onboarding</li>
-          </ul>
+          
         </div>
-
-        <div class="hero-panel reveal">
-          <div class="panel-frame">
-            <div class="panel-topline">
-              <span>Clinic operations view</span>
-              <span>Pilot-facing workflow</span>
-            </div>
-            <div class="panel-grid">
-              <article class="signal-card signal-risk">
-                <span class="signal-step">Detect</span>
-                <h2>Chair time at risk</h2>
-                <p>High-risk appointments surface before the slot is lost.</p>
-                <ul>
-                  <li>Tuesday 14:00 implant consult</li>
-                  <li>Thursday 09:30 hygiene block</li>
-                  <li>Friday 16:15 follow-up visit</li>
-                </ul>
-              </article>
-              <article class="signal-card signal-confirm">
-                <span class="signal-step">Confirm</span>
-                <h2>Act earlier</h2>
-                <p>Escalate confirmation and rescheduling before uncertainty becomes waste.</p>
-                <div class="status-stack">
-                  <span class="status-chip">SMS sent</span>
-                  <span class="status-chip">Reply pending</span>
-                  <span class="status-chip">Phone fallback queued</span>
-                </div>
-              </article>
-              <article class="signal-card signal-replace">
-                <span class="signal-step">Replace</span>
-                <h2>Recover capacity</h2>
-                <p>Use waitlists and earlier-slot offers to backfill otherwise empty time.</p>
-                <div class="recovery-meter">
-                  <span></span>
-                </div>
-                <small>Backfill remains under clinic control.</small>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="insight-band section-shell reveal" id="problem">
-        <div class="section-heading">
-          <p class="eyebrow">The problem</p>
-          <h2>Reminders exist. Prevention does not.</h2>
-          <p>
-            Sending the same reminder to everyone still leaves clinics reacting too late.
-          </p>
-        </div>
-        <div class="problem-grid">
-          <article class="problem-card">
-            <h3>No-shows turn booked time into lost revenue</h3>
-            <p>
-              A booked slot only creates value if the patient actually shows up. Empty chair time
-              is immediate lost capacity.
-            </p>
-          </article>
-          <article class="problem-card">
-            <h3>Late cancellations still leave chair time empty</h3>
-            <p>
-              Even when patients tell you, late notice often arrives too late to save the slot.
-            </p>
-          </article>
-          <article class="problem-card">
-            <h3>Admin work grows around uncertainty</h3>
-            <p>
-              Confirmations, rescheduling, and recovery work all increase when attendance is
-              unclear.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="workflow section-shell" id="workflow">
-        <div class="section-heading reveal">
-          <p class="eyebrow">The workflow</p>
-          <h2>Connect. Detect. Confirm. Replace.</h2>
-          <p>
-            Renvoo is designed as a clinic operations layer, not just a reminder tool.
-          </p>
-        </div>
-        <div class="workflow-grid">
-          <article class="workflow-card reveal">
-            <span>01</span>
-            <h3>Connect</h3>
-            <p>
-              Start with lightweight exports, read-only inputs, or local connector flows instead of
-              heavy enterprise integration.
-            </p>
-          </article>
-          <article class="workflow-card reveal">
-            <span>02</span>
-            <h3>Detect</h3>
-            <p>
-              Highlight higher-risk appointments using operational scheduling and communication
-              signals.
-            </p>
-          </article>
-          <article class="workflow-card reveal">
-            <span>03</span>
-            <h3>Confirm</h3>
-            <p>
-              Support earlier outreach, clearer status tracking, and lower uncertainty before the
-              slot is lost.
-            </p>
-          </article>
-          <article class="workflow-card reveal">
-            <span>04</span>
-            <h3>Replace</h3>
-            <p>
-              Help clinics recover otherwise empty time through waitlists or earlier-slot movement
-              while keeping operational control with staff.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="path section-shell" id="path">
-        <div class="section-heading reveal">
-          <p class="eyebrow">How a pilot starts</p>
-          <h2>Start with a short workflow review, not a heavy software project</h2>
-          <p>
-            The point of the first conversation is to understand where uncertainty creates empty
-            chair time and whether a lightweight pilot is justified.
-          </p>
-        </div>
-        <div class="path-grid">
-          <article class="path-card reveal">
-            <span>Step 1</span>
-            <h3>Validation meeting</h3>
-            <p>
-              Review current no-show, late-cancellation, confirmation, and rescheduling workflow
-              with the clinic owner or practice manager.
-            </p>
-          </article>
-          <article class="path-card reveal">
-            <span>Step 2</span>
-            <h3>Lightweight intake</h3>
-            <p>
-              Start with operational scheduling and communication data through CSV-first or
-              read-only inputs instead of pushing for deep integration on day one.
-            </p>
-          </article>
-          <article class="path-card reveal">
-            <span>Step 3</span>
-            <h3>Measure real outcomes</h3>
-            <p>
-              Use the pilot to learn whether no-show reduction, recovered revenue, and lower
-              front-desk load show up clearly enough to earn a broader rollout.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="proof section-shell" id="proof">
-        <div class="proof-grid">
-          <article class="proof-card proof-card-primary reveal">
-            <p class="eyebrow">Proof posture</p>
-            <h2>Built to validate with clinics, not just describe the problem</h2>
-            <p>
-              The case today is based on operating logic and scenario math. The point of a pilot is
-              to prove the outcome on real clinic workflows without overreaching into clinical data.
-            </p>
-            <div class="metric-row">
-              <div>
-                <strong>15-25%</strong>
-                <span>pilot target for no-show reduction</span>
-              </div>
-              <div>
-                <strong>30%+</strong>
-                <span>backfill target within 72 hours</span>
-              </div>
-              <div>
-                <strong>20%+</strong>
-                <span>admin time reduction target</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="proof-card reveal">
-            <p class="eyebrow">Data boundary</p>
-            <h2>Operational AI with a narrower data surface</h2>
-            <ul class="boundary-list">
-              <li>Non-clinical administrative scheduling data only</li>
-              <li>No diagnoses, clinical notes, or treatment decisions required</li>
-              <li>Auditability and staff visibility are part of the product skeleton</li>
+        <aside class="hero-rail" data-motion="intro" style="--motion-delay: 120ms;">
+          <div class="hero-note">
+            <p class="hero-note-kicker">Waar operators direct last van hebben</p>
+            <ul>
+              <li>Boekingen lijken gevuld, maar stoeltijd blijft kwetsbaar.</li><li>Late afzeggingen geven te weinig tijd om slim te herstellen.</li><li>Front-desk teams vangen de onzekerheid handmatig op.</li>
             </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="insight-band section-shell reveal" id="compliance">
-        <div class="section-heading">
-          <p class="eyebrow">Compliance posture</p>
-          <h2>Kept deliberately simple for the first clinic pilots</h2>
-          <p>
-            Renvoo is being launched as clinic SaaS, not as a patient platform or public
-            marketplace. The data and contract model stay narrow on purpose.
-          </p>
-        </div>
-        <div class="problem-grid">
-          <article class="problem-card">
-            <h3>Clinic controls patient data</h3>
-            <p>
-              For appointment and patient operational data, the clinic stays controller and Renvoo
-              acts as processor under clinic instruction.
-            </p>
-          </article>
-          <article class="problem-card">
-            <h3>v1 stays out of the patient-platform trap</h3>
-            <p>
-              No public marketplace, no user-generated content, no patient subscriptions, and no
-              patient accounts in the first release.
-            </p>
-          </article>
-          <article class="problem-card">
-            <h3>Non-clinical boundary by default</h3>
-            <p>
-              The default rollout excludes BSN, diagnosis, medication, lab data, treatment
-              decisions, and clinical free text.
-            </p>
-          </article>
-        </div>
-        <div class="download-actions compliance-actions">
-          <a class="button button-secondary" href="./privacy.html">Website privacy note</a>
-          <a class="button button-secondary" href="./patient-notice.html">Patient message note</a>
-        </div>
-      </section>
-
-      <section class="pilot section-shell" id="pilot">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Preliminary pilot</p>
-          <h2>Low-friction by design</h2>
-          <p>
-            Enough to frame budget fit now, while keeping the commercial commitment honest.
-          </p>
-        </div>
-        <div class="pilot-grid">
-          <article class="pilot-card reveal">
-            <h3>What clinics should expect</h3>
-            <p>
-              Founder-led onboarding, lightweight data intake, and a workflow focused on
-              confirmation, rescheduling, and capacity recovery without asking patients to create a
-              new account.
-            </p>
-            <ul class="pilot-list">
-              <li>Dental-first positioning</li>
-              <li>Read-only or CSV-first rollout</li>
-              <li>Staff control over schedule changes</li>
-            </ul>
-          </article>
-          <article class="pilot-card pilot-card-accent reveal">
-            <h3>Preliminary pilot pricing</h3>
-            <p class="pricing-line">
-              Preliminary pilot pricing starts at EUR 2.49 per appointment, plus a fixed fee
-              depending on the clinic. Final pricing is still being shaped with pilot partners.
-            </p>
-            <small>
-              Pricing is intentionally presented as preliminary because it still needs shaping with
-              real pilot partners.
-            </small>
-          </article>
-        </div>
-      </section>
-
-      <section class="founder section-shell reveal">
-        <div class="founder-card">
-          <div class="founder-copy">
-            <p class="eyebrow">Founder credibility</p>
-            <h2>Built to have practical conversations with operators</h2>
-            <p>
-              Renvoo is being built by Mohamed Ibrahim, former Electrical Subteam Lead for Team
-              Polar at TU/e and part of the NVIDIA 6G Developer Program.
-            </p>
           </div>
-          <img
-            class="founder-mark"
-            src="./assets/renvoo-logo-user-cropped.png"
-            alt="Renvoo mark"
-          />
-        </div>
-      </section>
+        </aside>
+      </div>
+    </section>
 
-      <section class="materials section-shell" id="materials">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Clinic materials</p>
-          <h2>Built to support real outreach, not just sit on a homepage</h2>
-          <p>
-            The current website pass ships with the same clinic-facing materials already used in
-            founder-led outreach.
-          </p>
-        </div>
-        <div class="materials-grid">
-          <article class="materials-copy reveal">
-            <div class="materials-card">
-              <h3>What is ready now</h3>
-              <ul class="boundary-list">
-                <li>Clinic one-pager for leave-behinds and email follow-up</li>
-                <li>Clinic deck for validation calls and short pilot discussions</li>
-                <li>Messaging aligned with the current dental-first B2B SaaS wedge</li>
-                <li>Pre-launch privacy and patient message notes for the simple pilot model</li>
-              </ul>
-              <div class="download-actions">
-                <a
-                  class="button button-primary"
-                  href="./downloads/renvoo-clinic-one-pager.pptx"
-                  download
-                >
-                  Download the one-pager
-                </a>
-                <a
-                  class="button button-secondary"
-                  href="./downloads/renvoo-clinic-deck.pptx"
-                  download
-                >
-                  Download the clinic deck
-                </a>
-              </div>
-            </div>
+    <section class="chapter story-grid">
+      <div class="section-heading" data-reveal>
+    <p class="eyebrow">Het echte probleem</p>
+    <h2>De schade zit niet alleen in de no-show.</h2>
+    <p class="section-intro">Het verlies ontstaat in de combinatie van lege stoeluren, te late signalen en extra herstelwerk rond bevestigen, verplaatsen en opvullen.</p>
+  </div>
+      <div class="editorial-grid">
+        <article class="story-card" data-reveal style="--reveal-delay: 0ms;">
+            <h3>Lege stoeluren raken direct de omzet</h3>
+            <p>Een geplande afspraak levert pas iets op als de patiënt ook echt verschijnt.</p>
+          </article><article class="story-card" data-reveal style="--reveal-delay: 90ms;">
+            <h3>Late uitval is vaak netjes gemeld, maar nog steeds duur</h3>
+            <p>Zelfs een keurige afmelding kan te laat komen om de stoel nog te redden.</p>
+          </article><article class="story-card" data-reveal style="--reveal-delay: 180ms;">
+            <h3>Herstelwerk groeit rond onzekerheid</h3>
+            <p>Bevestigen, nabellen, schuiven en terugvullen belanden als extra werk bij het team.</p>
           </article>
+      </div>
+    </section>
 
-          <article class="materials-previews reveal" aria-label="Material previews">
-            <figure class="preview-tile preview-tile-large">
-              <img
-                src="./assets/previews/one-pager-preview.png"
-                alt="Preview of the Renvoo clinic one-pager"
-              />
-              <figcaption>Clinic one-pager preview</figcaption>
-            </figure>
-            <figure class="preview-tile">
-              <img
-                src="./assets/previews/deck-slide-01.png"
-                alt="Preview of the Renvoo clinic deck cover slide"
-              />
-              <figcaption>Deck opening slide</figcaption>
-            </figure>
-            <figure class="preview-tile">
-              <img
-                src="./assets/previews/deck-slide-07.png"
-                alt="Preview of the Renvoo clinic deck solution slide"
-              />
-              <figcaption>Operational workflow slide</figcaption>
-            </figure>
+    <section class="chapter workflow-preview">
+      <div class="section-heading" data-reveal>
+    <p class="eyebrow">Hoe Renvoo denkt</p>
+    <h2>Van losse reminders naar planningszekerheid</h2>
+    <p class="section-intro">De pilot is ontworpen als operationele workflowlaag. Eerst zien waar risico zit, daarna gerichter bevestigen of verplaatsen en pas dan herstellen.</p>
+  </div>
+      <div class="timeline-grid">
+        <article class="timeline-card" data-reveal style="--reveal-delay: 0ms;">
+            <span class="step-chip">Connect</span>
+            <p>Start met plannings- en communicatiedata, niet met klinische inhoud.</p>
+          </article><article class="timeline-card" data-reveal style="--reveal-delay: 80ms;">
+            <span class="step-chip">Detect</span>
+            <p>Maak risicovolle afspraken eerder zichtbaar dan de standaard reminderflow doet.</p>
+          </article><article class="timeline-card" data-reveal style="--reveal-delay: 160ms;">
+            <span class="step-chip">Confirm</span>
+            <p>Geef het team een duidelijker moment om te bevestigen of te verplaatsen.</p>
+          </article><article class="timeline-card" data-reveal style="--reveal-delay: 240ms;">
+            <span class="step-chip">Replace</span>
+            <p>Help verloren capaciteit sneller terug te winnen terwijl de praktijk de controle houdt.</p>
           </article>
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="faq section-shell" id="faq">
-        <div class="section-heading reveal">
-          <p class="eyebrow">Questions clinics ask first</p>
-          <h2>Objection handling without startup theater</h2>
-          <p>
-            The first conversations are usually practical: workflow disruption, data boundaries,
-            and whether the outcome is worth changing anything at all.
-          </p>
-        </div>
-        <div class="faq-grid reveal">
-          <details class="faq-item">
-            <summary>We already send reminders.</summary>
-            <p>
-              That makes sense. The gap Renvoo focuses on is what happens when reminders are not
-              enough: no response, late notice, and the manual work needed to recover capacity
-              before the chair time is lost.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>We do not want another system.</summary>
-            <p>
-              That is exactly why the current direction is low-friction. The goal is not to force a
-              heavy system change, but to fit around current scheduling operations with lightweight
-              onboarding and operational visibility.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>We are careful with patient data.</summary>
-            <p>
-              That caution is right. Renvoo is designed around non-clinical administrative
-              scheduling and communication data, not diagnoses, clinical notes, or treatment
-              decisions.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>Do patients need a Renvoo account?</summary>
-            <p>
-              No. The current v1 posture is clinic SaaS, not a patient platform. The intention is
-              to use clinic-triggered reminders, confirmations, and secure links without adding a
-              separate patient account unless a later phase clearly requires it.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>We are too busy to change workflow.</summary>
-            <p>
-              The point of a short validation meeting is not to introduce a full rollout. It is to
-              understand the current workflow and see whether there is enough operational pain to
-              justify a lightweight pilot.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>How do we know this is worth it?</summary>
-            <p>
-              That is the key question. The current case is based on clear operational logic and
-              scenario math, and the pilot stage exists to validate real no-show reduction,
-              recovered revenue, and reduced admin burden with actual clinic workflows.
-            </p>
-          </details>
-        </div>
-      </section>
+    <section class="chapter proof-grid">
+      <div class="section-heading" data-reveal>
+    <p class="eyebrow">Waarom dit geloofwaardig voelt</p>
+    <h2>Gebouwd om met praktijken te valideren, niet om alvast te overbeloven.</h2>
+    
+  </div>
+      <div class="split-cards">
+        <article class="glass-card" data-reveal style="--reveal-delay: 0ms;">
+            <h3>Bewijspositie</h3>
+            <p>De huidige case rust op duidelijke operationele logica en scenario-denken. De pilot is er juist om echte reductie, herstel en tijdswinst te bewijzen.</p>
+          </article><article class="glass-card" data-reveal style="--reveal-delay: 110ms;">
+            <h3>Datagrens</h3>
+            <p>Renvoo is bewust gepositioneerd rond administratieve planning- en communicatiegegevens, niet rond diagnoses, notities of behandelbeslissingen.</p>
+          </article>
+      </div>
+    </section>
 
-      <section class="contact section-shell" id="contact">
-        <div class="contact-card reveal">
-          <p class="eyebrow">Current ask</p>
-          <h2>We are looking for a short validation meeting.</h2>
-          <p>
-            We are looking for a short validation meeting with a dental clinic owner or practice
-            manager to review your current no-show and rescheduling workflow.
-          </p>
-          <div class="contact-actions">
-            <a
-              class="button button-primary"
-              href="./downloads/renvoo-clinic-one-pager.pptx"
-              download
-            >
-              Download the one-pager
-            </a>
-            <a class="button button-secondary" href="#materials">See the materials</a>
-          </div>
-          <div class="contact-tags">
-            <span>Dental clinics first</span>
-            <span>Operational value, not AI theater</span>
-            <span>Lightweight onboarding path</span>
-          </div>
-        </div>
-      </section>
+    <section class="chapter path-grid">
+      <div class="section-heading" data-reveal>
+    <p class="eyebrow">Kies uw route</p>
+    <h2>Niet iedereen wil hetzelfde eerst zien.</h2>
+    
+  </div>
+      <div class="path-cards">
+        <article class="path-card" data-reveal style="--reveal-delay: 0ms;">
+            <h3>Eerst begrijpen wat het product doet</h3>
+            <p>Bekijk de volledige Connect → Detect → Confirm → Replace workflow.</p>
+            <a class="inline-link" href="/product.html">Naar product</a>
+          </article><article class="path-card" data-reveal style="--reveal-delay: 90ms;">
+            <h3>Eerst zien hoe de pilot werkt</h3>
+            <p>Bekijk de validatie-opzet, de meetingstructuur en de planner.</p>
+            <a class="inline-link" href="/pilot.html">Naar pilot</a>
+          </article><article class="path-card" data-reveal style="--reveal-delay: 180ms;">
+            <h3>Eerst vertrouwen en datagrens controleren</h3>
+            <p>Zie de controller/processor-posture, FAQ en clinic-materialen.</p>
+            <a class="inline-link" href="/trust.html">Naar vertrouwen</a>
+          </article>
+      </div>
+    </section>
+
+    <section class="chapter closing-band">
+    <div class="cta-strip" data-reveal>
+      <div>
+        <p class="eyebrow">Volgende stap</p>
+        <h2>De volgende stap is klein en praktisch.</h2>
+        <p>We zoeken een kort validatiegesprek met een praktijkhouder of praktijkmanager om de huidige no-show- en uitvalworkflow te begrijpen.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="button button-primary" href="/pilot.html#booking">Plan het gesprek</a>
+        <a class="button button-secondary" href="/pilot.html">Bekijk eerst de pilot</a>
+      </div>
+    </div>
+  </section>
+  
     </main>
-
-    <footer class="site-footer section-shell">
-      <p>Renvoo is an early-stage B2B clinic SaaS for dental clinic scheduling resilience.</p>
-      <p class="footer-links">
-        <a href="./privacy.html">Website privacy note</a>
-        <a href="./patient-notice.html">Patient message note</a>
-      </p>
-      <p><span data-year></span> Renvoo. Built around pilot proof, not inflated claims.</p>
-    </footer>
-
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-summary">
+      <p class="footer-kicker">Renvoo</p>
+      <p>Renvoo is een vroege B2B clinic SaaS voor Nederlandse tandartspraktijken die no-shows, late uitval en leeg stoeluur rustiger wil opvangen.</p>
+    </div>
+    <div>
+      <p class="footer-title">Funnel</p>
+      <ul class="footer-links"><li><a href="/">Start</a></li><li><a href="/product.html">Product</a></li><li><a href="/pilot.html">Pilot</a></li><li><a href="/trust.html">Vertrouwen</a></li><li><a href="/blog/">Blog</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Juridisch</p>
+      <ul class="footer-links"><li><a href="/privacy.html">Privacyverklaring website</a></li><li><a href="/patient-notice.html">Notitie patiëntbericht</a></li></ul>
+    </div>
+    <div>
+      <p class="footer-title">Taal</p>
+      <ul class="footer-links"><li><a href="/en/" data-locale-link="true" data-target-lang="en">English</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-meta">
+    <p>Gebouwd rond pilot-proof, niet rond opgeblazen claims.</p>
+    <p><span data-year></span> Renvoo</p>
+  </div>
+</footer>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

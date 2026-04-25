@@ -1,41 +1,58 @@
-import {
-  alternateLocale,
-  commercialPageKeys,
-  localeOrder,
-  pageFilePathFor,
-  pageLabelFor,
-  pagePathFor,
-  pageSlugs,
-  siteContent,
-} from "./site-content.js";
 import { getSuggestedInternalLinks } from "../../lib/blog-content.js";
+import { pageFileNames, pageOrder, siteContent } from "./site-content.js";
 
-const rootPageKeys = [
-  "home",
-  "about",
-  "contact",
-  "useCases",
-  "dentalClinics",
-  "privateClinics",
-  "noShowReduction",
-  "appointmentReminders",
-  "cancellationManagement",
-  "blogIndex",
-  "privacy",
-  "patientNotice",
+const localeOrder = ["nl", "en"];
+const pageSequence = [
+  { lang: "nl", page: "home" },
+  { lang: "nl", page: "product" },
+  { lang: "nl", page: "pilot" },
+  { lang: "nl", page: "trust" },
+  { lang: "nl", page: "blogIndex" },
+  { lang: "nl", page: "privacy" },
+  { lang: "nl", page: "patientNotice" },
+  { lang: "nl", page: "notFound" },
+  { lang: "en", page: "home" },
+  { lang: "en", page: "product" },
+  { lang: "en", page: "pilot" },
+  { lang: "en", page: "trust" },
+  { lang: "en", page: "blogIndex" },
+  { lang: "en", page: "privacy" },
+  { lang: "en", page: "patientNotice" },
 ];
 
-function assetPrefix(filePath) {
-  const depth = filePath.split("/").length;
-  return Array.from({ length: depth }, () => "..").join("/");
+function alternateLocale(lang) {
+  return lang === "en" ? "nl" : "en";
+}
+
+function prefixForPath(filePath) {
+  const depth = filePath.split("/").length - 1;
+  return depth === 0 ? "." : Array.from({ length: depth }, () => "..").join("/");
+}
+
+function outputPathFor(lang, page) {
+  const fileName = pageFileNames[page];
+  return lang === "en" && page !== "notFound" ? `en/${fileName}` : fileName;
+}
+
+function hrefFor(lang, page, hash = "") {
+  const filePath = outputPathFor(lang, page).replace(/\\/g, "/");
+  let href = `/${filePath}`;
+
+  if (href === "/index.html") {
+    href = "/";
+  } else if (href.endsWith("/index.html")) {
+    href = href.slice(0, -"index.html".length);
+  }
+
+  return `${href}${hash}`;
 }
 
 function canonicalUrl(siteUrl, pathname) {
-  if (!siteUrl) {
-    return pathname;
-  }
+  return siteUrl ? `${siteUrl.replace(/\/+$/, "")}${pathname}` : pathname;
+}
 
-  return `${siteUrl.replace(/\/+$/, "")}${pathname}`;
+function assetPath(prefix, relativePath) {
+  return `${prefix}/${relativePath}`;
 }
 
 function escapeHtml(value) {
@@ -49,49 +66,44 @@ function escapeHtml(value) {
 function renderJsonLd(schemaObjects) {
   return schemaObjects
     .filter(Boolean)
-    .map(
-      (schema) =>
-        `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>`,
-    )
+    .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>`)
     .join("\n");
 }
 
-function buildOrganizationSchema(locale, siteUrl) {
-  const content = siteContent[locale];
+function buildOrganizationSchema(lang, siteUrl) {
+  const content = siteContent[lang];
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Renvoo",
-    url: canonicalUrl(siteUrl, pagePathFor(locale, "home")),
+    url: canonicalUrl(siteUrl, hrefFor(lang, "home")),
     logo: canonicalUrl(siteUrl, "/social-preview.png"),
     description: content.footer.summary,
     areaServed: "NL",
-    sameAs: [],
   };
 }
 
-function buildWebsiteSchema(locale, siteUrl) {
-  const content = siteContent[locale];
+function buildWebsiteSchema(lang, siteUrl) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Renvoo",
-    url: canonicalUrl(siteUrl, pagePathFor(locale, "home")),
-    inLanguage: content.locale,
-    description: content.footer.summary,
+    url: canonicalUrl(siteUrl, hrefFor(lang, "home")),
+    inLanguage: siteContent[lang].locale,
+    description: siteContent[lang].footer.summary,
   };
 }
 
-function buildSoftwareSchema(locale, siteUrl, page) {
+function buildSoftwareSchema(lang, pathname, description) {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "Renvoo",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
-    inLanguage: siteContent[locale].locale,
-    description: page.answer || page.hero.lead,
-    url: canonicalUrl(siteUrl, pagePathFor(locale, page.key)),
+    inLanguage: siteContent[lang].locale,
+    description,
+    url: pathname,
     featureList: [
       "No-show reduction workflow",
       "Appointment confirmation support",
@@ -101,15 +113,15 @@ function buildSoftwareSchema(locale, siteUrl, page) {
   };
 }
 
-function buildFaqSchema(faq) {
-  if (!faq?.length) {
+function buildFaqSchema(items = []) {
+  if (!items.length) {
     return null;
   }
 
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faq.map((item) => ({
+    mainEntity: items.map((item) => ({
       "@type": "Question",
       name: item.question,
       acceptedAnswer: {
@@ -121,7 +133,7 @@ function buildFaqSchema(faq) {
 }
 
 function buildBreadcrumbSchema(siteUrl, breadcrumbs) {
-  if (!breadcrumbs?.length) {
+  if (!breadcrumbs.length) {
     return null;
   }
 
@@ -137,18 +149,18 @@ function buildBreadcrumbSchema(siteUrl, breadcrumbs) {
   };
 }
 
-function buildArticleSchema(siteUrl, locale, post, breadcrumbs) {
+function buildArticleSchema(siteUrl, lang, post, breadcrumbs) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
-    description: post.metaDescription,
+    description: post.metaDescription || post.excerpt,
     datePublished: post.date,
     dateModified: post.updated,
-    inLanguage: locale === "en" ? "en-US" : "nl-NL",
+    inLanguage: siteContent[lang].locale,
     mainEntityOfPage: canonicalUrl(
       siteUrl,
-      locale === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`,
+      lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`,
     ),
     author: {
       "@type": "Organization",
@@ -163,83 +175,198 @@ function buildArticleSchema(siteUrl, locale, post, breadcrumbs) {
       },
     },
     image: canonicalUrl(siteUrl, "/social-preview.png"),
-    keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(", "),
     articleSection: post.category,
+    keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(", "),
     breadcrumb: buildBreadcrumbSchema(siteUrl, breadcrumbs),
   };
 }
 
-function renderHeader(locale, currentPageKey) {
-  const content = siteContent[locale];
-  const navLinks = [
-    { key: "home", href: pagePathFor(locale, "home"), label: content.nav.home },
-    { key: "useCases", href: pagePathFor(locale, "useCases"), label: content.nav.useCases },
-    { key: "about", href: pagePathFor(locale, "about"), label: content.nav.about },
-    { key: "blogIndex", href: pagePathFor(locale, "blogIndex"), label: content.nav.blogIndex },
-    { key: "contact", href: pagePathFor(locale, "contact"), label: content.nav.contact },
+function breadcrumbsForPage(lang, page) {
+  if (page === "home" || page === "notFound") {
+    return [];
+  }
+
+  return [
+    { href: hrefFor(lang, "home"), label: siteContent[lang].pageNames.home },
+    { href: hrefFor(lang, page), label: siteContent[lang].pageNames[page] },
   ];
-  const switchLocale = alternateLocale(locale);
+}
+
+function renderBreadcrumbNav(breadcrumbs) {
+  if (!breadcrumbs.length) {
+    return "";
+  }
+
+  return `<nav class="breadcrumbs chapter" aria-label="Breadcrumb">
+    <ol>
+      ${breadcrumbs
+        .map((item, index) => {
+          const isLast = index === breadcrumbs.length - 1;
+          return `<li>${isLast ? `<span>${item.label}</span>` : `<a href="${item.href}">${item.label}</a>`}</li>`;
+        })
+        .join("")}
+    </ol>
+  </nav>`;
+}
+
+function renderDocument({
+  lang,
+  page,
+  content,
+  filePath,
+  pathname,
+  mainContent,
+  siteUrl = "",
+  breadcrumbs = [],
+  schema = [],
+  extraHead = "",
+  pageType = "website",
+  switchTarget = null,
+  seoOverride = null,
+}) {
+  const prefix = prefixForPath(filePath);
+  const pageCopy = {
+    ...(content.pages[page] ?? content.pages.home),
+    seo: seoOverride ?? (content.pages[page] ?? content.pages.home).seo,
+  };
+  const canonical = canonicalUrl(siteUrl, pathname);
+  const switchLang = alternateLocale(lang);
+  const bodyClass = `page-${page} lang-${lang}`;
+  const routes = {
+    home: hrefFor(lang, "home"),
+    product: hrefFor(lang, "product"),
+    pilot: hrefFor(lang, "pilot"),
+    trust: hrefFor(lang, "trust"),
+    blogIndex: hrefFor(lang, "blogIndex"),
+    booking: hrefFor(lang, "pilot", "#booking"),
+    privacy: hrefFor(lang, "privacy"),
+    patientNotice: hrefFor(lang, "patientNotice"),
+    switch:
+      switchTarget ?? (page === "notFound" ? hrefFor(switchLang, "home") : hrefFor(switchLang, page)),
+  };
+
+  const alternateHead = siteUrl
+    ? page !== "notFound" && pageType !== "article"
+      ? `<link rel="canonical" href="${canonical}" />
+    <link rel="alternate" hreflang="${content.locale}" href="${canonical}" />
+    <link rel="alternate" hreflang="${siteContent[switchLang].locale}" href="${canonicalUrl(siteUrl, hrefFor(switchLang, page))}" />
+    <link rel="alternate" hreflang="x-default" href="${canonicalUrl(siteUrl, hrefFor("nl", page === "notFound" ? "home" : page))}" />`
+      : `<link rel="canonical" href="${canonical}" />`
+    : "";
+
+  return `<!doctype html>
+<html lang="${content.htmlLang}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${pageCopy.seo.title}</title>
+    <meta name="description" content="${pageCopy.seo.description}" />
+    <meta name="theme-color" content="#f4efe7" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:type" content="${pageType}" />
+    <meta property="og:title" content="${pageCopy.seo.title}" />
+    <meta property="og:description" content="${pageCopy.seo.description}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
+    <meta property="og:image:alt" content="Renvoo website preview" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${pageCopy.seo.title}" />
+    <meta name="twitter:description" content="${pageCopy.seo.description}" />
+    <meta name="twitter:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
+    ${alternateHead}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="${assetPath(prefix, "icons/favicon.png")}" />
+    <link rel="apple-touch-icon" href="${assetPath(prefix, "icons/favicon.png")}" />
+    <link rel="manifest" href="${assetPath(prefix, "site.webmanifest")}" />
+    <link rel="stylesheet" href="${assetPath(prefix, "styles.css")}" />
+    ${extraHead}
+    ${renderJsonLd(schema)}
+  </head>
+  <body class="${bodyClass}" data-lang="${lang}" data-page="${page}" data-prefix="${prefix}" data-switch-lang="${switchLang}">
+    <a class="skip-link" href="#content">${lang === "nl" ? "Ga naar inhoud" : "Skip to content"}</a>
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
+    ${renderHeader(content, page, routes).replace("./assets/renvoo-logo-horizontal.png", assetPath(prefix, "assets/renvoo-logo-horizontal.png"))}
+    ${renderBreadcrumbNav(breadcrumbs)}
+    <main id="content" class="site-main">
+      ${mainContent}
+    </main>
+    ${renderFooter(content, lang, page)}
+    <script type="module" src="${assetPath(prefix, "main.js")}"></script>
+  </body>
+</html>
+`;
+}
+
+function renderHeader(content, page, routes) {
+  const navItems = ["home", "product", "pilot", "trust", "blogIndex"]
+    .map((navPage) => {
+      const isActive = page === navPage ? "is-active" : "";
+      return `<a class="${isActive}" href="${routes[navPage]}">${content.nav[navPage]}</a>`;
+    })
+    .join("");
+
+  const menuLabel = content.htmlLang === "nl" ? "Open navigatie" : "Open navigation";
 
   return `<header class="site-header" data-header>
   <div class="site-header-inner">
-    <a class="brand" href="${pagePathFor(locale, "home")}" aria-label="Renvoo ${content.nav.home}">
-      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" />
-      <span>${content.brand.taglines[locale]}</span>
+    <a class="brand-mark" href="${routes.home}" aria-label="Renvoo ${content.pageNames.home}">
+      <img src="${assetPath(".", "assets/renvoo-logo-horizontal.png")}" alt="Renvoo" width="1212" height="274" />
+      <span>${content.brandLine}</span>
     </a>
-    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
+    <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="${menuLabel}">
       <span></span>
       <span></span>
       <span></span>
-      <span class="sr-only">Toggle navigation</span>
     </button>
-    <div class="nav-shell" data-nav-shell>
+    <div class="site-nav-shell" data-site-nav-shell>
       <nav class="site-nav" id="site-nav" aria-label="Primary">
-        ${navLinks
-          .map(
-            (link) =>
-              `<a href="${link.href}" class="${currentPageKey === link.key ? "is-active" : ""}">${link.label}</a>`,
-          )
-          .join("")}
+        ${navItems}
       </nav>
-      <div class="header-actions">
-        <a class="language-switch" href="${pagePathFor(switchLocale, currentPageKey === "notFound" ? "home" : currentPageKey)}" data-track="language_switched">${content.switchLabel}</a>
-        <a class="button button-primary button-small" href="${pagePathFor(locale, "contact")}#request" data-track="nav_book_meeting">${content.nav.cta}</a>
+      <div class="site-header-actions">
+        <a class="language-switch" href="${routes.switch}" data-track="language_switched">${content.switchLabel}</a>
+        <a class="header-cta" href="${routes.booking}" data-track="nav_book_meeting">${content.nav.cta}</a>
       </div>
     </div>
   </div>
 </header>`;
 }
 
-function renderFooter(locale) {
-  const content = siteContent[locale];
+function renderFooter(content, lang, page) {
+  const quickLinks = ["home", "product", "pilot", "trust", "blogIndex"]
+    .map((footerPage) => `<li><a href="${hrefFor(lang, footerPage)}">${content.pageNames[footerPage]}</a></li>`)
+    .join("");
+
+  const legalLinks = content.footer.legalLinks
+    .map((link) => `<li><a href="${hrefFor(lang, link.page)}">${link.label}</a></li>`)
+    .join("");
+
+  const languageLinks = content.footer.languageLinks
+    .map((link) => {
+      const targetPage = page === "notFound" ? "home" : link.page;
+      return `<li><a href="${hrefFor(link.lang, targetPage)}" data-locale-link="true" data-target-lang="${link.lang}">${link.label}</a></li>`;
+    })
+    .join("");
+
   return `<footer class="site-footer">
-  <div class="site-footer-grid">
-    <div>
-      <p class="footer-title">Renvoo</p>
+  <div class="footer-grid">
+    <div class="footer-summary">
+      <p class="footer-kicker">Renvoo</p>
       <p>${content.footer.summary}</p>
     </div>
     <div>
-      <p class="footer-title">${content.nav.useCases}</p>
-      <ul class="footer-links">
-        <li><a href="${pagePathFor(locale, "dentalClinics")}">${content.pageNames.dentalClinics}</a></li>
-        <li><a href="${pagePathFor(locale, "noShowReduction")}">${content.pageNames.noShowReduction}</a></li>
-        <li><a href="${pagePathFor(locale, "cancellationManagement")}">${content.pageNames.cancellationManagement}</a></li>
-      </ul>
+      <p class="footer-title">${content.footer.quickLinksTitle}</p>
+      <ul class="footer-links">${quickLinks}</ul>
     </div>
     <div>
-      <p class="footer-title">${content.pageNames.about}</p>
-      <ul class="footer-links">
-        <li><a href="${pagePathFor(locale, "about")}">${content.pageNames.about}</a></li>
-        <li><a href="${pagePathFor(locale, "privacy")}">${content.pageNames.privacy}</a></li>
-        <li><a href="${pagePathFor(locale, "patientNotice")}">${content.pageNames.patientNotice}</a></li>
-      </ul>
+      <p class="footer-title">${content.footer.legalTitle}</p>
+      <ul class="footer-links">${legalLinks}</ul>
     </div>
     <div>
-      <p class="footer-title">${content.pageNames.contact}</p>
-      <ul class="footer-links">
-        <li><a href="${pagePathFor(locale, "contact")}">${content.pageNames.contact}</a></li>
-        <li><a href="${pagePathFor(locale, "blogIndex")}">${content.pageNames.blogIndex}</a></li>
-      </ul>
+      <p class="footer-title">${content.footer.languageTitle}</p>
+      <ul class="footer-links">${languageLinks}</ul>
     </div>
   </div>
   <div class="footer-meta">
@@ -249,457 +376,733 @@ function renderFooter(locale) {
 </footer>`;
 }
 
-function renderHero(page, locale) {
-  return `<section class="page-hero chapter">
-  <div class="hero-grid">
-    <div class="hero-copy" data-reveal>
-      <p class="eyebrow">${page.hero.eyebrow}</p>
-      <h1>${page.hero.title}</h1>
-      <p class="hero-lead">${page.hero.lead}</p>
-      <div class="hero-actions">
-        ${renderCtaLink(locale, page.hero.primary, "button button-primary", "hero_cta")}
-        ${renderCtaLink(locale, page.hero.secondary, "button button-secondary")}
-      </div>
-      ${
-        page.hero.badges?.length
-          ? `<ul class="hero-badges">${page.hero.badges.map((badge) => `<li>${badge}</li>`).join("")}</ul>`
-          : ""
-      }
-    </div>
-    <aside class="hero-sidecard" data-reveal>
-      <p class="eyebrow subdued">${siteContent[locale].brand.name}</p>
-      <p>${page.answer || page.hero.lead}</p>
-    </aside>
-  </div>
-</section>`;
-}
-
-function renderCtaLink(locale, action, classes, track = "") {
-  if (!action) {
-    return "";
-  }
-
-  if (action.href) {
-    return `<a class="${classes}" href="${action.href}"${track ? ` data-track="${track}"` : ""}>${action.label}</a>`;
-  }
-
-  return `<a class="${classes}" href="${pagePathFor(locale, action.pageKey)}"${track ? ` data-track="${track}"` : ""}>${action.label}</a>`;
-}
-
-function renderBreadcrumbs(locale, pageKey, currentLabel) {
-  if (pageKey === "home" || pageKey === "notFound") {
-    return [];
-  }
-
-  const content = siteContent[locale];
-  const items = [{ href: pagePathFor(locale, "home"), label: content.pageNames.home }];
-
-  if (pageKey === "blogIndex") {
-    items.push({ href: pagePathFor(locale, "blogIndex"), label: content.pageNames.blogIndex });
-    return items;
-  }
-
-  items.push({ href: pagePathFor(locale, pageKey), label: currentLabel });
-  return items;
-}
-
-function renderBreadcrumbNav(breadcrumbs) {
-  if (!breadcrumbs.length) {
-    return "";
-  }
-
-  return `<nav class="breadcrumbs chapter" aria-label="Breadcrumb">
-  <ol>
-    ${breadcrumbs
-      .map((item, index) => {
-        const isLast = index === breadcrumbs.length - 1;
-        return `<li>${isLast ? `<span>${item.label}</span>` : `<a href="${item.href}">${item.label}</a>`}</li>`;
-      })
-      .join("")}
-  </ol>
-</nav>`;
-}
-
-function renderAnswerBlock(page) {
-  return `<section class="chapter answer-block" data-reveal>
-  <div class="answer-card">
-    <p class="eyebrow subdued">Direct answer</p>
-    <p class="answer-copy">${page.answer}</p>
-  </div>
-  <div class="definition-card">
-    <h2>${page.definitionTitle}</h2>
-    <p>${page.definition}</p>
-    ${
-      page.audience?.length
-        ? `<div class="definition-list">
-      <h3>${page.audienceTitle}</h3>
-      <ul>${page.audience.map((item) => `<li>${item}</li>`).join("")}</ul>
-    </div>`
-        : ""
-    }
-  </div>
-</section>`;
-}
-
-function renderCardsSection(section, locale) {
-  return `<section class="chapter">
-  ${renderSectionHeading(section)}
-  <div class="card-grid">
-    ${section.items
-      .map(
-        (item, index) => `<article class="glass-card" data-reveal style="--reveal-delay:${index * 90}ms">
-        <h3>${item.title}</h3>
-        <p>${item.body}</p>
-        ${
-          item.pageKey
-            ? `<a class="inline-link" href="${pagePathFor(locale, item.pageKey)}">${item.label}</a>`
-            : ""
-        }
-      </article>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderStepsSection(section) {
-  return `<section class="chapter">
-  ${renderSectionHeading(section)}
-  <div class="steps-grid">
-    ${section.items
-      .map(
-        (item, index) => `<article class="step-card" data-reveal style="--reveal-delay:${index * 90}ms">
-        <span class="step-count">0${index + 1}</span>
-        <h3>${item.title}</h3>
-        <p>${item.body}</p>
-      </article>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderComparisonSection(section) {
-  return `<section class="chapter">
-  ${renderSectionHeading(section)}
-  <div class="comparison-grid">
-    <article class="comparison-card" data-reveal>
-      <p class="eyebrow subdued">${section.leftTitle}</p>
-      <ul>${section.leftItems.map((item) => `<li>${item}</li>`).join("")}</ul>
-    </article>
-    <article class="comparison-card comparison-card-accent" data-reveal style="--reveal-delay:110ms">
-      <p class="eyebrow subdued">${section.rightTitle}</p>
-      <ul>${section.rightItems.map((item) => `<li>${item}</li>`).join("")}</ul>
-    </article>
-  </div>
-</section>`;
-}
-
-function renderSectionHeading(section) {
-  return `<div class="section-heading" data-reveal>
-  ${section.eyebrow ? `<p class="eyebrow">${section.eyebrow}</p>` : ""}
-  <h2>${section.title}</h2>
-  ${section.intro ? `<p class="section-intro">${section.intro}</p>` : ""}
-</div>`;
-}
-
-function renderFaq(locale, faq) {
-  if (!faq?.length) {
-    return "";
-  }
-
-  return `<section class="chapter faq-section">
-  <div class="section-heading" data-reveal>
-    <p class="eyebrow">${locale === "en" ? "FAQ" : "FAQ"}</p>
-    <h2>${locale === "en" ? "Short answers to the first practical questions" : "Korte antwoorden op de eerste praktische vragen"}</h2>
-  </div>
-  <div class="faq-list" data-reveal>
-    ${faq
-      .map(
-        (item) => `<details class="faq-item">
-        <summary>${item.question}</summary>
-        <p>${item.answer}</p>
-      </details>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderRelatedPages(locale, relatedPages) {
-  if (!relatedPages?.length) {
-    return "";
-  }
-
-  return `<section class="chapter">
-  <div class="section-heading" data-reveal>
-    <p class="eyebrow">${locale === "en" ? "Related pages" : "Gerelateerde pagina's"}</p>
-    <h2>${locale === "en" ? "Keep following the right path" : "Volg de juiste volgende stap"}</h2>
-  </div>
-  <div class="card-grid">
-    ${relatedPages
-      .map(
-        (item, index) => `<article class="glass-card" data-reveal style="--reveal-delay:${index * 90}ms">
-        <h3>${item.label}</h3>
-        <p>${item.blurb}</p>
-        <a class="inline-link" href="${pagePathFor(locale, item.pageKey)}">${item.label}</a>
-      </article>`,
-      )
-      .join("")}
-  </div>
-</section>`;
-}
-
-function renderCtaBand(locale, cta) {
-  if (!cta) {
-    return "";
-  }
-
-  return `<section class="chapter">
-  <div class="cta-band" data-reveal>
-    <div>
-      <p class="eyebrow">${cta.eyebrow}</p>
-      <h2>${cta.title}</h2>
-      <p>${cta.body}</p>
-    </div>
-    <div class="hero-actions">
-      ${renderCtaLink(locale, cta.primary, "button button-primary")}
-      ${renderCtaLink(locale, cta.secondary, "button button-secondary")}
-    </div>
-  </div>
-</section>`;
-}
-
-function renderStandardPage(locale, page) {
-  return [
-    renderHero(page, locale),
-    renderAnswerBlock(page),
-    ...(page.sections ?? []).map((section) => {
-      if (section.type === "cards") {
-        return renderCardsSection(section, locale);
-      }
-      if (section.type === "steps") {
-        return renderStepsSection(section);
-      }
-      if (section.type === "comparison") {
-        return renderComparisonSection(section);
-      }
+function renderPageBody({ lang, page, content, routes, prefix }) {
+  switch (page) {
+    case "home":
+      return renderHomePage(content, routes);
+    case "product":
+      return renderProductPage(content, routes);
+    case "pilot":
+      return renderPilotPage(content, routes);
+    case "trust":
+      return renderTrustPage(content, routes, prefix);
+    case "blogIndex":
+      return renderBlogIndexPage(content, lang);
+    case "privacy":
+      return renderLegalPage(content.pages.privacy);
+    case "patientNotice":
+      return renderLegalPage(content.pages.patientNotice);
+    case "notFound":
+      return renderNotFoundPage(content, routes);
+    default:
       return "";
-    }),
-    renderRelatedPages(locale, page.relatedPages),
-    renderFaq(locale, page.faq),
-    renderCtaBand(locale, page.cta),
-  ].join("\n");
+  }
 }
 
-function renderLegalPage(locale, page) {
-  return [
-    renderHero(page, locale),
-    `<section class="chapter">
-      <div class="card-grid">
-        ${page.cards
+function renderSectionHeading(eyebrow, title, intro = "") {
+  return `<div class="section-heading" data-reveal>
+    <p class="eyebrow">${eyebrow}</p>
+    <h2>${title}</h2>
+    ${intro ? `<p class="section-intro">${intro}</p>` : ""}
+  </div>`;
+}
+
+function renderHomePage(content, routes) {
+  const copy = content.pages.home;
+
+  return `
+    <section class="chapter hero-home">
+      <div class="hero-grid">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="${routes.booking}" data-track="hero_cta">${copy.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${routes.product}">${copy.hero.secondaryCta}</a>
+          </div>
+          ${copy.hero.badges.length ? `<ul class="hero-badges" aria-label="Key points">
+            ${copy.hero.badges.map((badge) => `<li>${badge}</li>`).join("")}
+          </ul>` : ""}
+        </div>
+        <aside class="hero-rail" data-motion="intro" style="--motion-delay: 120ms;">
+          <div class="hero-note">
+            <p class="hero-note-kicker">${copy.hero.operatorCard.title}</p>
+            <ul>
+              ${copy.hero.operatorCard.items.map((item) => `<li>${item}</li>`).join("")}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="chapter story-grid">
+      ${renderSectionHeading(copy.pains.eyebrow, copy.pains.title, copy.pains.intro)}
+      <div class="editorial-grid">
+        ${copy.pains.items
           .map(
-            (card, index) => `<article class="glass-card" data-reveal style="--reveal-delay:${index * 90}ms">
-            <h2>${card.title}</h2>
+            (item, index) => `<article class="story-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+            <h3>${item.title}</h3>
+            <p>${item.body}</p>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter workflow-preview">
+      ${renderSectionHeading(copy.workflowTeaser.eyebrow, copy.workflowTeaser.title, copy.workflowTeaser.intro)}
+      <div class="timeline-grid">
+        ${copy.workflowTeaser.steps
+          .map(
+            (step, index) => `<article class="timeline-card" data-reveal style="--reveal-delay: ${index * 80}ms;">
+            <span class="step-chip">${step.label}</span>
+            <p>${step.body}</p>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter proof-grid">
+      ${renderSectionHeading(copy.proof.eyebrow, copy.proof.title)}
+      <div class="split-cards">
+        ${copy.proof.cards
+          .map(
+            (card, index) => `<article class="glass-card" data-reveal style="--reveal-delay: ${index * 110}ms;">
+            <h3>${card.title}</h3>
             <p>${card.body}</p>
           </article>`,
           )
           .join("")}
       </div>
-    </section>`,
-    renderCtaBand(locale, page.cta),
-  ].join("\n");
+    </section>
+
+    <section class="chapter path-grid">
+      ${renderSectionHeading(copy.paths.eyebrow, copy.paths.title)}
+      <div class="path-cards">
+        ${copy.paths.items
+          .map(
+            (item, index) => `<article class="path-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+            <h3>${item.title}</h3>
+            <p>${item.body}</p>
+            <a class="inline-link" href="${routes[item.page]}">${item.label}</a>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    ${renderClosingBand(copy.closing, routes.booking, routes.pilot)}
+  `;
 }
 
-function renderContactPage(locale, page, contactEmail) {
-  const form = siteContent[locale].contactForm;
+function renderProductPage(content, routes) {
+  const copy = content.pages.product;
 
-  return [
-    renderHero(page, locale),
-    renderAnswerBlock(page),
-    `<section class="chapter contact-split" id="request">
-      <div class="contact-form-shell" data-reveal>
-        <div class="section-heading">
-          <p class="eyebrow">${siteContent[locale].pageNames.contact}</p>
-          <h2>${form.title}</h2>
-          <p class="section-intro">${form.intro}</p>
-        </div>
-        <form class="contact-form" data-contact-form data-contact-email="${contactEmail || ""}" novalidate>
-          <div class="field-grid">
-            ${renderField("text", "name", form.fields.name)}
-            ${renderField("text", "clinic", form.fields.clinic)}
-            ${renderSelect("role", form.fields.role, form.roles)}
-            ${renderField("email", "email", form.fields.email)}
-            ${renderField("tel", "phone", form.fields.phone, false)}
-            ${renderField("text", "preferredTime", form.fields.preferredTime)}
-          </div>
-          ${renderTextarea("challenge", form.fields.challenge)}
-          ${renderTextarea("notes", form.fields.notes, false)}
-          <p class="form-status" data-contact-status aria-live="polite"></p>
+  return `
+    <section class="chapter hero-page hero-product">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
           <div class="hero-actions">
-            <button class="button button-primary" type="submit">${form.buttons.submit}</button>
-            <button class="button button-secondary" type="button" data-contact-copy hidden>${form.buttons.copy}</button>
-            <button class="button button-secondary" type="button" data-contact-mail hidden>${form.buttons.mail}</button>
+            <a class="button button-primary" href="${routes.booking}">${copy.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${routes.trust}">${copy.hero.secondaryCta}</a>
           </div>
-          <pre class="contact-summary" data-contact-summary hidden></pre>
-        </form>
+        </div>
       </div>
-      <aside class="hero-sidecard" data-reveal style="--reveal-delay:110ms">
-        <p class="eyebrow subdued">${locale === "en" ? "What the form captures" : "Wat het formulier vastlegt"}</p>
-        <ul class="bullet-list compact">
-          <li>${page.audience[0]}</li>
-          <li>${page.audience[1]}</li>
-          <li>${page.audience[2]}</li>
+    </section>
+
+    <section class="chapter compare-section">
+      ${renderSectionHeading(copy.comparison.eyebrow, copy.comparison.title)}
+      <div class="compare-grid">
+        <article class="compare-card" data-reveal>
+          <p class="eyebrow subdued">${copy.comparison.beforeTitle}</p>
+          <ul class="bullet-list">
+            ${copy.comparison.before.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        </article>
+        <article class="compare-card compare-card-accent" data-reveal style="--reveal-delay: 110ms;">
+          <p class="eyebrow subdued">${copy.comparison.afterTitle}</p>
+          <ul class="bullet-list">
+            ${copy.comparison.after.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter workflow-detail">
+      ${renderSectionHeading(copy.workflow.eyebrow, copy.workflow.title, copy.workflow.intro)}
+      <div class="workflow-grid">
+        ${copy.workflow.steps
+          .map(
+            (step, index) => `<article class="workflow-card" data-reveal style="--reveal-delay: ${index * 80}ms;">
+            <div class="workflow-card-top">
+              <span class="step-count">0${index + 1}</span>
+              <h3>${step.title}</h3>
+            </div>
+            <p>${step.body}</p>
+            <ul class="bullet-list compact">
+              ${step.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
+            </ul>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter fit-section">
+      ${renderSectionHeading(copy.fit.eyebrow, copy.fit.title)}
+      <div class="editorial-grid">
+        ${copy.fit.items
+          .map(
+            (item, index) => `<article class="story-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+            <h3>${item.title}</h3>
+            <p>${item.body}</p>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter why-section">
+      ${renderSectionHeading(copy.whyDental.eyebrow, copy.whyDental.title)}
+      <div class="why-list" data-reveal>
+        <ol>
+          ${copy.whyDental.items.map((item) => `<li>${item}</li>`).join("")}
+        </ol>
+      </div>
+    </section>
+
+    ${renderClosingBand(copy.closing, routes.booking, routes.pilot)}
+  `;
+}
+
+function renderPilotPage(content, routes) {
+  const copy = content.pages.pilot;
+  const booking = content.booking;
+
+  return `
+    <section class="chapter hero-page hero-pilot">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#booking">${copy.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${routes.product}">${copy.hero.secondaryCta}</a>
+          </div>
+          <ul class="hero-badges" aria-label="Pilot facts">
+            ${copy.hero.chips.map((chip) => `<li>${chip}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter agenda-grid">
+      ${renderSectionHeading(copy.agenda.eyebrow, copy.agenda.title)}
+      <div class="editorial-grid">
+        ${copy.agenda.items
+          .map(
+            (item, index) => `<article class="story-card" data-reveal style="--reveal-delay: ${index * 85}ms;">
+            <h3>${item.title}</h3>
+            <p>${item.body}</p>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter pilot-split">
+      <div>
+        ${renderSectionHeading(copy.bookingIntro.eyebrow, copy.bookingIntro.title, copy.bookingIntro.body)}
+        <ul class="bullet-list" data-reveal>
+          ${copy.bookingIntro.support.map((item) => `<li>${item}</li>`).join("")}
         </ul>
-      </aside>
-    </section>`,
-    ...(page.sections ?? []).map((section) => renderCardsSection(section, locale)),
-    renderRelatedPages(locale, page.relatedPages),
-    renderFaq(locale, page.faq),
-    renderCtaBand(locale, page.cta),
-  ].join("\n");
-}
-
-function renderField(type, name, label, required = true) {
-  return `<label class="field">
-    <span>${label}</span>
-    <input type="${type}" name="${name}" ${required ? "required" : ""} />
-    <small class="field-error" data-field-error="${name}"></small>
-  </label>`;
-}
-
-function renderSelect(name, label, options) {
-  return `<label class="field">
-    <span>${label}</span>
-    <select name="${name}" required>
-      <option value=""></option>
-      ${options.map((option) => `<option value="${option}">${option}</option>`).join("")}
-    </select>
-    <small class="field-error" data-field-error="${name}"></small>
-  </label>`;
-}
-
-function renderTextarea(name, label, required = true) {
-  return `<label class="field field-full">
-    <span>${label}</span>
-    <textarea name="${name}" rows="4" ${required ? "required" : ""}></textarea>
-    <small class="field-error" data-field-error="${name}"></small>
-  </label>`;
-}
-
-function renderBlogIndex(locale, page, posts) {
-  const content = siteContent[locale].blog;
-  const publishedPosts = posts.filter((post) => post.locale === locale && post.status === "published");
-
-  return [
-    renderHero(page, locale),
-    `<section class="chapter">
-      <div class="section-heading" data-reveal>
-        <p class="eyebrow">${content.eyebrow}</p>
-        <h2>${content.title}</h2>
-        <p class="section-intro">${content.intro}</p>
       </div>
+      <aside class="pricing-panel" data-reveal style="--reveal-delay: 120ms;">
+        <p class="eyebrow">${copy.pricing.eyebrow}</p>
+        <h3>${copy.pricing.title}</h3>
+        <p>${copy.pricing.body}</p>
+        <p class="subdued-copy">${copy.pricing.note}</p>
+      </aside>
+    </section>
+
+    <section class="chapter booking-chapter" id="booking">
+      ${renderSectionHeading(content.nav.cta, copy.hero.title, booking.labels.previewMode)}
+      <div class="booking-layout booking-layout-single">
+        ${renderBookingForm(content)}
+      </div>
+    </section>
+
+    <section class="chapter fallback-band">
+      <div class="cta-strip" data-reveal>
+        <div>
+          <p class="eyebrow">${copy.fallback.title}</p>
+          <p>${copy.fallback.body}</p>
+        </div>
+        <a class="button button-secondary" href="${routes.trust}">${copy.fallback.label}</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderBookingForm(content) {
+  const booking = content.booking;
+  const labels = booking.labels;
+
+  return `<div class="booking-stack" data-reveal>
+    <form class="booking-form" data-booking-form novalidate autocomplete="off">
+      <ol class="booking-progress" aria-label="${labels.stepLabel}">
+        <li class="is-active" data-step-marker="1"><span>${labels.stepLabel} 1</span><strong>${labels.step1}</strong></li>
+        <li data-step-marker="2"><span>${labels.stepLabel} 2</span><strong>${labels.step2}</strong></li>
+        <li data-step-marker="3"><span>${labels.stepLabel} 3</span><strong>${labels.step3}</strong></li>
+      </ol>
+      <p class="form-status" data-form-status aria-live="polite">${labels.statusReady}</p>
+
+      <section class="booking-step" data-step-panel="1">
+        <div class="field-grid">
+          ${renderInputField({
+            label: labels.contactName,
+            id: "contactName",
+            name: "contactName",
+            type: "text",
+            autocomplete: "name",
+            placeholder: content.htmlLang === "nl" ? "Bijvoorbeeld Mohamed Ibrahim…" : "For example Mohamed Ibrahim…",
+          })}
+          ${renderInputField({
+            label: labels.contactEmail,
+            id: "contactEmail",
+            name: "contactEmail",
+            type: "email",
+            autocomplete: "email",
+            placeholder: content.htmlLang === "nl" ? "naam@praktijk.nl…" : "name@clinic.com…",
+            spellcheck: false,
+            inputmode: "email",
+          })}
+          ${renderSelectField({
+            label: labels.role,
+            id: "role",
+            name: "role",
+            placeholder: content.htmlLang === "nl" ? "Kies uw rol…" : "Choose your role…",
+            options: booking.roles,
+          })}
+          ${renderInputField({
+            label: labels.clinicName,
+            id: "clinicName",
+            name: "clinicName",
+            type: "text",
+            autocomplete: "organization",
+            placeholder: content.htmlLang === "nl" ? "Naam van de praktijk…" : "Clinic name…",
+          })}
+          ${renderInputField({
+            label: labels.city,
+            id: "city",
+            name: "city",
+            type: "text",
+            autocomplete: "address-level2",
+            placeholder: content.htmlLang === "nl" ? "Bijvoorbeeld Eindhoven…" : "For example Eindhoven…",
+          })}
+          ${renderSelectField({
+            label: labels.clinicSize,
+            id: "clinicSize",
+            name: "clinicSize",
+            placeholder: content.htmlLang === "nl" ? "Kies de schaal…" : "Choose the clinic size…",
+            options: booking.clinicSizes,
+          })}
+          ${renderSelectField({
+            label: labels.primaryPain,
+            id: "primaryPain",
+            name: "primaryPain",
+            placeholder: content.htmlLang === "nl" ? "Kies het grootste pijnpunt…" : "Choose the main pain point…",
+            options: booking.primaryPains,
+          })}
+        </div>
+        ${renderTextareaField({
+          label: labels.workflowNotes,
+          id: "workflowNotes",
+          name: "workflowNotes",
+          placeholder: labels.help.workflowNotes,
+          rows: 4,
+        })}
+      </section>
+
+      <section class="booking-step" data-step-panel="2" hidden>
+        <fieldset class="choice-group">
+          <legend>${labels.meetingFormat}</legend>
+          <div class="choice-grid">
+            ${booking.meetingFormats
+              .map(
+                (option) => `<label class="choice-card">
+                <input type="radio" name="meetingFormat" value="${option.value}" />
+                <span>${option.label}</span>
+              </label>`,
+              )
+              .join("")}
+          </div>
+          <p class="field-error" id="meetingFormat-error" data-field-error="meetingFormat" aria-live="polite"></p>
+        </fieldset>
+
+        <div class="field-grid field-grid-datetime">
+          ${renderDateTimeField({
+            label: labels.preferredSlot,
+            id: "preferredSlot",
+            name: "preferredSlot",
+            hint: labels.help.preferredSlot,
+            required: true,
+          })}
+          ${renderDateTimeField({
+            label: labels.backupSlot,
+            id: "backupSlot",
+            name: "backupSlot",
+            hint: labels.help.backupSlot,
+          })}
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button class="button button-primary" type="button" data-booking-next>${labels.buttons.next}</button>
+      </div>
+
+      <section class="booking-step booking-review" data-step-panel="3" hidden>
+        <div class="review-card">
+          <h3>${labels.step3}</h3>
+          <dl data-review-list></dl>
+        </div>
+        <div class="form-actions">
+          <button class="button button-secondary" type="button" data-booking-back hidden>${labels.buttons.back}</button>
+          <button class="button button-primary" type="submit" data-booking-submit hidden>${labels.buttons.submit}</button>
+        </div>
+      </section>
+
+      <p class="booking-preview-note">${labels.previewMode}</p>
+    </form>
+
+    <section class="booking-success" data-booking-success hidden aria-live="polite">
+      <div class="success-card">
+        <p class="eyebrow">${labels.successTitle}</p>
+        <h3 data-success-heading>${labels.statusSuccess}</h3>
+        <p data-success-body>${labels.successBody}</p>
+        <pre data-success-summary></pre>
+        <div class="form-actions">
+          <a class="button button-primary" href="#" target="_blank" rel="noreferrer" data-booking-calendar hidden>${labels.buttons.calendar}</a>
+          <button class="button button-secondary" type="button" data-booking-copy>${labels.buttons.copy}</button>
+          <button class="button button-secondary" type="button" data-booking-download>${labels.buttons.download}</button>
+          <button class="button button-secondary" type="button" data-booking-restart>${labels.buttons.restart}</button>
+        </div>
+        <p class="form-status" data-success-status aria-live="polite"></p>
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderInputField({
+  label,
+  id,
+  name,
+  type,
+  autocomplete,
+  placeholder,
+  spellcheck,
+  inputmode,
+}) {
+  return `<div class="field">
+    <label for="${id}">${label}</label>
+    <input id="${id}" name="${name}" type="${type}" autocomplete="${autocomplete}" placeholder="${placeholder}"${spellcheck === false ? ' spellcheck="false"' : ""}${inputmode ? ` inputmode="${inputmode}"` : ""} aria-describedby="${id}-error" />
+    <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
+  </div>`;
+}
+
+function renderSelectField({ label, id, name, placeholder, options }) {
+  return `<div class="field">
+    <label for="${id}">${label}</label>
+    <select id="${id}" name="${name}" autocomplete="off" aria-describedby="${id}-error">
+      <option value="">${placeholder}</option>
+      ${options.map((option) => `<option value="${option.value}">${option.label}</option>`).join("")}
+    </select>
+    <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
+  </div>`;
+}
+
+function renderTextareaField({ label, id, name, placeholder, rows }) {
+  return `<div class="field field-full">
+    <label for="${id}">${label}</label>
+    <textarea id="${id}" name="${name}" rows="${rows}" autocomplete="off" placeholder="${placeholder}" aria-describedby="${id}-hint ${id}-error"></textarea>
+    <p class="field-hint" id="${id}-hint">${placeholder}</p>
+    <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
+  </div>`;
+}
+
+function renderDateTimeField({ label, id, name, hint, required = false }) {
+  return `<div class="field">
+    <label for="${id}">${label}</label>
+    <input id="${id}" name="${name}" type="datetime-local" step="900"${required ? " required" : ""} aria-describedby="${id}-hint ${id}-error" />
+    <p class="field-hint" id="${id}-hint">${hint}</p>
+    <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
+  </div>`;
+}
+
+function renderTrustPage(content, routes, prefix) {
+  const copy = content.pages.trust;
+
+  return `
+    <section class="chapter hero-page hero-trust">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="${routes.booking}">${copy.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${routes.product}">${copy.hero.secondaryCta}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter boundary-grid">
+      ${renderSectionHeading(copy.boundary.eyebrow, copy.boundary.title)}
+      <div class="editorial-grid">
+        ${copy.boundary.items
+          .map(
+            (item, index) => `<article class="story-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+            <h3>${item.title}</h3>
+            <p>${item.body}</p>
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter trust-proof">
+      ${renderSectionHeading(copy.proof.eyebrow, copy.proof.title)}
+      <div class="split-cards">
+        <article class="glass-card" data-reveal>
+          <ul class="bullet-list">
+            ${copy.proof.items.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        </article>
+        <article class="glass-card founder-card" data-reveal style="--reveal-delay: 110ms;">
+          <p class="eyebrow subdued">Founder</p>
+          <p>${copy.proof.founderLine}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter faq-section">
+      ${renderSectionHeading(copy.faq.eyebrow, copy.faq.title)}
+      <div class="faq-grid" data-reveal>
+        ${copy.faq.items
+          .map(
+            (item) => `<details class="faq-item">
+            <summary>${item.question}</summary>
+            <p>${item.answer}</p>
+          </details>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="chapter materials-section">
+      ${renderSectionHeading(copy.materials.eyebrow, copy.materials.title, copy.materials.intro)}
+      <div class="materials-layout${copy.materials.downloads.length === 1 ? " materials-layout-single" : ""}">
+        <div class="materials-copy" data-reveal>
+          <div class="download-stack${copy.materials.downloads.length === 1 ? " download-stack-single" : ""}">
+            ${copy.materials.downloads
+              .map(
+                (download) => `<article class="download-card">
+                <h3>${download.title}</h3>
+                <p>${download.description}</p>
+                <a class="button button-secondary" href="${assetPath(prefix, download.href)}" download${
+                  download.track ? ` data-track="${download.track}"` : ""
+                }>${download.label}</a>
+              </article>`,
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="preview-grid${copy.materials.previews.length === 1 ? " preview-grid-single" : ""}" data-reveal style="--reveal-delay: 110ms;">
+          ${copy.materials.previews
+            .map(
+              (preview) => `<figure class="preview-card">
+              <img src="${assetPath(prefix, preview.src)}" alt="${preview.alt}" width="${preview.width}" height="${preview.height}" loading="lazy" />
+              <figcaption>${preview.caption}</figcaption>
+            </figure>`,
+            )
+            .join("")}
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter legal-section">
+      ${renderSectionHeading(copy.legal.eyebrow, copy.legal.title, copy.legal.body)}
+      <div class="cta-row" data-reveal>
+        ${copy.legal.links
+          .map(
+            (link) => `<a class="button button-secondary" href="${routes[link.page]}">${link.label}</a>`,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    ${renderClosingBand(copy.closing, routes.booking, routes.pilot)}
+  `;
+}
+
+function renderLegalPage(copy) {
+  return `
+    <section class="chapter legal-hero">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter legal-grid">
+      <div class="legal-stack">
+        ${copy.cards
+          .map(
+            (card, index) => `<article class="legal-card" data-reveal style="--reveal-delay: ${index * 70}ms;">
+            <h2>${card.title}</h2>
+            ${card.body ? `<p>${card.body}</p>` : ""}
+            ${card.list ? `<ul class="bullet-list compact">${card.list.map((item) => `<li>${item}</li>`).join("")}</ul>` : ""}
+          </article>`,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderBlogIndexPage(content, lang, posts = []) {
+  const page = content.pages.blogIndex;
+  const blog = content.blog;
+  const publishedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
+  const locale = lang === "en" ? "en-US" : "nl-NL";
+
+  return `
+    <section class="chapter hero-page hero-blog">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${page.hero.eyebrow}</p>
+          <h1>${page.hero.title}</h1>
+          <p class="hero-lead">${page.hero.body}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="${hrefFor(lang, "pilot", "#booking")}">${page.hero.primaryCta}</a>
+            <a class="button button-secondary" href="${hrefFor(lang, "product")}">${page.hero.secondaryCta}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter blog-index-section">
+      ${renderSectionHeading(blog.eyebrow, blog.title, blog.intro)}
       ${
         publishedPosts.length
           ? `<div class="blog-grid">
           ${publishedPosts
             .map(
-              (post, index) => `<article class="blog-card" data-reveal style="--reveal-delay:${index * 90}ms">
-              <p class="blog-meta">${new Date(post.date).toLocaleDateString(locale === "en" ? "en-US" : "nl-NL", { year: "numeric", month: "short", day: "numeric" })} · ${post.primaryKeyword}</p>
-              <h3>${post.title}</h3>
-              <p>${post.excerpt}</p>
+              (post, index) => `<article class="blog-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+              <p class="blog-meta">${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(post.primaryKeyword)}</p>
+              <h3>${escapeHtml(post.title)}</h3>
+              <p>${escapeHtml(post.excerpt)}</p>
               <div class="blog-card-footer">
-                <span class="category-chip">${post.category}</span>
-                <a class="inline-link" href="${locale === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`}">${content.readMore}</a>
+                <span class="step-chip">${escapeHtml(post.category)}</span>
+                <a class="inline-link" href="${lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`}">${blog.readMore}</a>
               </div>
             </article>`,
             )
             .join("")}
         </div>`
-          : `<div class="empty-state" data-reveal><p>${content.emptyLabel}</p></div>`
+          : `<div class="empty-state" data-reveal><p>${blog.emptyLabel}</p></div>`
       }
-    </section>`,
-    renderCtaBand(locale, {
-      eyebrow: content.eyebrow,
-      title: content.ctaTitle,
-      body: content.ctaBody,
-      primary: { pageKey: "contact", label: content.ctaPrimary },
-      secondary: { pageKey: "useCases", label: locale === "en" ? "View use cases" : "Bekijk use cases" },
-    }),
-  ].join("\n");
+    </section>
+
+    ${renderClosingBand(
+      {
+        eyebrow: blog.eyebrow,
+        title: blog.ctaTitle,
+        body: blog.ctaBody,
+        primaryCta: blog.ctaPrimary,
+        secondaryCta: lang === "en" ? "See the trust page" : "Bekijk de trust-pagina",
+      },
+      hrefFor(lang, "pilot", "#booking"),
+      hrefFor(lang, "trust"),
+    )}
+  `;
 }
 
-function renderBlogArticle(locale, post) {
-  const content = siteContent[locale].blog;
+function renderBlogArticle(lang, post) {
+  const blog = siteContent[lang].blog;
   const relatedLinks = getSuggestedInternalLinks(post);
+  const locale = lang === "en" ? "en-US" : "nl-NL";
+
   return `<article class="chapter article-shell">
     <div class="article-head" data-reveal>
-      <p class="eyebrow">${content.eyebrow}</p>
-      <h1>${post.title}</h1>
-      <p class="hero-lead">${post.excerpt}</p>
+      <p class="eyebrow">${blog.eyebrow}</p>
+      <h1>${escapeHtml(post.title)}</h1>
+      <p class="hero-lead">${escapeHtml(post.excerpt)}</p>
       <div class="article-meta">
-        <span>${new Date(post.date).toLocaleDateString(locale === "en" ? "en-US" : "nl-NL", { year: "numeric", month: "long", day: "numeric" })}</span>
-        <span>${post.primaryKeyword}</span>
+        <span>${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}</span>
+        <span>${escapeHtml(post.primaryKeyword)}</span>
       </div>
     </div>
     <section class="answer-card article-answer" data-reveal>
-      <p class="eyebrow subdued">${locale === "en" ? "Short answer" : "Kort antwoord"}</p>
-      <p class="answer-copy">${post.answer || post.excerpt}</p>
+      <p class="eyebrow subdued">${lang === "en" ? "Short answer" : "Kort antwoord"}</p>
+      <p class="answer-copy">${escapeHtml(post.answer || post.excerpt)}</p>
     </section>
     <div class="article-body prose" data-reveal>${post.contentHtml}</div>
   </article>
-  ${renderSources(locale, post.sources)}
-  ${renderFaq(locale, post.faq)}
-  ${renderArticleRelated(locale, relatedLinks)}
-  ${renderCtaBand(locale, {
-    eyebrow: content.eyebrow,
-    title: content.ctaTitle,
-    body: content.ctaBody,
-    primary: { pageKey: "contact", label: content.ctaPrimary },
-    secondary: { pageKey: "blogIndex", label: content.backToBlog },
-  })}`;
+  ${renderSourcesSection(lang, post.sources)}
+  ${renderFaqSection(lang, post.faq)}
+  ${renderArticleRelated(lang, relatedLinks)}
+  ${renderClosingBand(
+    {
+      eyebrow: blog.eyebrow,
+      title: blog.ctaTitle,
+      body: blog.ctaBody,
+      primaryCta: blog.ctaPrimary,
+      secondaryCta: blog.backToBlog,
+    },
+    hrefFor(lang, "pilot", "#booking"),
+    hrefFor(lang, "blogIndex"),
+  )}`;
 }
 
-function renderSources(locale, sources) {
+function renderSourcesSection(lang, sources) {
   if (!sources?.length) {
     return "";
   }
 
   return `<section class="chapter">
-    <div class="section-heading" data-reveal>
-      <p class="eyebrow">${locale === "en" ? "Sources" : "Bronnen"}</p>
-      <h2>${siteContent[locale].blog.sourcesTitle}</h2>
-    </div>
+    ${renderSectionHeading(lang === "en" ? "Sources" : "Bronnen", siteContent[lang].blog.sourcesTitle)}
     <div class="glass-card" data-reveal>
       <ul class="source-list">
-        ${sources
-          .map(
-            (source) =>
-              `<li><a href="${source.url}" rel="noreferrer">${source.title}</a></li>`,
-          )
-          .join("")}
+        ${sources.map((source) => `<li><a href="${source.url}" rel="noreferrer">${escapeHtml(source.title)}</a></li>`).join("")}
       </ul>
     </div>
   </section>`;
 }
 
-function renderArticleRelated(locale, links) {
-  if (!links?.length) {
+function renderFaqSection(lang, items) {
+  if (!items?.length) {
     return "";
   }
 
   return `<section class="chapter">
-    <div class="section-heading" data-reveal>
-      <p class="eyebrow">${locale === "en" ? "Internal links" : "Interne links"}</p>
-      <h2>${siteContent[locale].blog.relatedTitle}</h2>
-    </div>
-    <div class="card-grid">
-      ${links
+    ${renderSectionHeading("FAQ", lang === "en" ? "Frequent questions" : "Veelgestelde vragen")}
+    <div class="faq-list">
+      ${items
         .map(
-          (link, index) => `<article class="glass-card" data-reveal style="--reveal-delay:${index * 90}ms">
-          <h3>${link.label}</h3>
-          <p>${link.href}</p>
-          <a class="inline-link" href="${link.href}">${link.label}</a>
+          (item, index) => `<article class="faq-card" data-reveal style="--reveal-delay: ${index * 80}ms;">
+          <h3>${escapeHtml(item.question)}</h3>
+          <p>${escapeHtml(item.answer)}</p>
         </article>`,
         )
         .join("")}
@@ -707,102 +1110,89 @@ function renderArticleRelated(locale, links) {
   </section>`;
 }
 
-function renderNotFound(locale) {
-  const page = siteContent[locale].pages.notFound;
-  return `<section class="chapter not-found-wrap">
-    <div class="not-found-card" data-reveal>
-      <p class="eyebrow">${page.hero.eyebrow}</p>
-      <h1>${page.hero.title}</h1>
-      <p class="hero-lead">${page.hero.lead}</p>
+function renderArticleRelated(lang, links) {
+  if (!links?.length) {
+    return "";
+  }
+
+  return `<section class="chapter">
+    ${renderSectionHeading(lang === "en" ? "Internal links" : "Interne links", siteContent[lang].blog.relatedTitle)}
+    <div class="path-cards">
+      ${links
+        .map(
+          (link, index) => `<article class="path-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+          <h3>${escapeHtml(link.label)}</h3>
+          <p>${escapeHtml(link.href)}</p>
+          <a class="inline-link" href="${link.href}">${escapeHtml(link.label)}</a>
+        </article>`,
+        )
+        .join("")}
+    </div>
+  </section>`;
+}
+
+function renderNotFoundPage(content, routes) {
+  const copy = content.pages.notFound;
+  return `
+    <section class="chapter hero-page hero-not-found">
+      <div class="hero-grid hero-grid-wide">
+        <div class="hero-copy" data-motion="intro">
+          <p class="eyebrow">${copy.hero.eyebrow}</p>
+          <h1>${copy.hero.title}</h1>
+          <p class="hero-lead">${copy.hero.body}</p>
+          <div class="hero-actions">
+            ${copy.actions
+              .map(
+                (action, index) => `<a class="button ${index === 0 ? "button-primary" : "button-secondary"}" href="${routes[action.page]}">${action.label}</a>`,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderClosingBand(copy, primaryHref, secondaryHref) {
+  return `<section class="chapter closing-band">
+    <div class="cta-strip" data-reveal>
+      <div>
+        <p class="eyebrow">${copy.eyebrow ?? "Next step"}</p>
+        <h2>${copy.title}</h2>
+        <p>${copy.body}</p>
+      </div>
       <div class="hero-actions">
-        <a class="button button-primary" href="${pagePathFor(locale, "home")}">${siteContent[locale].pageNames.home}</a>
-        <a class="button button-secondary" href="${pagePathFor(locale, "useCases")}">${siteContent[locale].pageNames.useCases}</a>
+        <a class="button button-primary" href="${primaryHref}">${copy.primaryCta}</a>
+        <a class="button button-secondary" href="${secondaryHref}">${copy.secondaryCta}</a>
       </div>
     </div>
   </section>`;
 }
 
-function renderDocument({
-  locale,
-  pageKey,
-  page,
-  filePath,
-  content,
-  mainContent,
-  siteUrl,
-  breadcrumbs,
-  schema,
-  extraHead = "",
-  pathnameOverride = "",
-}) {
-  const prefix = assetPrefix(filePath);
-  const canonicalPath = pathnameOverride || pagePathFor(locale, pageKey);
-  const canonical = canonicalUrl(siteUrl, canonicalPath);
-  const alternate = alternateLocale(locale);
-  const alternatePath =
-    pageKey === "notFound" || page.type === "article" ? null : pagePathFor(alternate, pageKey);
-  const logoPath = `${prefix}/assets/renvoo-logo-horizontal.png`;
-  const alternateHead = siteUrl
-    ? `<link rel="canonical" href="${canonical}" />
-    <link rel="alternate" hreflang="${content.locale}" href="${canonical}" />
-    ${
-      alternatePath
-        ? `<link rel="alternate" hreflang="${siteContent[alternate].locale}" href="${canonicalUrl(siteUrl, alternatePath)}" />
-    <link rel="alternate" hreflang="x-default" href="${canonicalUrl(siteUrl, pagePathFor("nl", pageKey))}" />`
-        : ""
-    }`
-    : "";
+function faqItemsForPage(lang, page) {
+  if (page === "trust") {
+    return siteContent[lang].pages.trust.faq.items;
+  }
 
-  return `<!doctype html>
-<html lang="${content.htmlLang}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${page.seo.title}</title>
-    <meta name="description" content="${page.seo.description}" />
-    <meta name="theme-color" content="#f4efe7" />
-    <meta name="robots" content="index,follow" />
-    <meta property="og:type" content="${page.type === "article" ? "article" : "website"}" />
-    <meta property="og:title" content="${page.seo.title}" />
-    <meta property="og:description" content="${page.seo.description}" />
-    <meta property="og:url" content="${canonical}" />
-    <meta property="og:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
-    <meta property="og:image:alt" content="Renvoo website preview" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${page.seo.title}" />
-    <meta name="twitter:description" content="${page.seo.description}" />
-    <meta name="twitter:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
-    ${alternateHead}
-    <link rel="icon" type="image/png" href="/icons/favicon.png" />
-    <link rel="apple-touch-icon" href="/icons/favicon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="stylesheet" href="${prefix}/styles.css" />
-    ${extraHead}
-    ${renderJsonLd(schema)}
-  </head>
-  <body data-page="${pageKey}" data-locale="${locale}" data-contact-email="">
-    <a class="skip-link" href="#content">${locale === "en" ? "Skip to content" : "Ga naar inhoud"}</a>
-    <div class="page-aura page-aura-left"></div>
-    <div class="page-aura page-aura-right"></div>
-    ${renderHeader(locale, pageKey).replace("./assets/renvoo-logo-horizontal.png", logoPath)}
-    ${renderBreadcrumbNav(breadcrumbs)}
-    <main id="content" class="site-main">
-      ${mainContent}
-    </main>
-    ${renderFooter(locale)}
-    <script type="module" src="${prefix}/main.js"></script>
-  </body>
-</html>`;
+  return [];
 }
 
-function buildStandardSchema(locale, pageKey, page, siteUrl, breadcrumbs) {
+function schemaForStandardPage(lang, page, pathname, breadcrumbs, siteUrl) {
+  const content = siteContent[lang];
+  const pageCopy = content.pages[page];
+  const description =
+    pageCopy.hero?.body ??
+    pageCopy.hero?.lead ??
+    pageCopy.bookingIntro?.body ??
+    pageCopy.seo.description;
+
   return [
-    buildOrganizationSchema(locale, siteUrl),
-    pageKey === "home" || pageKey === "blogIndex" ? buildWebsiteSchema(locale, siteUrl) : null,
-    pageKey !== "blogIndex" && pageKey !== "privacy" && pageKey !== "patientNotice"
-      ? buildSoftwareSchema(locale, siteUrl, { ...page, key: pageKey })
+    buildOrganizationSchema(lang, siteUrl),
+    page === "home" || page === "blogIndex" ? buildWebsiteSchema(lang, siteUrl) : null,
+    page !== "privacy" && page !== "patientNotice" && page !== "blogIndex"
+      ? buildSoftwareSchema(lang, canonicalUrl(siteUrl, pathname), description)
       : null,
-    buildFaqSchema(page.faq),
+    buildFaqSchema(faqItemsForPage(lang, page)),
     buildBreadcrumbSchema(siteUrl, breadcrumbs),
   ];
 }
@@ -811,94 +1201,65 @@ export function renderAllPages({ siteUrl = "", contactEmail = "", posts = [] } =
   const pages = [];
   const routeManifest = [];
 
-  for (const locale of localeOrder) {
-    const content = siteContent[locale];
+  for (const { lang, page } of pageSequence) {
+    const content = siteContent[lang];
+    const filePath = outputPathFor(lang, page);
+    const pathname = hrefFor(lang, page);
+    const breadcrumbs = breadcrumbsForPage(lang, page);
+    const pageCopy = content.pages[page];
+    const mainContent =
+      page === "blogIndex"
+        ? renderBlogIndexPage(content, lang, posts)
+        : renderPageBody({ lang, page, content, routes: {
+            home: hrefFor(lang, "home"),
+            product: hrefFor(lang, "product"),
+            pilot: hrefFor(lang, "pilot"),
+            trust: hrefFor(lang, "trust"),
+            blogIndex: hrefFor(lang, "blogIndex"),
+            booking: hrefFor(lang, "pilot", "#booking"),
+            privacy: hrefFor(lang, "privacy"),
+            patientNotice: hrefFor(lang, "patientNotice"),
+            switch: hrefFor(alternateLocale(lang), page === "notFound" ? "home" : page),
+          }, prefix: prefixForPath(filePath), posts });
 
-    for (const pageKey of rootPageKeys) {
-      const page = content.pages[pageKey];
-      const filePath = pageFilePathFor(locale, pageKey);
-      const breadcrumbs = renderBreadcrumbs(locale, pageKey, pageLabelFor(content, pageKey));
-      const schema = buildStandardSchema(locale, pageKey, page, siteUrl, breadcrumbs);
-      const mainContent =
-        page.type === "home" || page.type === "standard"
-          ? renderStandardPage(locale, page)
-          : page.type === "contact"
-            ? renderContactPage(locale, page, contactEmail)
-            : page.type === "blogIndex"
-              ? renderBlogIndex(locale, page, posts)
-              : renderLegalPage(locale, page);
-
-      pages.push({
-        path: filePath,
-        html: renderDocument({
-          locale,
-          pageKey,
-          page,
-          filePath,
-          content,
-          mainContent,
-          siteUrl,
-          breadcrumbs,
-          schema,
-        }),
-      });
-
-      routeManifest.push({
-        locale,
-        type: page.type,
+    pages.push({
+      path: filePath,
+      html: renderDocument({
+        lang,
+        page,
+        content,
         filePath,
-        pathname: pagePathFor(locale, pageKey),
-        title: page.seo.title,
-        description: page.seo.description,
-      });
-    }
+        pathname,
+        mainContent,
+        siteUrl,
+        breadcrumbs,
+        schema: schemaForStandardPage(lang, page, pathname, breadcrumbs, siteUrl),
+        pageType: page === "blogIndex" ? "website" : "website",
+        switchTarget: hrefFor(alternateLocale(lang), page === "notFound" ? "home" : page),
+      }),
+    });
+
+    routeManifest.push({
+      locale: lang,
+      type: page === "notFound" ? "notFound" : page === "blogIndex" ? "blogIndex" : "page",
+      filePath,
+      pathname: page === "home" ? (lang === "en" ? "/en/" : "/") : page === "blogIndex" ? (lang === "en" ? "/en/blog/" : "/blog/") : pathname.replace(/\.html$/, ""),
+      title: pageCopy.seo.title,
+      description: pageCopy.seo.description,
+    });
   }
 
-  const notFoundPage = siteContent.nl.pages.notFound;
-  const notFoundBreadcrumbs = [];
-  pages.push({
-    path: "404.html",
-    html: renderDocument({
-      locale: "nl",
-      pageKey: "notFound",
-      page: notFoundPage,
-      filePath: "404.html",
-      content: siteContent.nl,
-      mainContent: renderNotFound("nl"),
-      siteUrl,
-      breadcrumbs: notFoundBreadcrumbs,
-      schema: [buildOrganizationSchema("nl", siteUrl)],
-    }),
-  });
-
-  routeManifest.push({
-    locale: "nl",
-    type: "notFound",
-    filePath: "404.html",
-    pathname: "/404.html",
-    title: notFoundPage.seo.title,
-    description: notFoundPage.seo.description,
-  });
-
-  for (const locale of localeOrder) {
-    const localizedPosts = posts.filter((post) => post.locale === locale && post.status === "published");
+  for (const lang of localeOrder) {
+    const localizedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
     for (const post of localizedPosts) {
-      const pathname = locale === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`;
-      const filePath = locale === "en" ? `en/blog/${post.slug}/index.html` : `blog/${post.slug}/index.html`;
+      const pathname = lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`;
+      const filePath = lang === "en" ? `en/blog/${post.slug}/index.html` : `blog/${post.slug}/index.html`;
       const breadcrumbs = [
-        { href: pagePathFor(locale, "home"), label: siteContent[locale].pageNames.home },
-        { href: pagePathFor(locale, "blogIndex"), label: siteContent[locale].pageNames.blogIndex },
+        { href: hrefFor(lang, "home"), label: siteContent[lang].pageNames.home },
+        { href: hrefFor(lang, "blogIndex"), label: siteContent[lang].pageNames.blogIndex },
         { href: pathname, label: post.title },
       ];
-      const schema = [
-        buildOrganizationSchema(locale, siteUrl),
-        buildArticleSchema(siteUrl, locale, post, breadcrumbs),
-        buildFaqSchema(post.faq),
-        buildBreadcrumbSchema(siteUrl, breadcrumbs),
-      ];
-
       const articlePage = {
-        type: "article",
         seo: {
           title: post.metaTitle || post.title,
           description: post.metaDescription || post.excerpt,
@@ -908,32 +1269,45 @@ export function renderAllPages({ siteUrl = "", contactEmail = "", posts = [] } =
       pages.push({
         path: filePath,
         html: renderDocument({
-          locale,
-          pageKey: "blogIndex",
-          page: articlePage,
+          lang,
+          page: "blogIndex",
+          content: siteContent[lang],
           filePath,
-          content: siteContent[locale],
-          mainContent: `${renderBreadcrumbNav(breadcrumbs)}${renderBlogArticle(locale, post)}`,
+          pathname,
+          mainContent: renderBlogArticle(lang, post),
           siteUrl,
-          breadcrumbs: [],
-          schema,
-          pathnameOverride: pathname,
+          breadcrumbs,
+          schema: [
+            buildOrganizationSchema(lang, siteUrl),
+            buildArticleSchema(siteUrl, lang, post, breadcrumbs),
+            buildFaqSchema(post.faq),
+            buildBreadcrumbSchema(siteUrl, breadcrumbs),
+          ],
+          pageType: "article",
+          switchTarget: hrefFor(alternateLocale(lang), "blogIndex"),
+          seoOverride: articlePage.seo,
           extraHead: `<meta property="article:published_time" content="${post.date}" />
     <meta property="article:modified_time" content="${post.updated}" />
     <meta property="article:section" content="${post.category}" />`,
-        }).replace(renderBreadcrumbNav([]), ""),
+        }),
       });
 
       routeManifest.push({
-        locale,
+        locale: lang,
         type: "article",
         filePath,
         pathname,
-        title: post.metaTitle || post.title,
-        description: post.metaDescription || post.excerpt,
+        title: articlePage.seo.title,
+        description: articlePage.seo.description,
       });
     }
   }
 
   return { pages, routeManifest };
 }
+
+export function getPagePaths() {
+  return pageSequence.map(({ lang, page }) => outputPathFor(lang, page));
+}
+
+export { hrefFor as routeFor, outputPathFor, pageOrder };

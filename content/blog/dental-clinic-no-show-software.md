@@ -59,7 +59,7 @@ When a slot looks vulnerable, the team needs a better next step than simply send
 
 A tool only becomes operationally meaningful when it also helps the clinic think faster about recovery. If a cancellation comes in late, the team should be able to move more quickly toward backfill, earlier-slot offers, or other recovery actions. That part is often where the real economic value appears.
 
-You can read more about that broader recovery problem on the [cancellation management page](/en/cancellation-management/) and the [no-show reduction page](/en/no-show-reduction/).
+You can read more about that broader recovery problem on the [trust page](/en/trust.html) and the [product page](/en/product.html).
 
 ## Why this matters more in dental workflows than in generic scheduling
 
@@ -90,4 +90,4 @@ That matters because many clinics do not need another broad software promise. Th
 
 The best **dental clinic no-show software** should improve more than reminders. It should help a clinic see risk earlier, respond more deliberately, and recover lost time faster when the schedule changes. That is where the operational value becomes visible for owners, managers, and the team running the day.
 
-If that sounds close to your own workflow pain, continue with the [dental clinics page](/en/dental-clinics/) or request a short workflow review through [contact](/en/contact/).
+If that sounds close to your own workflow pain, continue with the [product page](/en/product.html) or request a short workflow review through the [pilot planner](/en/pilot.html#booking).

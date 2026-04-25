@@ -12,10 +12,10 @@ Karpathy-compatible root index for the Renvoo startup wiki.
 
 ## Catalogs
 
-- [[wiki/indexes/topics]] (16)
+- [[wiki/indexes/topics]] (14)
 - [[wiki/indexes/entities]] (6)
 - [[wiki/indexes/decisions]] (7)
-- [[wiki/indexes/sources]] (8)
+- [[wiki/indexes/sources]] (6)
 
 ## Operations
 
