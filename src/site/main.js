@@ -3,7 +3,9 @@ import {
   collectBookingValues,
   createBookingPayload,
   createDownloadFile,
+  createGoogleCalendarUrl,
   createPlainTextSummary,
+  formatBookingDateTime,
   getFirstInvalidField,
   persistBookingRequest,
   validateBookingStep,
@@ -149,6 +151,7 @@ function setupBookingFlow() {
   const successPanel = document.querySelector("[data-booking-success]");
   const successSummary = successPanel?.querySelector("[data-success-summary]");
   const successStatus = successPanel?.querySelector("[data-success-status]");
+  const calendarButton = successPanel?.querySelector("[data-booking-calendar]");
   const copyButton = successPanel?.querySelector("[data-booking-copy]");
   const downloadButton = successPanel?.querySelector("[data-booking-download]");
   const restartButton = successPanel?.querySelector("[data-booking-restart]");
@@ -161,6 +164,7 @@ function setupBookingFlow() {
   let started = false;
   let latestSummary = "";
 
+  primeDateTimeFields(form);
   setStep(1);
 
   form.addEventListener("input", (event) => {
@@ -220,7 +224,7 @@ function setupBookingFlow() {
 
     if (Object.keys(combinedErrors).length) {
       const firstField = getFirstInvalidField(combinedErrors);
-      setStep(["meetingFormat", "availability"].includes(firstField ?? "") ? 2 : 1);
+      setStep(["meetingFormat", "preferredSlot", "backupSlot"].includes(firstField ?? "") ? 2 : 1);
       applyErrors(form, combinedErrors, labels.errors);
       focusFirstField(form, firstField);
       return;
@@ -243,6 +247,14 @@ function setupBookingFlow() {
       successSummary.textContent = latestSummary;
     }
 
+    if (calendarButton instanceof HTMLAnchorElement) {
+      const calendarUrl = createGoogleCalendarUrl(payload);
+      calendarButton.hidden = !calendarUrl;
+      if (calendarUrl) {
+        calendarButton.href = calendarUrl;
+      }
+    }
+
     form.hidden = true;
     if (successPanel instanceof HTMLElement) {
       successPanel.hidden = false;
@@ -254,11 +266,15 @@ function setupBookingFlow() {
 
     emitFunnelEvent("booking_submitted", {
       mode: "preview",
-      availabilityCount: payload.availability.length,
+      hasBackupSlot: Boolean(payload.backupSlot),
       meetingFormat: payload.meetingFormat,
     });
 
     setSubmitting(false);
+  });
+
+  calendarButton?.addEventListener("click", () => {
+    setSuccessStatus(labels.calendarReady);
   });
 
   copyButton?.addEventListener("click", async () => {
@@ -295,9 +311,14 @@ function setupBookingFlow() {
   restartButton?.addEventListener("click", () => {
     form.reset();
     clearAllErrors(form);
+    primeDateTimeFields(form);
     form.hidden = false;
     if (successPanel instanceof HTMLElement) {
       successPanel.hidden = true;
+    }
+    if (calendarButton instanceof HTMLAnchorElement) {
+      calendarButton.hidden = true;
+      calendarButton.href = "#";
     }
     latestSummary = "";
     setSuccessStatus("");
@@ -323,7 +344,7 @@ function setupBookingFlow() {
     });
 
     if (backButton instanceof HTMLElement) {
-      backButton.hidden = currentStep === 1;
+      backButton.hidden = currentStep !== 3;
     }
 
     if (nextButton instanceof HTMLElement) {
@@ -378,14 +399,12 @@ function createLabelMaps(booking, labels) {
     primaryPain: labels.primaryPain,
     workflowNotes: labels.workflowNotes,
     meetingFormat: labels.meetingFormat,
-    availabilityTitle: labels.availabilityTitle,
+    preferredSlot: labels.preferredSlot,
+    backupSlot: labels.backupSlot,
     roles: Object.fromEntries(booking.roles.map((item) => [item.value, item.label])),
     clinicSizes: Object.fromEntries(booking.clinicSizes.map((item) => [item.value, item.label])),
     primaryPains: Object.fromEntries(booking.primaryPains.map((item) => [item.value, item.label])),
     meetingFormats: Object.fromEntries(booking.meetingFormats.map((item) => [item.value, item.label])),
-    availability: Object.fromEntries(
-      booking.availability.map((item) => [item.value, `${item.label} (${item.detail})`]),
-    ),
   };
 }
 
@@ -400,10 +419,8 @@ function renderReviewList(reviewList, values, labelMaps) {
     [labelMaps.primaryPain, labelMaps.primaryPains[values.primaryPain] ?? values.primaryPain],
     [labelMaps.workflowNotes, values.workflowNotes],
     [labelMaps.meetingFormat, labelMaps.meetingFormats[values.meetingFormat] ?? values.meetingFormat],
-    [
-      labelMaps.availabilityTitle,
-      values.availability.map((item) => labelMaps.availability[item] ?? item).join(", "),
-    ],
+    [labelMaps.preferredSlot, formatBookingDateTime(values.preferredSlot, copy.locale)],
+    [labelMaps.backupSlot, values.backupSlot ? formatBookingDateTime(values.backupSlot, copy.locale) : "—"],
   ];
 
   reviewList.innerHTML = rows
@@ -417,7 +434,7 @@ function applyErrors(form, errors, errorCopy) {
   clearAllErrors(form);
 
   Object.entries(errors).forEach(([fieldName, errorKey]) => {
-    const message = fieldName === "availability" ? errorCopy.availability : errorCopy[errorKey];
+    const message = errorCopy[errorKey] ?? errorCopy.required;
     const errorSlot = form.querySelector(`[data-field-error="${fieldName}"]`);
     if (errorSlot instanceof HTMLElement) {
       errorSlot.textContent = message;
@@ -464,4 +481,36 @@ function focusFirstField(form, fieldName) {
   if (field instanceof HTMLElement) {
     field.focus();
   }
+}
+
+function primeDateTimeFields(form) {
+  const dateInputs = form.querySelectorAll('input[type="datetime-local"]');
+  if (!dateInputs.length) {
+    return;
+  }
+
+  const minValue = getNextQuarterHourValue();
+  dateInputs.forEach((input) => {
+    if (input instanceof HTMLInputElement) {
+      input.min = minValue;
+    }
+  });
+}
+
+function getNextQuarterHourValue() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 45);
+  now.setSeconds(0, 0);
+  const roundedMinutes = Math.ceil(now.getMinutes() / 15) * 15;
+  if (roundedMinutes === 60) {
+    now.setHours(now.getHours() + 1, 0, 0, 0);
+  } else {
+    now.setMinutes(roundedMinutes, 0, 0);
+  }
+
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+function pad(value) {
+  return String(value).padStart(2, "0");
 }

@@ -29,7 +29,7 @@
     <header class="site-header" data-header>
   <div class="site-header-inner">
     <a class="brand-mark" href="./index.html" aria-label="Renvoo Start">
-      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" width="1200" height="320" />
+      <img src="./assets/renvoo-logo-horizontal.png" alt="Renvoo" width="1212" height="274" />
       <span>Operationele SaaS voor rustigere agenda's</span>
     </a>
     <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open navigatie">
@@ -61,7 +61,7 @@
             <a class="button button-secondary" href="./product.html">Bekijk eerst het product</a>
           </div>
           <ul class="hero-badges" aria-label="Pilot facts">
-            <li>15 minuten</li><li>Founder-led</li><li>Geen live kalender-sync nodig</li>
+            <li>15 minuten</li><li>Founder-led</li><li>Google Calendar-uitnodiging na aanvraag</li>
           </ul>
         </div>
       </div>
@@ -91,11 +91,11 @@
       <div>
         <div class="section-heading" data-reveal>
     <p class="eyebrow">Lokale planner</p>
-    <h2>Kies uw voorkeurstijden zoals in een lichte Calendly-flow</h2>
-    <p class="section-intro">Deze planner werkt nu als request-flow op basis van lokale beschikbaarheidsblokken. De aanvraag wordt als nette handoff opgeslagen zolang live routing nog niet is gekoppeld.</p>
+    <h2>Kies een voorkeursmoment en een backupmoment</h2>
+    <p class="section-intro">Deze planner werkt nu als request-flow. U kiest een eerste moment en eventueel een backupmoment, daarna staat een Google Calendar-draft klaar terwijl live routing nog ontbreekt.</p>
   </div>
         <ul class="bullet-list" data-reveal>
-          <li>Naam en zakelijke contactgegevens</li><li>Korte context over praktijk en huidige workflow</li><li>Voorkeur voor gesprekstype en tijdsblokken</li>
+          <li>Naam en zakelijke contactgegevens</li><li>Korte context over praktijk en huidige workflow</li><li>Gesprekstype plus een eerste en tweede tijdsoptie</li>
         </ul>
       </div>
       <aside class="pricing-panel" data-reveal style="--reveal-delay: 120ms;">
@@ -110,9 +110,9 @@
       <div class="section-heading" data-reveal>
     <p class="eyebrow">Plan gesprek</p>
     <h2>Vraag een validatiegesprek aan</h2>
-    <p class="section-intro">Live routing is nog niet gekoppeld. De planner slaat daarom een nette handoff lokaal op voor demo- en launchvoorbereiding.</p>
+    <p class="section-intro">Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.</p>
   </div>
-      <div class="booking-layout">
+      <div class="booking-layout booking-layout-single">
         <div class="booking-stack" data-reveal>
     <form class="booking-form" data-booking-form novalidate autocomplete="off">
       <ol class="booking-progress" aria-label="Stap">
@@ -195,74 +195,56 @@
           <p class="field-error" id="meetingFormat-error" data-field-error="meetingFormat" aria-live="polite"></p>
         </fieldset>
 
-        <fieldset class="choice-group">
-          <legend>Voorkeurstijden</legend>
-          <p class="field-hint">Kies minimaal één blok. Meer mag ook.</p>
-          <div class="choice-grid choice-grid-dense">
-            <label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="tue-morning" />
-                <span>Dinsdag ochtend</span>
-                <small>09:00-11:30 CET</small>
-              </label><label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="tue-afternoon" />
-                <span>Dinsdag middag</span>
-                <small>13:00-16:00 CET</small>
-              </label><label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="wed-morning" />
-                <span>Woensdag ochtend</span>
-                <small>09:00-11:30 CET</small>
-              </label><label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="thu-afternoon" />
-                <span>Donderdag middag</span>
-                <small>13:30-16:30 CET</small>
-              </label><label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="fri-morning" />
-                <span>Vrijdag ochtend</span>
-                <small>09:00-11:00 CET</small>
-              </label>
-          </div>
-          <p class="field-error" id="availability-error" data-field-error="availability" aria-live="polite"></p>
-        </fieldset>
+        <div class="field-grid field-grid-datetime">
+          <div class="field">
+    <label for="preferredSlot">Voorkeursmoment</label>
+    <input id="preferredSlot" name="preferredSlot" type="datetime-local" step="900" required aria-describedby="preferredSlot-hint preferredSlot-error" />
+    <p class="field-hint" id="preferredSlot-hint">Kies uw beste eerste optie. Tijden worden gelezen als Europe/Amsterdam.</p>
+    <p class="field-error" id="preferredSlot-error" data-field-error="preferredSlot" aria-live="polite"></p>
+  </div>
+          <div class="field">
+    <label for="backupSlot">Backupmoment (optioneel)</label>
+    <input id="backupSlot" name="backupSlot" type="datetime-local" step="900" aria-describedby="backupSlot-hint backupSlot-error" />
+    <p class="field-hint" id="backupSlot-hint">Handig als alternatief wanneer de eerste optie schuift.</p>
+    <p class="field-error" id="backupSlot-error" data-field-error="backupSlot" aria-live="polite"></p>
+  </div>
+        </div>
       </section>
+
+      <div class="form-actions">
+        <button class="button button-primary" type="button" data-booking-next>Verder</button>
+      </div>
 
       <section class="booking-step booking-review" data-step-panel="3" hidden>
         <div class="review-card">
           <h3>Controleren</h3>
           <dl data-review-list></dl>
         </div>
+        <div class="form-actions">
+          <button class="button button-secondary" type="button" data-booking-back hidden>Terug</button>
+          <button class="button button-primary" type="submit" data-booking-submit hidden>Verstuur aanvraag</button>
+        </div>
       </section>
 
-      <div class="form-actions">
-        <button class="button button-secondary" type="button" data-booking-back hidden>Terug</button>
-        <button class="button button-primary" type="button" data-booking-next>Verder</button>
-        <button class="button button-primary" type="submit" data-booking-submit hidden>Verstuur aanvraag</button>
-      </div>
-
-      <p class="booking-preview-note">Live routing is nog niet gekoppeld. De planner slaat daarom een nette handoff lokaal op voor demo- en launchvoorbereiding.</p>
+      <p class="booking-preview-note">Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.</p>
     </form>
 
     <section class="booking-success" data-booking-success hidden aria-live="polite">
       <div class="success-card">
         <p class="eyebrow">Aanvraag klaar voor opvolging</p>
         <h3>Uw aanvraag is lokaal opgeslagen voor de live handoff.</h3>
-        <p>De planner heeft een schone handoff gemaakt. U kunt de samenvatting kopiëren of downloaden zolang live routing nog niet actief is.</p>
+        <p>De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.</p>
         <pre data-success-summary></pre>
         <div class="form-actions">
+          <a class="button button-primary" href="#" target="_blank" rel="noreferrer" data-booking-calendar hidden>Open Google Calendar</a>
           <button class="button button-secondary" type="button" data-booking-copy>Kopieer samenvatting</button>
           <button class="button button-secondary" type="button" data-booking-download>Download samenvatting</button>
-          <button class="button button-primary" type="button" data-booking-restart>Nieuwe aanvraag</button>
+          <button class="button button-secondary" type="button" data-booking-restart>Nieuwe aanvraag</button>
         </div>
         <p class="form-status" data-success-status aria-live="polite"></p>
       </div>
     </section>
   </div>
-        <aside class="booking-sidecard" data-reveal style="--reveal-delay: 120ms;">
-          <h3>Wat u na versturen ziet</h3>
-          <ul class="bullet-list compact">
-            <li>Een lokale successtatus met samenvatting</li><li>Een kopieerbare handoff voor de live routing</li><li>Een schone samenvatting voor interne opvolging</li>
-          </ul>
-          <p class="support-note">Doelrespons: een bevestiging van het gesprek of een korte follow-up om een definitieve tijd vast te zetten.</p>
-        </aside>
       </div>
     </section>
 

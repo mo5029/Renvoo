@@ -111,7 +111,7 @@ function renderHeader(content, page, routes) {
   return `<header class="site-header" data-header>
   <div class="site-header-inner">
     <a class="brand-mark" href="${routes.home}" aria-label="Renvoo ${content.pageNames.home}">
-      <img src="${assetPath(prefixForLang(content.htmlLang === "nl" ? "nl" : "en"), "assets/renvoo-logo-horizontal.png")}" alt="Renvoo" width="1200" height="320" />
+      <img src="${assetPath(prefixForLang(content.htmlLang === "nl" ? "nl" : "en"), "assets/renvoo-logo-horizontal.png")}" alt="Renvoo" width="1212" height="274" />
       <span>${content.brandLine}</span>
     </a>
     <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="${menuLabel}">
@@ -223,9 +223,9 @@ function renderHomePage(content, routes) {
             <a class="button button-primary" href="${routes.booking}" data-track="hero_cta">${copy.hero.primaryCta}</a>
             <a class="button button-secondary" href="${routes.product}">${copy.hero.secondaryCta}</a>
           </div>
-          <ul class="hero-badges" aria-label="Key points">
+          ${copy.hero.badges.length ? `<ul class="hero-badges" aria-label="Key points">
             ${copy.hero.badges.map((badge) => `<li>${badge}</li>`).join("")}
-          </ul>
+          </ul>` : ""}
         </div>
         <aside class="hero-rail" data-motion="intro" style="--motion-delay: 120ms;">
           <div class="hero-note">
@@ -435,15 +435,8 @@ function renderPilotPage(content, routes) {
 
     <section class="chapter booking-chapter" id="booking">
       ${renderSectionHeading(content.nav.cta, copy.hero.title, booking.labels.previewMode)}
-      <div class="booking-layout">
+      <div class="booking-layout booking-layout-single">
         ${renderBookingForm(content)}
-        <aside class="booking-sidecard" data-reveal style="--reveal-delay: 120ms;">
-          <h3>${copy.plannerAside.title}</h3>
-          <ul class="bullet-list compact">
-            ${copy.plannerAside.items.map((item) => `<li>${item}</li>`).join("")}
-          </ul>
-          <p class="support-note">${copy.plannerAside.responseExpectation}</p>
-        </aside>
       </div>
     </section>
 
@@ -555,36 +548,37 @@ function renderBookingForm(content) {
           <p class="field-error" id="meetingFormat-error" data-field-error="meetingFormat" aria-live="polite"></p>
         </fieldset>
 
-        <fieldset class="choice-group">
-          <legend>${labels.availabilityTitle}</legend>
-          <p class="field-hint">${labels.help.availability}</p>
-          <div class="choice-grid choice-grid-dense">
-            ${booking.availability
-              .map(
-                (option) => `<label class="choice-card choice-card-multi">
-                <input type="checkbox" name="availability" value="${option.value}" />
-                <span>${option.label}</span>
-                <small>${option.detail}</small>
-              </label>`,
-              )
-              .join("")}
-          </div>
-          <p class="field-error" id="availability-error" data-field-error="availability" aria-live="polite"></p>
-        </fieldset>
+        <div class="field-grid field-grid-datetime">
+          ${renderDateTimeField({
+            label: labels.preferredSlot,
+            id: "preferredSlot",
+            name: "preferredSlot",
+            hint: labels.help.preferredSlot,
+            required: true,
+          })}
+          ${renderDateTimeField({
+            label: labels.backupSlot,
+            id: "backupSlot",
+            name: "backupSlot",
+            hint: labels.help.backupSlot,
+          })}
+        </div>
       </section>
+
+      <div class="form-actions">
+        <button class="button button-primary" type="button" data-booking-next>${labels.buttons.next}</button>
+      </div>
 
       <section class="booking-step booking-review" data-step-panel="3" hidden>
         <div class="review-card">
           <h3>${labels.step3}</h3>
           <dl data-review-list></dl>
         </div>
+        <div class="form-actions">
+          <button class="button button-secondary" type="button" data-booking-back hidden>${labels.buttons.back}</button>
+          <button class="button button-primary" type="submit" data-booking-submit hidden>${labels.buttons.submit}</button>
+        </div>
       </section>
-
-      <div class="form-actions">
-        <button class="button button-secondary" type="button" data-booking-back hidden>${labels.buttons.back}</button>
-        <button class="button button-primary" type="button" data-booking-next>${labels.buttons.next}</button>
-        <button class="button button-primary" type="submit" data-booking-submit hidden>${labels.buttons.submit}</button>
-      </div>
 
       <p class="booking-preview-note">${labels.previewMode}</p>
     </form>
@@ -596,9 +590,10 @@ function renderBookingForm(content) {
         <p>${labels.successBody}</p>
         <pre data-success-summary></pre>
         <div class="form-actions">
+          <a class="button button-primary" href="#" target="_blank" rel="noreferrer" data-booking-calendar hidden>${labels.buttons.calendar}</a>
           <button class="button button-secondary" type="button" data-booking-copy>${labels.buttons.copy}</button>
           <button class="button button-secondary" type="button" data-booking-download>${labels.buttons.download}</button>
-          <button class="button button-primary" type="button" data-booking-restart>${labels.buttons.restart}</button>
+          <button class="button button-secondary" type="button" data-booking-restart>${labels.buttons.restart}</button>
         </div>
         <p class="form-status" data-success-status aria-live="polite"></p>
       </div>
@@ -639,6 +634,15 @@ function renderTextareaField({ label, id, name, placeholder, rows }) {
     <label for="${id}">${label}</label>
     <textarea id="${id}" name="${name}" rows="${rows}" autocomplete="off" placeholder="${placeholder}" aria-describedby="${id}-hint ${id}-error"></textarea>
     <p class="field-hint" id="${id}-hint">${placeholder}</p>
+    <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
+  </div>`;
+}
+
+function renderDateTimeField({ label, id, name, hint, required = false }) {
+  return `<div class="field">
+    <label for="${id}">${label}</label>
+    <input id="${id}" name="${name}" type="datetime-local" step="900"${required ? " required" : ""} aria-describedby="${id}-hint ${id}-error" />
+    <p class="field-hint" id="${id}-hint">${hint}</p>
     <p class="field-error" id="${id}-error" data-field-error="${name}" aria-live="polite"></p>
   </div>`;
 }
@@ -706,9 +710,9 @@ function renderTrustPage(content, routes, prefix) {
 
     <section class="chapter materials-section">
       ${renderSectionHeading(copy.materials.eyebrow, copy.materials.title, copy.materials.intro)}
-      <div class="materials-layout">
+      <div class="materials-layout${copy.materials.downloads.length === 1 ? " materials-layout-single" : ""}">
         <div class="materials-copy" data-reveal>
-          <div class="download-stack">
+          <div class="download-stack${copy.materials.downloads.length === 1 ? " download-stack-single" : ""}">
             ${copy.materials.downloads
               .map(
                 (download) => `<article class="download-card">
@@ -722,7 +726,7 @@ function renderTrustPage(content, routes, prefix) {
               .join("")}
           </div>
         </div>
-        <div class="preview-grid" data-reveal style="--reveal-delay: 110ms;">
+        <div class="preview-grid${copy.materials.previews.length === 1 ? " preview-grid-single" : ""}" data-reveal style="--reveal-delay: 110ms;">
           ${copy.materials.previews
             .map(
               (preview) => `<figure class="preview-card">

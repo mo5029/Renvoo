@@ -8,7 +8,8 @@ export interface BookingValues {
   primaryPain: string;
   workflowNotes: string;
   meetingFormat: string;
-  availability: string[];
+  preferredSlot: string;
+  backupSlot: string;
 }
 
 export interface BookingPayload extends BookingValues {
@@ -19,6 +20,9 @@ export interface BookingPayload extends BookingValues {
 }
 
 export declare const BOOKING_STORAGE_KEY: string;
+export declare const BOOKING_TIME_ZONE: string;
+export declare const BOOKING_DURATION_MINUTES: number;
+export declare const BOOKING_HOST_EMAIL: string;
 export declare const bookingFieldOrder: string[];
 
 export declare function collectBookingValues(form: HTMLFormElement): BookingValues;
@@ -45,15 +49,17 @@ export declare function createPlainTextSummary(
     primaryPain: string;
     workflowNotes: string;
     meetingFormat: string;
-    availabilityTitle: string;
+    preferredSlot: string;
+    backupSlot: string;
     roles: Record<string, string>;
     clinicSizes: Record<string, string>;
     primaryPains: Record<string, string>;
     meetingFormats: Record<string, string>;
-    availability: Record<string, string>;
   },
 ): string;
 export declare function createDownloadFile(summary: string, fileName: string): {
   fileName: string;
   href: string;
 };
+export declare function formatBookingDateTime(value: string, locale?: string): string;
+export declare function createGoogleCalendarUrl(payload: BookingPayload): string;

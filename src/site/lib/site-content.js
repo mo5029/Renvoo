@@ -11,19 +11,6 @@ const sharedDownloads = [
     href: "downloads/renvoo-clinic-one-pager.pptx",
     label: "Download the one-pager",
   },
-  {
-    title: "Clinic deck",
-    description: "Clinic-facing deck for workflow reviews and pilot conversations.",
-    href: "downloads/renvoo-clinic-deck.pptx",
-    label: "Download the clinic deck",
-    track: "deck_downloaded",
-  },
-  {
-    title: "PDF leave-behind",
-    description: "Ready-to-forward PDF version of the one-pager.",
-    href: "downloads/renvoo-clinic-one-pager.pdf",
-    label: "Download the PDF",
-  },
 ];
 
 export const siteContent = {
@@ -76,11 +63,7 @@ export const siteContent = {
             "Renvoo helpt tandartspraktijken no-shows eerder signaleren, late uitval rustiger opvangen en verloren afspraken sneller herstellen zonder extra front-desk werk.",
           primaryCta: "Vraag een validatiegesprek aan",
           secondaryCta: "Bekijk hoe het werkt",
-          badges: [
-            "Geen patiëntaccounts in v1",
-            "Niet-klinische datagrens",
-            "Pilot-first, niet platform-first",
-          ],
+          badges: [],
           operatorCard: {
             title: "Waar operators direct last van hebben",
             items: [
@@ -306,7 +289,7 @@ export const siteContent = {
             "Het eerste gesprek is geen zware salesdemo. Het is een korte operator-review van uw no-show-, bevestigings- en herstelworkflow om te zien of een lichte pilot logisch is.",
           primaryCta: "Start de planner",
           secondaryCta: "Bekijk eerst het product",
-          chips: ["15 minuten", "Founder-led", "Geen live kalender-sync nodig"],
+          chips: ["15 minuten", "Founder-led", "Google Calendar-uitnodiging na aanvraag"],
         },
         agenda: {
           eyebrow: "Wat het gesprek oplevert",
@@ -328,13 +311,13 @@ export const siteContent = {
         },
         bookingIntro: {
           eyebrow: "Lokale planner",
-          title: "Kies uw voorkeurstijden zoals in een lichte Calendly-flow",
+          title: "Kies een voorkeursmoment en een backupmoment",
           body:
-            "Deze planner werkt nu als request-flow op basis van lokale beschikbaarheidsblokken. De aanvraag wordt als nette handoff opgeslagen zolang live routing nog niet is gekoppeld.",
+            "Deze planner werkt nu als request-flow. U kiest een eerste moment en eventueel een backupmoment, daarna staat een Google Calendar-draft klaar terwijl live routing nog ontbreekt.",
           support: [
             "Naam en zakelijke contactgegevens",
             "Korte context over praktijk en huidige workflow",
-            "Voorkeur voor gesprekstype en tijdsblokken",
+            "Gesprekstype plus een eerste en tweede tijdsoptie",
           ],
         },
         pricing: {
@@ -347,12 +330,12 @@ export const siteContent = {
         plannerAside: {
           title: "Wat u na versturen ziet",
           items: [
-            "Een lokale successtatus met samenvatting",
+            "Een Google Calendar-draft op basis van uw eerste voorkeur",
             "Een kopieerbare handoff voor de live routing",
             "Een schone samenvatting voor interne opvolging",
           ],
           responseExpectation:
-            "Doelrespons: een bevestiging van het gesprek of een korte follow-up om een definitieve tijd vast te zetten.",
+            "Doelrespons: bevestiging op uw eerste tijdsoptie of een korte follow-up met uw backupmoment.",
         },
         fallback: {
           title: "Nog niet klaar om te boeken?",
@@ -441,9 +424,9 @@ export const siteContent = {
         },
         materials: {
           eyebrow: "Clinic-materialen",
-          title: "De outreach-assets zijn al concreet genoeg voor echte gesprekken",
+          title: "Een scherpe one-pager is genoeg voor de eerste follow-up",
           intro:
-            "De website is niet het enige artefact. De huidige funnel hangt samen met dezelfde one-pager, deck en operatorverhalen die ook in founder-led outreach worden gebruikt.",
+            "Voor de website houden we het materiaal bewust smal: één clinic one-pager die probleem, workflow en pilot-posture rustig samenvat.",
           downloads: sharedDownloads,
           previews: [
             {
@@ -452,20 +435,6 @@ export const siteContent = {
               caption: "One-pager preview",
               width: 1080,
               height: 1528,
-            },
-            {
-              src: "assets/previews/deck-slide-01.png",
-              alt: "Preview van de eerste slide van de Renvoo clinic deck",
-              caption: "Deck cover slide",
-              width: 1280,
-              height: 720,
-            },
-            {
-              src: "assets/previews/deck-slide-07.png",
-              alt: "Preview van de oplossingsslide van de Renvoo clinic deck",
-              caption: "Deck solution slide",
-              width: 1280,
-              height: 720,
             },
           ],
         },
@@ -631,11 +600,13 @@ export const siteContent = {
         primaryPain: "Grootste pijnpunt",
         workflowNotes: "Huidige workflow of tooling",
         meetingFormat: "Gesprekstype",
-        availabilityTitle: "Voorkeurstijden",
+        preferredSlot: "Voorkeursmoment",
+        backupSlot: "Backupmoment (optioneel)",
         buttons: {
           next: "Verder",
           back: "Terug",
           submit: "Verstuur aanvraag",
+          calendar: "Open Google Calendar",
           restart: "Nieuwe aanvraag",
           copy: "Kopieer samenvatting",
           download: "Download samenvatting",
@@ -643,24 +614,27 @@ export const siteContent = {
         help: {
           workflowNotes:
             "Beschrijf kort uw huidige systeem of werkwijze… Bijvoorbeeld Exquise met handmatige reminders en losse terugbellijst.",
-          availability: "Kies minimaal één blok. Meer mag ook.",
+          preferredSlot: "Kies uw beste eerste optie. Tijden worden gelezen als Europe/Amsterdam.",
+          backupSlot: "Handig als alternatief wanneer de eerste optie schuift.",
         },
         errors: {
           required: "Dit veld is nodig om verder te gaan.",
           email: "Gebruik een geldig zakelijk e-mailadres.",
           tooShort: "Voeg iets meer context toe zodat de praktijkworkflow duidelijk wordt.",
-          availability: "Kies minimaal één voorkeurstijd.",
+          dateTime: "Kies een geldig datum- en tijdsmoment.",
+          differentDateTime: "Kies een ander backupmoment dan uw eerste voorkeur.",
         },
         previewMode:
-          "Live routing is nog niet gekoppeld. De planner slaat daarom een nette handoff lokaal op voor demo- en launchvoorbereiding.",
+          "Live routing is nog niet gekoppeld. De planner maakt daarom nu een nette handoff en een Google Calendar-draft op basis van uw eerste voorkeur.",
         responseExpectation:
-          "Doel: na deze aanvraag volgt een bevestiging of korte afstemming om het gesprek definitief vast te zetten.",
+          "Doel: na deze aanvraag volgt bevestiging op de eerste optie of een korte afstemming via het backupmoment.",
         successTitle: "Aanvraag klaar voor opvolging",
         successBody:
-          "De planner heeft een schone handoff gemaakt. U kunt de samenvatting kopiëren of downloaden zolang live routing nog niet actief is.",
+          "De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.",
         copySuccess: "Samenvatting gekopieerd.",
         copyFallback: "Kopiëren lukte niet automatisch. Gebruik de downloadknop als fallback.",
         downloadReady: "Samenvatting gedownload.",
+        calendarReady: "Google Calendar-draft geopend.",
       },
       roles: [
         { value: "owner", label: "Praktijkhouder / eigenaar" },
@@ -684,13 +658,6 @@ export const siteContent = {
         { value: "video", label: "Video call" },
         { value: "phone", label: "Telefonisch" },
         { value: "onsite", label: "Op locatie als het logisch is" },
-      ],
-      availability: [
-        { value: "tue-morning", label: "Dinsdag ochtend", detail: "09:00-11:30 CET" },
-        { value: "tue-afternoon", label: "Dinsdag middag", detail: "13:00-16:00 CET" },
-        { value: "wed-morning", label: "Woensdag ochtend", detail: "09:00-11:30 CET" },
-        { value: "thu-afternoon", label: "Donderdag middag", detail: "13:30-16:30 CET" },
-        { value: "fri-morning", label: "Vrijdag ochtend", detail: "09:00-11:00 CET" },
       ],
     },
   },
@@ -743,11 +710,7 @@ export const siteContent = {
             "Renvoo helps Dutch dental clinics spot no-show risk earlier, handle late cancellations sooner, and recover empty chair time without adding front-desk work.",
           primaryCta: "Request a Validation Meeting",
           secondaryCta: "See How It Works",
-          badges: [
-            "No patient accounts in v1",
-            "Administrative-data boundary",
-            "Pilot-first, not platform-first",
-          ],
+          badges: [],
           operatorCard: {
             title: "What operators feel first",
             items: [
@@ -973,7 +936,7 @@ export const siteContent = {
             "The first conversation is not a heavy product demo. It is a short operator review of the current no-show, confirmation, and recovery workflow to see whether a lightweight pilot is worth it.",
           primaryCta: "Start the Planner",
           secondaryCta: "See the Product First",
-          chips: ["15 minutes", "Founder-led", "No live calendar sync yet"],
+          chips: ["15 minutes", "Founder-led", "Google Calendar follow-up"],
         },
         agenda: {
           eyebrow: "What the first meeting should do",
@@ -995,13 +958,13 @@ export const siteContent = {
         },
         bookingIntro: {
           eyebrow: "Local booking flow",
-          title: "Pick preferred time blocks in a lightweight Calendly-style flow",
+          title: "Choose a preferred slot and one backup option",
           body:
-            "This planner currently works as a request flow backed by local availability blocks. It stores a clean handoff while live routing is still being connected.",
+            "This planner currently works as a request flow. Choose a first option and an optional backup, then open a Google Calendar draft while live routing is still being connected.",
           support: [
             "Name and business contact details",
             "Short context about clinic and current workflow",
-            "Preferred meeting format and time blocks",
+            "Meeting format plus a first and second time option",
           ],
         },
         pricing: {
@@ -1014,12 +977,12 @@ export const siteContent = {
         plannerAside: {
           title: "What happens after submit",
           items: [
-            "A local success state with a clean request summary",
+            "A Google Calendar draft based on the first preferred slot",
             "A copyable handoff while live routing is not yet active",
             "A tidy summary for internal follow-up or launch prep",
           ],
           responseExpectation:
-            "Target response: confirmation of the meeting or a short follow-up to lock the final time.",
+            "Target response: confirmation on the first option or a short follow-up using the backup slot.",
         },
         fallback: {
           title: "Not ready to book yet?",
@@ -1108,9 +1071,9 @@ export const siteContent = {
         },
         materials: {
           eyebrow: "Clinic materials",
-          title: "The outreach assets are already concrete enough for real conversations",
+          title: "One sharp one-pager is enough for the first follow-up",
           intro:
-            "The website is not the only artifact. This funnel sits alongside the same one-pager, deck, and operator framing already used in founder-led outreach.",
+            "For the website, the materials stay intentionally narrow: one clinic one-pager that calmly summarizes the problem, workflow, and pilot posture.",
           downloads: sharedDownloads,
           previews: [
             {
@@ -1119,20 +1082,6 @@ export const siteContent = {
               caption: "One-pager preview",
               width: 1080,
               height: 1528,
-            },
-            {
-              src: "assets/previews/deck-slide-01.png",
-              alt: "Preview of the first Renvoo clinic deck slide",
-              caption: "Deck cover slide",
-              width: 1280,
-              height: 720,
-            },
-            {
-              src: "assets/previews/deck-slide-07.png",
-              alt: "Preview of the Renvoo clinic deck solution slide",
-              caption: "Deck solution slide",
-              width: 1280,
-              height: 720,
             },
           ],
         },
@@ -1298,11 +1247,13 @@ export const siteContent = {
         primaryPain: "Primary pain point",
         workflowNotes: "Current workflow or tooling",
         meetingFormat: "Meeting format",
-        availabilityTitle: "Preferred time blocks",
+        preferredSlot: "Preferred slot",
+        backupSlot: "Backup slot (optional)",
         buttons: {
           next: "Continue",
           back: "Back",
           submit: "Submit Request",
+          calendar: "Open Google Calendar",
           restart: "Start Again",
           copy: "Copy Summary",
           download: "Download Summary",
@@ -1310,24 +1261,27 @@ export const siteContent = {
         help: {
           workflowNotes:
             "Briefly describe the current system or process… For example Exquise with manual reminders and a separate backfill list.",
-          availability: "Choose at least one time block. More is fine.",
+          preferredSlot: "Choose the best first option. Times are interpreted in Europe/Amsterdam.",
+          backupSlot: "Helpful as a fallback if the first option slips.",
         },
         errors: {
           required: "This field is needed to continue.",
           email: "Use a valid business email address.",
           tooShort: "Add a bit more context so the clinic workflow is clear.",
-          availability: "Choose at least one preferred time block.",
+          dateTime: "Choose a valid date and time.",
+          differentDateTime: "Choose a different backup slot from the first option.",
         },
         previewMode:
-          "Live routing is not connected yet. The planner therefore stores a clean local handoff for launch prep and demo use.",
+          "Live routing is not connected yet. The planner therefore creates a clean local handoff plus a Google Calendar draft from the first preferred slot.",
         responseExpectation:
-          "Target response: confirmation of the meeting or a short follow-up to lock the final time.",
+          "Target response: confirmation on the first option or a short follow-up using the backup slot.",
         successTitle: "Request ready for follow-up",
         successBody:
-          "The planner has created a clean handoff. You can copy or download the summary while live routing is still inactive.",
+          "The planner has saved the request locally. Open the Google Calendar draft for the first preferred slot, or copy/download the handoff while live routing is still inactive.",
         copySuccess: "Summary copied.",
         copyFallback: "Automatic copy did not work. Use the download button as fallback.",
         downloadReady: "Summary downloaded.",
+        calendarReady: "Google Calendar draft opened.",
       },
       roles: [
         { value: "owner", label: "Clinic owner" },
@@ -1351,13 +1305,6 @@ export const siteContent = {
         { value: "video", label: "Video call" },
         { value: "phone", label: "Phone call" },
         { value: "onsite", label: "On-site if it makes sense" },
-      ],
-      availability: [
-        { value: "tue-morning", label: "Tuesday morning", detail: "09:00-11:30 CET" },
-        { value: "tue-afternoon", label: "Tuesday afternoon", detail: "13:00-16:00 CET" },
-        { value: "wed-morning", label: "Wednesday morning", detail: "09:00-11:30 CET" },
-        { value: "thu-afternoon", label: "Thursday afternoon", detail: "13:30-16:30 CET" },
-        { value: "fri-morning", label: "Friday morning", detail: "09:00-11:00 CET" },
       ],
     },
   },
