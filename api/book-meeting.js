@@ -1,93 +1,95 @@
-import {
-  BOOKING_HOST_EMAIL,
-  createGoogleCalendarUrl,
-  validateBookingStep,
-} from "../src/site/lib/booking.js";
-import {
-  createCalendarBookingEvent,
-  isCalendarBookingConfigured,
-} from "../src/lib/google-calendar-booking.js";
-
-function normalizePayload(payload) {
-  return {
-    contactName: String(payload?.contactName ?? "").trim(),
-    contactEmail: String(payload?.contactEmail ?? "").trim(),
-    role: String(payload?.role ?? "").trim(),
-    clinicName: String(payload?.clinicName ?? "").trim(),
-    city: String(payload?.city ?? "").trim(),
-    clinicSize: String(payload?.clinicSize ?? "").trim(),
-    primaryPain: String(payload?.primaryPain ?? "").trim(),
-    workflowNotes: String(payload?.workflowNotes ?? "").trim(),
-    meetingFormat: String(payload?.meetingFormat ?? "").trim(),
-    preferredSlot: String(payload?.preferredSlot ?? "").trim(),
-    backupSlot: String(payload?.backupSlot ?? "").trim(),
-    locale: String(payload?.locale ?? "en-US").trim(),
-    page: String(payload?.page ?? "pilot").trim(),
-    mode: String(payload?.mode ?? "website").trim(),
-    submittedAt: String(payload?.submittedAt ?? new Date().toISOString()).trim(),
-  };
-}
+import { buildMeetingNotificationEmail, getMeetingNotificationConfig, parseMeetingRequest } from "../src/lib/meeting-request.js";
 
 export async function POST(request) {
-  let payload;
+  let input;
 
   try {
-    payload = normalizePayload(await request.json());
+    input = await request.json();
+  } catch {
+    return Response.json(
+      { success: false, error: "Invalid JSON body." },
+      { status: 400 },
+    );
+  }
+
+  const parsed = parseMeetingRequest(input);
+  if (!parsed.ok) {
+    return Response.json(
+      {
+        success: false,
+        error: "Meeting request is invalid.",
+        details: parsed.errors,
+      },
+      { status: 400 },
+    );
+  }
+
+  const config = getMeetingNotificationConfig();
+  if (!config.apiKey || !config.fromEmail || !config.notificationEmail) {
+    return Response.json(
+      {
+        success: false,
+        error: "Resend is not configured.",
+      },
+      { status: 503 },
+    );
+  }
+
+  const payload = parsed.data;
+  const email = buildMeetingNotificationEmail(payload);
+
+  try {
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+        "User-Agent": "renvoo-booking/1.0",
+        "Idempotency-Key": [
+          payload.contactEmail,
+          payload.clinicName,
+          payload.preferredSlot,
+        ].join(":"),
+      },
+      body: JSON.stringify({
+        from: config.fromEmail,
+        to: [config.notificationEmail],
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        reply_to: payload.contactEmail,
+        tags: [
+          { name: "source", value: "website" },
+          { name: "flow", value: "meeting-request" },
+          { name: "locale", value: payload.locale },
+        ],
+      }),
+    });
+
+    const resendJson = await resendResponse.json().catch(() => null);
+    if (!resendResponse.ok) {
+      return Response.json(
+        {
+          success: false,
+          error: resendJson?.message || "Resend failed to send the meeting notification.",
+        },
+        { status: 502 },
+      );
+    }
+
+    return Response.json({
+      success: true,
+      mode: "email-notification",
+      emailId: resendJson?.id ?? "",
+      notificationEmail: config.notificationEmail,
+    });
   } catch {
     return Response.json(
       {
         success: false,
-        error: "Invalid booking request payload.",
+        error: "Resend request failed before the notification could be sent.",
       },
-      { status: 400 },
+      { status: 502 },
     );
-  }
-
-  const validationErrors = {
-    ...validateBookingStep(1, payload),
-    ...validateBookingStep(2, payload),
-  };
-
-  if (Object.keys(validationErrors).length > 0) {
-    return Response.json(
-      {
-        success: false,
-        error: "Booking request failed validation.",
-        fields: validationErrors,
-      },
-      { status: 400 },
-    );
-  }
-
-  const fallbackCalendarUrl = createGoogleCalendarUrl(payload);
-  const fallbackResponse = {
-    success: true,
-    mode: "draft-fallback",
-    calendarUrl: fallbackCalendarUrl,
-    hostEmail: BOOKING_HOST_EMAIL,
-    note: "Live host-side calendar booking is not configured yet, so the site returned the Google Calendar draft flow instead.",
-  };
-
-  if (!isCalendarBookingConfigured()) {
-    return Response.json(fallbackResponse);
-  }
-
-  try {
-    const event = await createCalendarBookingEvent(payload);
-    return Response.json({
-      success: true,
-      mode: "calendar-event",
-      hostEmail: BOOKING_HOST_EMAIL,
-      eventId: event.id,
-      htmlLink: event.htmlLink ?? "",
-      meetLink: event.hangoutLink ?? "",
-      status: event.status ?? "confirmed",
-      note: "The meeting was added to Mohamed's calendar and the contact email was invited.",
-    });
-  } catch (error) {
-    return Response.json({
-      ...fallbackResponse,
-      warning: error instanceof Error ? error.message : String(error),
-    });
   }
 }

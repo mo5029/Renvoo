@@ -330,7 +330,7 @@ export const siteContent = {
           eyebrow: "Lokale planner",
           title: "Kies een voorkeursmoment en een backupmoment",
           body:
-            "Deze planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet is gekoppeld, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
+            "Deze planner probeert Mohamed direct per e-mail te waarschuwen over nieuwe gespreksaanvragen. Als live notificatie nog niet is gekoppeld, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
           support: [
             "Naam en zakelijke contactgegevens",
             "Korte context over praktijk en huidige workflow",
@@ -347,12 +347,12 @@ export const siteContent = {
         plannerAside: {
           title: "Wat u na versturen ziet",
           items: [
-            "Bij live koppeling: een afspraak op Mohameds agenda met uitnodiging naar uw e-mailadres",
+            "Bij live koppeling: Mohamed krijgt direct een e-mailmelding met uw voorkeursmoment en context",
             "Anders: een Google Calendar-draft op basis van uw eerste voorkeur",
             "Een schone samenvatting voor interne opvolging",
           ],
           responseExpectation:
-            "Doelrespons: bevestiging op uw eerste tijdsoptie of een korte follow-up met uw backupmoment.",
+            "Doelrespons: een snelle e-mailreactie op uw eerste tijdsoptie of een korte follow-up met uw backupmoment.",
         },
         fallback: {
           title: "Nog niet klaar om te boeken?",
@@ -620,6 +620,7 @@ export const siteContent = {
         statusStep2: "Kies uw voorkeursmomenten voor het gesprek.",
         statusReview: "Controleer uw aanvraag en verstuur wanneer alles klopt.",
         statusSuccess: "Uw aanvraag is lokaal opgeslagen voor de live handoff.",
+        statusNotified: "Mohamed heeft per e-mail een melding gekregen en kan op uw voorkeursmoment reageren.",
         statusBooked: "Het gesprek staat in Mohameds agenda en de uitnodiging is verstuurd.",
         statusFallback: "Live boeken lukte niet direct. Gebruik de draft of de samenvatting voor follow-up.",
         summaryTitle: "Renvoo booking request",
@@ -661,12 +662,14 @@ export const siteContent = {
           differentDateTime: "Kies een ander backupmoment dan uw eerste voorkeur.",
         },
         previewMode:
-          "De planner probeert eerst live op Mohameds agenda te boeken. Als host-booking nog niet beschikbaar is, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
+          "De planner probeert Mohamed eerst per e-mail te waarschuwen. Als live notificatie nog niet beschikbaar is, valt hij terug op een Google Calendar-draft op basis van uw eerste voorkeur.",
         responseExpectation:
           "Doel: na deze aanvraag volgt bevestiging op de eerste optie of een korte afstemming via het backupmoment.",
         successTitle: "Aanvraag klaar voor opvolging",
         successBody:
           "De planner heeft de aanvraag lokaal opgeslagen. Open daarna de Google Calendar-draft voor uw eerste voorkeursmoment, of kopieer/download de handoff zolang live routing nog niet actief is.",
+        successBodyNotified:
+          "Mohamed heeft per e-mail uw praktijkcontext en voorkeursmoment ontvangen. Bewaar de samenvatting hieronder gerust voor uw eigen opvolging terwijl u op bevestiging wacht.",
         successBodyBooked:
           "Renvoo heeft het gesprek op Mohameds agenda gezet en de uitnodiging naar dit zakelijke e-mailadres gestuurd. Bewaar de samenvatting hieronder voor uw eigen referentie.",
         successBodyFallback:
@@ -1017,7 +1020,7 @@ export const siteContent = {
           eyebrow: "Local booking flow",
           title: "Choose a preferred slot and one backup option",
           body:
-            "This planner tries to book on Mohamed's calendar first. If live host-side booking is not configured yet, it falls back to a Google Calendar draft built from the first preferred slot.",
+            "This planner tries to notify Mohamed by email about new meeting requests first. If live notification is not configured yet, it falls back to a Google Calendar draft built from the first preferred slot.",
           support: [
             "Name and business contact details",
             "Short context about clinic and current workflow",
@@ -1034,12 +1037,12 @@ export const siteContent = {
         plannerAside: {
           title: "What happens after submit",
           items: [
-            "If live booking works: the meeting lands on Mohamed's calendar and your email gets invited",
+            "If live notification works: Mohamed gets an email with your preferred slot and clinic context",
             "Otherwise: a Google Calendar draft based on the first preferred slot",
             "A tidy summary for internal follow-up or launch prep",
           ],
           responseExpectation:
-            "Target response: confirmation on the first option or a short follow-up using the backup slot.",
+            "Target response: a quick confirmation on the first option or a short follow-up using the backup slot.",
         },
         fallback: {
           title: "Not ready to book yet?",
@@ -1307,6 +1310,7 @@ export const siteContent = {
         statusStep2: "Choose preferred meeting timing next.",
         statusReview: "Review the request and submit when everything looks right.",
         statusSuccess: "Your request has been saved locally for the live handoff.",
+        statusNotified: "Mohamed has been notified by email and can follow up from your requested slot.",
         statusBooked: "The meeting is on Mohamed's calendar and the invite has been sent.",
         statusFallback: "Live booking was not available right away. Use the draft or summary for follow-up.",
         summaryTitle: "Renvoo booking request",
@@ -1348,12 +1352,14 @@ export const siteContent = {
           differentDateTime: "Choose a different backup slot from the first option.",
         },
         previewMode:
-          "The planner tries to book on Mohamed's calendar first. If live host-side booking is not available, it falls back to a Google Calendar draft from the first preferred slot.",
+          "The planner tries to notify Mohamed by email first. If live notification is not available, it falls back to a Google Calendar draft from the first preferred slot.",
         responseExpectation:
           "Target response: confirmation on the first option or a short follow-up using the backup slot.",
         successTitle: "Request ready for follow-up",
         successBody:
           "The planner has saved the request locally. Open the Google Calendar draft for the first preferred slot, or copy/download the handoff while live routing is still inactive.",
+        successBodyNotified:
+          "Mohamed has been notified by email with your clinic context and requested time. Keep the summary below if you want your own copy while waiting for confirmation.",
         successBodyBooked:
           "Renvoo added the meeting to Mohamed's calendar and sent the invite to this business email. Keep the summary below if you want your own copy.",
         successBodyFallback:

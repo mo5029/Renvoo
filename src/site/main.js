@@ -501,6 +501,19 @@ async function submitBookingRequest(payload, labels) {
       };
     }
 
+    if (json.mode === "email-notification") {
+      return {
+        mode: "email-notification",
+        heading: labels.statusNotified,
+        body: labels.successBodyNotified,
+        statusMessage: labels.statusNotified,
+        actionUrl: "",
+        actionLabel: "",
+        eventId: json.emailId ?? "",
+        warning: "",
+      };
+    }
+
     return {
       ...fallback,
       actionUrl: json.calendarUrl || fallback.actionUrl,

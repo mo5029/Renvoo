@@ -111,7 +111,7 @@ The site currently includes:
 - English mirrors under `/en/`
 - structured data for `Organization`, `WebSite`, `SoftwareApplication`, `FAQPage`, `BreadcrumbList`, and blog `Article` pages
 - a markdown blog index and article pipeline
-- a static contact-request flow that can open a configured public email address via `SITE_CONTACT_EMAIL`
+- a pilot booking flow that can notify Mohamed via Resend when configured, with a Google Calendar draft fallback when it is not
 
 Deployment notes live in `docs/website/deployment.md`.
 
@@ -146,6 +146,9 @@ Main environment variables:
 
 - `SITE_URL`: absolute production URL used for canonical tags, `hreflang`, and sitemap generation
 - `SITE_CONTACT_EMAIL`: public inbox used by the contact page mailto flow
+- `RESEND_API_KEY`: API key for live meeting-request notifications from the pilot booking flow
+- `RESEND_FROM_EMAIL`: verified sender for meeting notifications, for example `Renvoo <requests@renvoo.nl>`
+- `RESEND_TO_EMAIL`: inbox that should receive booking notifications; if unset, the code falls back to `MEETING_NOTIFICATION_EMAIL`, `SITE_CONTACT_EMAIL`, then Mohamed's hardcoded host inbox
 - `OPENAI_API_KEY`: enables AI-assisted draft generation
 - `BLOG_PUBLISH_MODE=draft|publish`: whether passing posts should stay draft or be marked published. Default is `publish`.
 - `BLOG_DEFAULT_LOCALE=nl|en`
@@ -163,6 +166,35 @@ Typical local workflow:
 2. review `tmp/blog/latest-run.json`
 3. `npm run generate:daily-blog`
 4. `npm run site:build`
+
+### Meeting Request Notifications
+
+The pilot planner on the website now posts to `POST /api/book-meeting`.
+
+Preferred live behavior:
+
+- the visitor submits the planner
+- Renvoo sends Mohamed an email notification through Resend
+- the visitor still gets the on-page confirmation and summary
+
+Fallback behavior:
+
+- if Resend is not configured, the planner falls back to the existing Google Calendar draft and summary path instead of failing silently
+
+To enable the live notification path:
+
+1. verify a sending domain or subdomain in Resend
+2. create a Resend API key
+3. add these env vars in Vercel:
+   - `RESEND_API_KEY`
+   - `RESEND_FROM_EMAIL`
+   - `RESEND_TO_EMAIL`
+
+Resend references:
+
+- [Send Email API](https://resend.com/docs/api-reference/emails)
+- [Create a sender after verifying a domain](https://resend.com/docs/knowledge-base/how-do-I-create-an-email-address-or-sender-in-resend)
+- [Domain verification overview](https://resend.com/docs/dashboard/domains/introduction)
 
 Scheduling options:
 
