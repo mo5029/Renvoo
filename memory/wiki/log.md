@@ -2,8 +2,17 @@
 
 ## Recent Entries
 
-## [2026-04-25T02:05:00.000Z] website | Patched live booking flow and English locale persistence
-## [2026-04-25T12:30:00.000Z] website | Preserved Renvoo website versions and created funnel-plus-SEO branch
+## [2026-04-27T08:25:00.000Z] website | Published blog posts and updated blog automation
+## [2026-04-27T05:09:37.040Z] automation | Created daily Renvoo blog draft on recovering open slots
+## [2026-04-26T05:02:19.037Z] automation | Created daily Renvoo blog draft on appointment confirmation
+## [2026-04-25T09:15:00.000Z] launch | Deployed Renvoo to Vercel and attached domains
+## [2026-04-25T09:45:00.000Z] launch | Corrected live Vercel content to the funnel build
+## [2026-04-25T10:00:00.000Z] launch | Renvoo domain DNS now points to Vercel
+## [2026-04-24T12:20:00.000Z] launch | Pushed launch-ready Renvoo site to main
+## [2026-04-24T10:10:00.000Z] compliance | Added blog compliance policy memory
+## [2026-04-24T09:55:00.000Z] automation | Created daily Renvoo blog automation
+## [2026-04-24T09:44:50.000Z] website | Added SEO and AI-search growth engine memory
+## [2026-04-24T08:30:00.000Z] security-audit | Added Renvoo security review memory
 ## [2026-04-17T19:45:00.000Z] outreach | Cleared remaining tracker emails
 ## [2026-04-17T19:35:00.000Z] outreach | Sent second dental outreach wave
 ## [2026-04-17T19:20:00.000Z] outreach | Sent first dental outreach wave
@@ -13,15 +22,6 @@
 ## [2026-04-17T11:44:51.908Z] init | Initialized Renvoo memory vault
 ## [2026-04-17T11:45:46.353Z] init | Initialized Renvoo memory vault
 ## [2026-04-17T11:46:01.142Z] lint | Linted Renvoo wiki
-## [2026-04-17T11:46:41.930Z] lint | Linted Renvoo wiki
-## [2026-04-17T13:12:19.184Z] compact | Compacted Renvoo wiki
-## [2026-04-17T13:12:27.929Z] lint | Linted Renvoo wiki
-## [2026-04-17T13:12:57.485Z] query | What is Renvoo's current wedge and what contradictions should I remember?
-## [2026-04-17T18:08:07.960Z] lint | Linted Renvoo wiki
-## [2026-04-17T18:45:16.267Z] lint | Linted Renvoo wiki
-## [2026-04-17T18:45:41.819Z] lint | Linted Renvoo wiki
-## [2026-04-17T19:02:39.988Z] lint | Linted Renvoo wiki
-## [2026-04-17T19:07:32.911Z] lint | Linted Renvoo wiki
 
 ## Monthly Logs
 

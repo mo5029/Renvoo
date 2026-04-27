@@ -116,7 +116,7 @@ function buildIsoDate(date = new Date()) {
 
 function getBlogSettings() {
   return {
-    publishMode: process.env.BLOG_PUBLISH_MODE === "publish" ? "publish" : "draft",
+    publishMode: process.env.BLOG_PUBLISH_MODE === "draft" ? "draft" : "publish",
     defaultLocale: process.env.BLOG_DEFAULT_LOCALE === "en" ? "en" : "nl",
     outputDir: process.env.BLOG_OUTPUT_DIR?.trim() || DEFAULT_BLOG_DIR,
     minScore: Number(process.env.BLOG_MIN_SCORE ?? 72),
