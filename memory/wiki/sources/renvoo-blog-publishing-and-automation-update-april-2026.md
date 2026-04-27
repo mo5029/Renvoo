@@ -5,7 +5,7 @@ domain: renvoo-startup
 source_id: d2b0c8494e5f4f91
 source_kind: text
 summary: "Structured capture of the April 27, 2026 change that published the validated Dutch Renvoo blog posts to the website, changed the repo generator to publish by default, and updated the recurring Codex automation to publish passing posts."
-updated_at: '2026-04-27T08:25:00.000Z'
+updated_at: '2026-04-27T06:31:16.000Z'
 created_at: '2026-04-27T08:25:00.000Z'
 raw_path: raw/2026/04/27-renvoo-blog-publishing-and-automation-update-april-2026.md
 storage_strategy: wiki-only
@@ -65,6 +65,17 @@ The following checks passed after the change:
 
 The site build output confirmed that the Dutch blog index and individual article pages now include the published Dutch posts.
 
+## Live Deployment Result
+
+After the GitHub push landed on `main`, production was deployed from a clean linked Vercel worktree so the website would pick up the published blog content without unrelated local workspace edits.
+
+Live verification confirmed:
+
+- `https://renvoo.nl/blog/` returns `200 OK`
+- `https://renvoo.nl/blog/open-plekken-tandartspraktijk-opvullen/` returns `200 OK`
+
+That matters because this note is not only about changing local content state. It also records that the website actually began serving the published posts on the public domain.
+
 ## Key Files
 
 - `content/blog/late-afzeggingen-in-de-tandartspraktijk.md`
@@ -84,7 +95,7 @@ The site build output confirmed that the Dutch blog index and individual article
 
 ## Claims
 
-- The public website blog started showing the validated Dutch posts after their status was changed from draft to published. (high) — `content/blog/*.md`, `dist/site/blog/index.html`
+- The public website blog started showing the validated Dutch posts after their status was changed from draft to published and the site was redeployed to production. (high) — `content/blog/*.md`, `dist/site/blog/index.html`, `https://renvoo.nl/blog/`
 - The repo blog generator now defaults to publishing passing posts unless draft mode is explicitly requested. (high) — `src/lib/blog-generator.js`
 - The recurring Codex automation was updated to publish passing posts and only keep weak posts as drafts. (high) — app automation `daily-renvoo-blog-draft`
 

@@ -2,9 +2,9 @@
 title: "Renvoo Blog Publishing Workflow April 2026"
 type: topic
 domain: renvoo-startup
-summary: "On April 27, 2026, Renvoo started publishing validated blog posts to the live website by default instead of leaving them hidden as drafts, and the recurring blog automation was updated to match that behavior."
-updated_at: '2026-04-27T08:25:00.000Z'
-review_after: '2026-05-27T08:25:00.000Z'
+summary: "On April 27, 2026, Renvoo started publishing validated blog posts to the live website by default instead of leaving them hidden as drafts, updated the recurring blog automation to match that behavior, and verified the pages live on renvoo.nl."
+updated_at: '2026-04-27T06:31:16.000Z'
+review_after: '2026-05-27T06:31:16.000Z'
 source_ids:
   - d2b0c8494e5f4f91
 source_note_links:
@@ -16,7 +16,7 @@ related_links:
 claims:
   - statement: "Validated Renvoo blog posts now appear on the public website by default once they pass the repo's quality and compliance checks."
     confidence: high
-    evidence: "content/blog/*.md, src/lib/blog-generator.js, dist/site/blog/index.html"
+    evidence: "content/blog/*.md, src/lib/blog-generator.js, dist/site/blog/index.html, https://renvoo.nl/blog/"
   - statement: "The daily Codex automation now targets published posts first and only falls back to draft when the post is weak or unsafe."
     confidence: high
     evidence: "automation update for daily-renvoo-blog-draft on 2026-04-27"
@@ -59,6 +59,8 @@ After that change, the site build emitted:
 - individual Dutch article pages for those posts
 
 The generator default was then updated so passing posts publish automatically unless draft mode is explicitly requested.
+
+The same workflow was then carried through to production, where the live blog index and a newly published article page both returned `200 OK` on `renvoo.nl`.
 
 ## Operating Rule To Remember
 

@@ -3,6 +3,7 @@
 ## Recent Entries
 
 ## [2026-04-27T08:25:00.000Z] website | Published blog posts and updated blog automation
+## [2026-04-27T06:31:16.000Z] launch | Deployed live Renvoo blog pages to renvoo.nl
 ## [2026-04-27T05:09:37.040Z] automation | Created daily Renvoo blog draft on recovering open slots
 ## [2026-04-26T05:02:19.037Z] automation | Created daily Renvoo blog draft on appointment confirmation
 ## [2026-04-25T09:15:00.000Z] launch | Deployed Renvoo to Vercel and attached domains
@@ -21,7 +22,6 @@
 ## [2026-04-17T14:30:00.000Z] ingest | Added Renvoo spring 2026 event outreach plan
 ## [2026-04-17T11:44:51.908Z] init | Initialized Renvoo memory vault
 ## [2026-04-17T11:45:46.353Z] init | Initialized Renvoo memory vault
-## [2026-04-17T11:46:01.142Z] lint | Linted Renvoo wiki
 
 ## Monthly Logs
 
