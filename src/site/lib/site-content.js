@@ -1,17 +1,31 @@
-const sharedFounderLine =
-  "Renvoo is being built by Mohamed Ibrahim, former Electrical Subteam Lead for Team Polar at TU/e and part of the NVIDIA 6G Developer Program.";
+const sharedFounderLine = {
+  nl: "Renvoo wordt gebouwd door Mohamed Ibrahim, met een founder-led aanpak die eerst operationele pijn en pilot-fit wil valideren voordat het product zwaarder wordt uitgerold.",
+  en: "Renvoo is being built by Mohamed Ibrahim, with a founder-led approach focused on validating real operating pain and pilot fit before the product becomes heavier.",
+};
 
-const sharedPricingLine =
-  "Preliminary pilot pricing starts at EUR 2.49 per appointment, plus a fixed fee depending on the clinic. Final pricing is still being shaped with pilot partners.";
+const sharedPricingLine = {
+  nl: "De voorlopige pilotprijs start vanaf EUR 2,49 per afspraak, aangevuld met een vaste fee afhankelijk van de praktijk. De definitieve prijsstelling wordt nog samen met pilotpartners aangescherpt.",
+  en: "Preliminary pilot pricing starts from EUR 2.49 per appointment, plus a fixed fee depending on the clinic. Final pricing is still being shaped with pilot partners.",
+};
 
-const sharedDownloads = [
-  {
-    title: "Clinic one-pager",
-    description: "Compact leave-behind for operators after a short intro or follow-up email.",
-    href: "downloads/renvoo-clinic-one-pager.pptx",
-    label: "Download the one-pager",
-  },
-];
+const sharedDownloads = {
+  nl: [
+    {
+      title: "Praktijk one-pager",
+      description: "Compacte leave-behind voor praktijkhouders en praktijkmanagers na een korte intro of follow-up.",
+      href: "downloads/renvoo-clinic-one-pager.pptx",
+      label: "Download de one-pager",
+    },
+  ],
+  en: [
+    {
+      title: "Clinic one-pager",
+      description: "Compact leave-behind for clinic owners and practice managers after a short intro or follow-up.",
+      href: "downloads/renvoo-clinic-one-pager.pptx",
+      label: "Download the one-pager",
+    },
+  ],
+};
 
 export const siteContent = {
   nl: {
@@ -82,7 +96,7 @@ export const siteContent = {
           secondaryCta: "Bekijk hoe het werkt",
           badges: [],
           operatorCard: {
-            title: "Waar operators direct last van hebben",
+            title: "Waar teams direct last van hebben",
             items: [
               "Boekingen lijken gevuld, maar stoeltijd blijft kwetsbaar.",
               "Late afzeggingen geven te weinig tijd om slim te herstellen.",
@@ -339,8 +353,8 @@ export const siteContent = {
         },
         pricing: {
           eyebrow: "Prijsstelling blijft secundair",
-          title: "Preliminary pilot pricing",
-          body: sharedPricingLine,
+          title: "Voorlopige pilotprijs",
+          body: sharedPricingLine.nl,
           note:
             "De prijsregel is er om budgetfit te framen, niet om een zwaar commitment te forceren vóór validatie.",
         },
@@ -401,7 +415,7 @@ export const siteContent = {
             "Het doel van de pilot is echte reductie, herstel en admin-tijdswinst valideren met praktijkdata.",
             "De founder-led motion is gericht op workflow-validatie, niet op een generieke self-serve funnel.",
           ],
-          founderLine: sharedFounderLine,
+          founderLine: sharedFounderLine.nl,
         },
         faq: {
           eyebrow: "Veelgehoorde vragen",
@@ -443,8 +457,8 @@ export const siteContent = {
           eyebrow: "Clinic-materialen",
           title: "Een scherpe one-pager is genoeg voor de eerste follow-up",
           intro:
-            "Voor de website houden we het materiaal bewust smal: één clinic one-pager die probleem, workflow en pilot-posture rustig samenvat.",
-          downloads: sharedDownloads,
+            "Voor de website houden we het materiaal bewust smal: één praktijk one-pager die probleem, workflow en pilot-posture rustig samenvat.",
+          downloads: sharedDownloads.nl,
           previews: [
             {
               src: "assets/previews/one-pager-preview.png",
@@ -1030,7 +1044,7 @@ export const siteContent = {
         pricing: {
           eyebrow: "Pricing stays secondary",
           title: "Preliminary pilot pricing",
-          body: sharedPricingLine,
+          body: sharedPricingLine.en,
           note:
             "The pricing line is here to frame budget fit, not to force a heavy commitment before validation.",
         },
@@ -1091,7 +1105,7 @@ export const siteContent = {
             "The pilot exists to validate real reduction, recovery, and admin relief with live clinic workflows.",
             "The founder-led motion is meant to create workflow proof, not a generic self-serve funnel.",
           ],
-          founderLine: sharedFounderLine,
+          founderLine: sharedFounderLine.en,
         },
         faq: {
           eyebrow: "Frequent questions",
@@ -1134,7 +1148,7 @@ export const siteContent = {
           title: "One sharp one-pager is enough for the first follow-up",
           intro:
             "For the website, the materials stay intentionally narrow: one clinic one-pager that calmly summarizes the problem, workflow, and pilot posture.",
-          downloads: sharedDownloads,
+          downloads: sharedDownloads.en,
           previews: [
             {
               src: "assets/previews/one-pager-preview.png",

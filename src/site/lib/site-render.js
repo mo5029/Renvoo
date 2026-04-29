@@ -274,9 +274,6 @@ function renderDocument({
     <meta name="twitter:description" content="${pageCopy.seo.description}" />
     <meta name="twitter:image" content="${canonicalUrl(siteUrl, "/social-preview.png")}" />
     ${alternateHead}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="${assetPath(prefix, "icons/favicon.png")}" />
     <link rel="apple-touch-icon" href="${assetPath(prefix, "icons/favicon.png")}" />
     <link rel="manifest" href="${assetPath(prefix, "site.webmanifest")}" />
@@ -376,18 +373,18 @@ function renderFooter(content, lang, page) {
 </footer>`;
 }
 
-function renderPageBody({ lang, page, content, routes, prefix }) {
+function renderPageBody({ lang, page, content, routes, prefix, posts = [] }) {
   switch (page) {
     case "home":
-      return renderHomePage(content, routes);
+      return renderHomePage(content, routes, prefix);
     case "product":
-      return renderProductPage(content, routes);
+      return renderProductPage(content, routes, prefix);
     case "pilot":
       return renderPilotPage(content, routes);
     case "trust":
       return renderTrustPage(content, routes, prefix);
     case "blogIndex":
-      return renderBlogIndexPage(content, lang);
+      return renderBlogIndexPage(content, lang, posts);
     case "privacy":
       return renderLegalPage(content.pages.privacy);
     case "patientNotice":
@@ -407,7 +404,7 @@ function renderSectionHeading(eyebrow, title, intro = "") {
   </div>`;
 }
 
-function renderHomePage(content, routes) {
+function renderHomePage(content, routes, prefix) {
   const copy = content.pages.home;
 
   return `
@@ -425,8 +422,11 @@ function renderHomePage(content, routes) {
             ${copy.hero.badges.map((badge) => `<li>${badge}</li>`).join("")}
           </ul>` : ""}
         </div>
-        <aside class="hero-rail" data-motion="intro" style="--motion-delay: 120ms;">
-          <div class="hero-note">
+        <aside class="hero-stage hero-stage-home" data-motion="intro" style="--motion-delay: 120ms;">
+          <figure class="hero-preview-frame">
+            <img src="${assetPath(prefix, "assets/previews/one-pager-preview.png")}" alt="${content.htmlLang === "nl" ? "Preview van de Renvoo one-pager met agenda- en no-show-visuals" : "Preview of the Renvoo one-pager with schedule and no-show visuals"}" width="1080" height="1528" loading="eager" />
+          </figure>
+          <div class="hero-note hero-note-floating">
             <p class="hero-note-kicker">${copy.hero.operatorCard.title}</p>
             <ul>
               ${copy.hero.operatorCard.items.map((item) => `<li>${item}</li>`).join("")}
@@ -497,7 +497,7 @@ function renderHomePage(content, routes) {
   `;
 }
 
-function renderProductPage(content, routes) {
+function renderProductPage(content, routes, prefix) {
   const copy = content.pages.product;
 
   return `
@@ -512,6 +512,17 @@ function renderProductPage(content, routes) {
             <a class="button button-secondary" href="${routes.trust}">${copy.hero.secondaryCta}</a>
           </div>
         </div>
+        <aside class="hero-stage hero-stage-product" data-motion="intro" style="--motion-delay: 120ms;">
+          <figure class="hero-preview-frame hero-preview-frame-product">
+            <img src="${assetPath(prefix, "assets/previews/deck-slide-07.png")}" alt="${content.htmlLang === "nl" ? "Preview van Renvoo's operationele workflowstappen" : "Preview of Renvoo's operational workflow steps"}" width="1280" height="720" loading="eager" />
+          </figure>
+          <div class="hero-note hero-note-inline">
+            <p class="hero-note-kicker">${copy.workflow.title}</p>
+            <div class="hero-chip-grid">
+              ${copy.workflow.steps.map((step) => `<span class="step-chip">${step.title}</span>`).join("")}
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -599,6 +610,18 @@ function renderPilotPage(content, routes) {
             ${copy.hero.chips.map((chip) => `<li>${chip}</li>`).join("")}
           </ul>
         </div>
+        <aside class="hero-stage hero-stage-pilot" data-motion="intro" style="--motion-delay: 120ms;">
+          <div class="hero-note">
+            <p class="hero-note-kicker">${copy.bookingIntro.title}</p>
+            <ul>
+              ${copy.bookingIntro.support.map((item) => `<li>${item}</li>`).join("")}
+            </ul>
+          </div>
+          <div class="hero-stage-callout">
+            <p class="hero-note-kicker">${copy.pricing.title}</p>
+            <p>${copy.pricing.note}</p>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -860,6 +883,18 @@ function renderTrustPage(content, routes, prefix) {
             <a class="button button-secondary" href="${routes.product}">${copy.hero.secondaryCta}</a>
           </div>
         </div>
+        <aside class="hero-stage hero-stage-trust" data-motion="intro" style="--motion-delay: 120ms;">
+          <div class="hero-note">
+            <p class="hero-note-kicker">${copy.boundary.title}</p>
+            <ul>
+              ${copy.boundary.items.map((item) => `<li>${item.title}</li>`).join("")}
+            </ul>
+          </div>
+          <div class="hero-stage-callout">
+            <p class="hero-note-kicker">${content.htmlLang === "nl" ? "Founder-led houding" : "Founder-led posture"}</p>
+            <p>${copy.proof.founderLine}</p>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -985,6 +1020,7 @@ function renderBlogIndexPage(content, lang, posts = []) {
   const blog = content.blog;
   const publishedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
   const locale = lang === "en" ? "en-US" : "nl-NL";
+  const [featuredPost, ...remainingPosts] = publishedPosts;
 
   return `
     <section class="chapter hero-page hero-blog">
@@ -998,6 +1034,18 @@ function renderBlogIndexPage(content, lang, posts = []) {
             <a class="button button-secondary" href="${hrefFor(lang, "product")}">${page.hero.secondaryCta}</a>
           </div>
         </div>
+        ${
+          featuredPost
+            ? `<aside class="hero-stage hero-stage-blog" data-motion="intro" style="--motion-delay: 120ms;">
+          <div class="hero-note hero-note-featured">
+            <p class="hero-note-kicker">${lang === "nl" ? "Uitgelicht artikel" : "Featured article"}</p>
+            <h3>${escapeHtml(featuredPost.title)}</h3>
+            <p>${escapeHtml(featuredPost.excerpt)}</p>
+            <a class="inline-link" href="${lang === "en" ? `/en/blog/${featuredPost.slug}/` : `/blog/${featuredPost.slug}/`}">${blog.readMore}</a>
+          </div>
+        </aside>`
+            : ""
+        }
       </div>
     </section>
 
@@ -1005,8 +1053,19 @@ function renderBlogIndexPage(content, lang, posts = []) {
       ${renderSectionHeading(blog.eyebrow, blog.title, blog.intro)}
       ${
         publishedPosts.length
-          ? `<div class="blog-grid">
-          ${publishedPosts
+          ? `${featuredPost ? `<article class="featured-article" data-reveal>
+          <div class="featured-article-copy">
+            <p class="blog-meta">${new Date(featuredPost.date).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(featuredPost.primaryKeyword)}</p>
+            <h3>${escapeHtml(featuredPost.title)}</h3>
+            <p>${escapeHtml(featuredPost.excerpt)}</p>
+            <div class="blog-card-footer">
+              <span class="step-chip">${escapeHtml(featuredPost.category)}</span>
+              <a class="inline-link" href="${lang === "en" ? `/en/blog/${featuredPost.slug}/` : `/blog/${featuredPost.slug}/`}">${blog.readMore}</a>
+            </div>
+          </div>
+        </article>` : ""}
+        ${remainingPosts.length ? `<div class="blog-grid">
+          ${remainingPosts
             .map(
               (post, index) => `<article class="blog-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
               <p class="blog-meta">${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(post.primaryKeyword)}</p>
@@ -1019,7 +1078,7 @@ function renderBlogIndexPage(content, lang, posts = []) {
             </article>`,
             )
             .join("")}
-        </div>`
+        </div>` : ""}`
           : `<div class="empty-state" data-reveal><p>${blog.emptyLabel}</p></div>`
       }
     </section>

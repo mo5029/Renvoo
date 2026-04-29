@@ -1,5 +1,5 @@
 # Topic Index
 
-Total notes: 20
+Total notes: 24
 
-- [[wiki/indexes/topics/m-r]] (20)
+- [[wiki/indexes/topics/m-r]] (24)
