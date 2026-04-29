@@ -158,7 +158,7 @@ Main environment variables:
 - `BLOG_MAX_POSTS_PER_DAY`: upper limit for generated posts per run
 - `BLOG_PERSIST_DESTINATION=filesystem|github`
 - `CRON_SECRET`: secures the Vercel Cron route
-- `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `GITHUB_BRANCH`: required when Vercel Cron should persist generated posts back to GitHub
+- `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `GITHUB_BRANCH`: required when Vercel Cron or local automation should persist generated posts back to GitHub
 
 Typical local workflow:
 
@@ -166,6 +166,8 @@ Typical local workflow:
 2. review `tmp/blog/latest-run.json`
 3. `npm run generate:daily-blog`
 4. `npm run site:build`
+
+If GitHub persistence credentials are available, the generator now defaults to publishing back to GitHub even when `BLOG_PERSIST_DESTINATION` is not explicitly set. If you want local-only output, set `BLOG_PERSIST_DESTINATION=filesystem`.
 
 ### Meeting Request Notifications
 

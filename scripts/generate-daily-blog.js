@@ -3,7 +3,11 @@ import "dotenv/config";
 import { generateBlogPost } from "../src/lib/blog-generator.js";
 import { publishFileToGitHub } from "../src/lib/github-publish.js";
 
-const persistDestination = process.env.BLOG_PERSIST_DESTINATION?.trim() || "filesystem";
+const hasGitHubPersistence = Boolean(
+  process.env.GITHUB_TOKEN?.trim() && process.env.GITHUB_REPOSITORY?.trim(),
+);
+const persistDestination =
+  process.env.BLOG_PERSIST_DESTINATION?.trim() || (hasGitHubPersistence ? "github" : "filesystem");
 
 try {
   const result = await generateBlogPost({

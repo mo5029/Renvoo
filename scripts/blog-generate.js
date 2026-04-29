@@ -11,7 +11,11 @@ const dryRun = args.has("--dry-run");
 const forceFallback = args.has("--fallback");
 const localeArg = process.argv.find((item) => item.startsWith("--locale="));
 const locale = localeArg?.split("=")[1] || undefined;
-const persistDestination = process.env.BLOG_PERSIST_DESTINATION?.trim() || "filesystem";
+const hasGitHubPersistence = Boolean(
+  process.env.GITHUB_TOKEN?.trim() && process.env.GITHUB_REPOSITORY?.trim(),
+);
+const persistDestination =
+  process.env.BLOG_PERSIST_DESTINATION?.trim() || (hasGitHubPersistence ? "github" : "filesystem");
 
 try {
   const result = await generateBlogPost({
