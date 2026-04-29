@@ -87,6 +87,17 @@ describe("blog system", () => {
     expect(blogRoutes.some((route) => route.pathname === "/en/blog/dental-clinic-no-show-software/")).toBe(true);
   });
 
+  it("shows published Dutch articles on the English blog index when English inventory is sparse", async () => {
+    const posts = await loadBlogPosts(process.cwd());
+    const { pages } = renderAllPages({ posts });
+    const englishBlogIndex = pages.find((page) => page.path === "en/blog/index.html");
+
+    expect(englishBlogIndex).toBeDefined();
+    expect(englishBlogIndex?.html).toContain("More published articles are currently available in Dutch");
+    expect(englishBlogIndex?.html).toContain("/blog/wachtlijst-tandartspraktijk/");
+    expect(englishBlogIndex?.html).toContain("Read in Dutch");
+  });
+
   it("rejects prohibited manipulative or exaggerated claims", () => {
     const post = createSyntheticPost({
       title: "Guaranteed no-show software voor tandartspraktijken",

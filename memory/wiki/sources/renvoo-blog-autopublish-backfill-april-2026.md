@@ -59,6 +59,9 @@ What changed:
   - no-show-beleid-tandartspraktijk
   - wachtlijst-tandartspraktijk
 - Revalidated the full blog set and rebuilt the site
+- Followed up on an English-surface issue where `/en/blog/` still showed only the single English article even though the Dutch archive was healthy.
+- Updated `src/site/lib/site-render.js` so the English blog index now shows English articles first and then a clearly labeled Dutch archive fallback when English inventory is sparse.
+- Added the matching blog copy in `src/site/lib/site-content.js` and test coverage in `tests/blog-system.test.ts`.
 
 [truncated]
 ## Raw Reference

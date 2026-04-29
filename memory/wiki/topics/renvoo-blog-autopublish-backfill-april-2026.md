@@ -29,6 +29,8 @@ summary: >-
     - no-show-beleid-tandartspraktijk
     - wachtlijst-tandartspraktijk
   - Revalidated the full blog set and rebuilt the site
+  - Followed up on the English blog surface so `/en/blog/` no longer looks empty
+  while Dutch-first publishing is ahead of English.
 
 
   [truncated]
@@ -57,6 +59,7 @@ What changed:
   - no-show-beleid-tandartspraktijk
   - wachtlijst-tandartspraktijk
 - Revalidated the full blog set and rebuilt the site
+- Updated `/en/blog/` so English posts still lead, but published Dutch posts appear below in a clearly labeled Dutch archive fallback.
 
 [truncated]
 

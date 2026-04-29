@@ -984,7 +984,22 @@ function renderBlogIndexPage(content, lang, posts = []) {
   const page = content.pages.blogIndex;
   const blog = content.blog;
   const publishedPosts = posts.filter((post) => post.locale === lang && post.status === "published");
-  const locale = lang === "en" ? "en-US" : "nl-NL";
+  const fallbackPosts =
+    lang === "en" ? posts.filter((post) => post.locale === "nl" && post.status === "published") : [];
+  const renderBlogCard = (post, index, options = {}) => {
+    const articleLocale = post.locale === "en" ? "en-US" : "nl-NL";
+    const articleHref = post.locale === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`;
+
+    return `<article class="blog-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
+      <p class="blog-meta">${new Date(post.date).toLocaleDateString(articleLocale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(post.primaryKeyword)}</p>
+      <h3>${escapeHtml(post.title)}</h3>
+      <p>${escapeHtml(post.excerpt)}</p>
+      <div class="blog-card-footer">
+        <span class="step-chip">${escapeHtml(options.badgeLabel ?? post.category)}</span>
+        <a class="inline-link" href="${articleHref}">${escapeHtml(options.readMoreLabel ?? blog.readMore)}</a>
+      </div>
+    </article>`;
+  };
 
   return `
     <section class="chapter hero-page hero-blog">
@@ -1007,22 +1022,30 @@ function renderBlogIndexPage(content, lang, posts = []) {
         publishedPosts.length
           ? `<div class="blog-grid">
           ${publishedPosts
-            .map(
-              (post, index) => `<article class="blog-card" data-reveal style="--reveal-delay: ${index * 90}ms;">
-              <p class="blog-meta">${new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })} · ${escapeHtml(post.primaryKeyword)}</p>
-              <h3>${escapeHtml(post.title)}</h3>
-              <p>${escapeHtml(post.excerpt)}</p>
-              <div class="blog-card-footer">
-                <span class="step-chip">${escapeHtml(post.category)}</span>
-                <a class="inline-link" href="${lang === "en" ? `/en/blog/${post.slug}/` : `/blog/${post.slug}/`}">${blog.readMore}</a>
-              </div>
-            </article>`,
-            )
+            .map((post, index) => renderBlogCard(post, index))
             .join("")}
         </div>`
-          : `<div class="empty-state" data-reveal><p>${blog.emptyLabel}</p></div>`
+          : `<div class="empty-state" data-reveal><p>${fallbackPosts.length ? blog.fallbackLead : blog.emptyLabel}</p></div>`
       }
     </section>
+
+    ${
+      fallbackPosts.length
+        ? `<section class="chapter blog-index-section blog-index-fallback">
+      ${renderSectionHeading(blog.fallbackEyebrow, blog.fallbackTitle, blog.fallbackIntro)}
+      <div class="blog-grid">
+        ${fallbackPosts
+          .map((post, index) =>
+            renderBlogCard(post, index, {
+              badgeLabel: blog.fallbackBadge,
+              readMoreLabel: blog.fallbackReadMore,
+            }),
+          )
+          .join("")}
+      </div>
+    </section>`
+        : ""
+    }
 
     ${renderClosingBand(
       {

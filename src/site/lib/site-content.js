@@ -57,6 +57,14 @@ export const siteContent = {
       intro:
         "Korte, eerlijke artikelen voor praktijkhouders en praktijkmanagers over no-shows, late afzeggingen, herinneringen en herstel van lege stoeluren.",
       emptyLabel: "Er staan nog geen gepubliceerde artikelen klaar.",
+      fallbackLead:
+        "De Engelstalige blog groeit nog. Tot er meer vertalingen live staan, vindt u hieronder ook de gepubliceerde Nederlandse artikelen.",
+      fallbackEyebrow: "Nederlandse artikelen",
+      fallbackTitle: "Meer gepubliceerde artikelen staan nu in het Nederlands",
+      fallbackIntro:
+        "Renvoo publiceert blogartikelen Dutch-first. Tot er een Engelse versie klaarstaat, kunt u deze gepubliceerde Nederlandse artikelen hier al lezen.",
+      fallbackBadge: "NL artikel",
+      fallbackReadMore: "Lees in het Nederlands",
       readMore: "Lees artikel",
       backToBlog: "Terug naar blog",
       sourcesTitle: "Bronnen",
@@ -747,6 +755,14 @@ export const siteContent = {
       intro:
         "Short, specific articles for clinic operators on no-shows, late cancellations, reminder workflows, and recovering empty chair time without extra noise.",
       emptyLabel: "No published articles are live yet.",
+      fallbackLead:
+        "The English archive is still growing. Until more translations are live, published Dutch articles are available below as well.",
+      fallbackEyebrow: "Dutch archive",
+      fallbackTitle: "More published articles are currently available in Dutch",
+      fallbackIntro:
+        "Renvoo publishes blog posts Dutch-first. Until an English mirror is ready, you can still read these published Dutch articles here.",
+      fallbackBadge: "Dutch article",
+      fallbackReadMore: "Read in Dutch",
       readMore: "Read article",
       backToBlog: "Back to blog",
       sourcesTitle: "Sources",
