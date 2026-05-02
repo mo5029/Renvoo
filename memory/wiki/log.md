@@ -2,6 +2,8 @@
 
 ## Recent Entries
 
+## [2026-05-02T05:01:40Z] automation | Published a Dutch article on no response after appointment reminders
+## [2026-05-02T09:13:29.989Z] lint | Linted Renvoo wiki
 ## [2026-04-17T11:45:00.000Z] memory | Initialized Renvoo memory vault
 ## [2026-04-17T14:30:00.000Z] outreach | Built the first dental-first outreach layer
 ## [2026-04-24T08:30:00.000Z] security | Audited and hardened the repo
@@ -21,4 +23,5 @@
 
 ## Monthly Logs
 
+- [[wiki/logs/2026-05]]
 - [[wiki/logs/2026-04]]
