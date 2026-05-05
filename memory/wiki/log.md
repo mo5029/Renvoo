@@ -4,6 +4,9 @@
 
 ## [2026-05-02T05:01:40Z] automation | Published a Dutch article on no response after appointment reminders
 ## [2026-05-02T09:13:29.989Z] lint | Linted Renvoo wiki
+## [2026-05-05T07:35:32Z] automation | Published a Dutch article on earlier appointment rescheduling
+## [2026-05-05T08:40:28.736Z] lint | Linted Renvoo wiki
+## [2026-05-05T08:41:20.951Z] lint | Linted Renvoo wiki
 ## [2026-04-17T11:45:00.000Z] memory | Initialized Renvoo memory vault
 ## [2026-04-17T14:30:00.000Z] outreach | Built the first dental-first outreach layer
 ## [2026-04-24T08:30:00.000Z] security | Audited and hardened the repo
@@ -19,7 +22,6 @@
 ## [2026-04-30T08:35:46.530Z] automation | Published a Dutch no-show reduction category article
 ## [2026-04-29T13:59:30.595Z] lint | Linted Renvoo wiki
 ## [2026-04-29T16:32:18.477Z] lint | Linted Renvoo wiki
-## [2026-04-30T08:39:28.219Z] lint | Linted Renvoo wiki
 
 ## Monthly Logs
 
